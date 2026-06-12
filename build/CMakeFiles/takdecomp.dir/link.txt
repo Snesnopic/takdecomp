@@ -1,0 +1,1 @@
+/usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/takdecomp.dir/src/cli/main.cpp.o -o bin/takdecomp  lib/libtakdecomp_core.a
