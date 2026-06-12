@@ -1,6 +1,11 @@
 #ifndef TAK_ENCODER_ENCODER_HPP
 #define TAK_ENCODER_ENCODER_HPP
 
+#include <iostream>
+#include <fstream>
+#include <istream>
+#include <ostream>
+#include <string>
 #include <cstdint>
 #include <vector>
 #include <span>
@@ -26,6 +31,7 @@ public:
     static int calc_bits_needed(int mode, const int32_t* data, int len);
 
     static void encode_file(const char* wav_path, const char* tak_path);
+    static void encode_stream(std::istream& is, std::ostream& os);
 };
 
 } // namespace takenc
