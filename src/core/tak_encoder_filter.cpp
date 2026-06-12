@@ -98,7 +98,7 @@ static void compute_filter_residuals(const int32_t* decoded, int subframe_size,
             }
             int32_t pred = clip_intp2(v >> filter_quant, 13) * (1 << dshift);
             int32_t actual = decoded[filter_order + out_idx];
-            residuals_out[out_idx] = actual - pred;
+            residuals_out[out_idx] = pred - actual;
             residues[filter_order + i] = static_cast<int16_t>(actual >> dshift);
             out_idx++;
         }
@@ -130,7 +130,7 @@ int estimate_lpc_cost(const int32_t* samples, int length, int lpc_mode) {
     std::vector<int32_t> tmp(samples, samples + length);
     inverse_lpc(tmp.data(), lpc_mode, length);
     int best = Encoder::calc_bits_needed(1, tmp.data() + 1, length - 1);
-    for (int m = 2; m <= 50; m++) {
+    for (int m = 2; m <= 34; m++) {
         int c = Encoder::calc_bits_needed(m, tmp.data() + 1, length - 1);
         if (c < best) best = c;
     }
@@ -167,7 +167,7 @@ bool try_filter_encode(const int32_t* samples, int subframe_size,
         return false;
     }
 
-    cfg.predictors.resize(filter_order);
+    cfg.predictors.resize(std::max(4, filter_order));
     for (int i = 0; i < filter_order; i++) {
         double k = parcor[i];
         int q;
@@ -218,7 +218,7 @@ bool try_filter_encode(const int32_t* samples, int subframe_size,
     int warmup_cost = 0;
     {
         int best = Encoder::calc_bits_needed(1, cfg.warmup_residuals.data(), filter_order);
-        for (int m = 2; m <= 50; m++) {
+        for (int m = 2; m <= 34; m++) {
             int c = Encoder::calc_bits_needed(m, cfg.warmup_residuals.data(), filter_order);
             if (c < best) best = c;
         }
@@ -230,7 +230,7 @@ bool try_filter_encode(const int32_t* samples, int subframe_size,
     {
         int best = Encoder::calc_bits_needed(1, cfg.filter_residuals.data(),
                                               subframe_size - filter_order);
-        for (int m = 2; m <= 50; m++) {
+        for (int m = 2; m <= 34; m++) {
             int c = Encoder::calc_bits_needed(m, cfg.filter_residuals.data(),
                                                subframe_size - filter_order);
             if (c < best) best = c;

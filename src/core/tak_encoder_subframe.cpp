@@ -15,7 +15,8 @@ SubframeChoice evaluate_subframe(const int32_t* subframe_data, int subframe_size
 
     // Estimate cost of no-filter path
     int best = Encoder::calc_bits_needed(1, subframe_data, subframe_size);
-    for (int m = 2; m <= cfg.max_lpc_mode; m++) {
+    int limit = std::min(cfg.max_lpc_mode, 34);
+    for (int m = 2; m <= limit; m++) {
         int c = Encoder::calc_bits_needed(m, subframe_data, subframe_size);
         if (c < best) best = c;
     }
@@ -51,12 +52,12 @@ SubframeChoice evaluate_subframe(const int32_t* subframe_data, int subframe_size
 static void encode_residues(const int32_t* data, int length, BitStreamWriter& fw) {
     int best_mode = 1;
     int best_cost = Encoder::calc_bits_needed(1, data, length);
-    for (int m = 2; m <= 50; m++) {
+    for (int m = 2; m <= 34; m++) {
         int c = Encoder::calc_bits_needed(m, data, length);
         if (c < best_cost) { best_cost = c; best_mode = m; }
     }
     fw.write_bit(0);
-    fw.write_bits(best_mode, 6);
+    fw.write_bits(best_mode, 6); printf("encode_residues mode=%d length=%d\n", best_mode, length);
     Encoder::encode_segment(best_mode, data, length, fw);
 }
 

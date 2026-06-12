@@ -37,6 +37,7 @@ add_library(takenc_core STATIC
             src/core/tak_encoder_entropy.cpp
             src/core/tak_encoder_decorrelate.cpp
             src/core/tak_encoder_md5.cpp
+            src/core/ape_tag.cpp
             src/core/tak_crc.cpp)
 
 target_include_directories(takenc_core PUBLIC src/core/include)

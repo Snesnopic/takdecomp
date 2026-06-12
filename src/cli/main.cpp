@@ -87,19 +87,14 @@ auto main(int argc, char* argv[]) -> int {
         if (type == MetaDataType::End) {
             uint64_t const curpos = is.tellg();
             if (!has_data_end) { data_end = curpos; // Will compute properly below
-}
+            }
             break;
         }
 
-        if (size <= 3) {
-            std::cerr << "Invalid metadata size\n";
-            return 1;
-        }
-
-        std::vector<uint8_t> buffer(size - 3);
-        is.read(reinterpret_cast<char*>(buffer.data()), size - 3);
+        std::vector<uint8_t> buffer(size);
+        is.read(reinterpret_cast<char*>(buffer.data()), size);
         is.seekg(3, std::ios::cur); // Skip CRC
-
+        
         if (type == MetaDataType::StreamInfo) {
             Decoder dec;
             BitStreamReader gb(buffer);
@@ -145,6 +140,8 @@ auto main(int argc, char* argv[]) -> int {
     is.read(reinterpret_cast<char*>(file_data.data()), data_len);
     
     size_t pos = 0;
+    std::cerr << "data_end = " << data_end << ", data_len = " << data_len << ", current_pos = " << current_pos << "\n";
+    std::cerr << "file_data[0..4] = " << std::hex << (int)file_data[0] << " " << (int)file_data[1] << " " << (int)file_data[2] << " " << (int)file_data[3] << " " << (int)file_data[4] << std::dec << "\n";
     while (pos < file_data.size() - 2) {
         // Find sync 0xA0FF
         if (file_data[pos] == 0xFF && file_data[pos+1] == 0xA0) {
@@ -160,7 +157,8 @@ auto main(int argc, char* argv[]) -> int {
                         decoder.decode_frame_header(check_gb, dummy_info);
                         // If it succeeds without throwing, it's highly likely a valid sync word
                         break;
-                    } catch (...) {
+                    } catch (const std::exception& e) {
+                        std::cerr << "next_sync " << next_sync << " threw: " << e.what() << "\n";
                         // Not a valid sync word, continue searching
                     }
                 }
@@ -177,9 +175,12 @@ auto main(int argc, char* argv[]) -> int {
                 std::span<const uint8_t> const frame_span(padded_frame);
                 std::vector<std::vector<int32_t>> decoded_channels;
                 
+                std::cerr << "Calling decode_frame for pos " << pos << ", frame_size " << frame_size << "\n";
                 decoder.decode_frame(frame_span, stream_info, decoded_channels);
                 
-                int const nb_samples = decoded_channels[0].size();
+                int const nb_samples = decoded_channels.empty() ? 0 : decoded_channels[0].size();
+                std::cerr << "decode_frame returned " << nb_samples << " samples\n";
+                
                 int const channels = stream_info.channels;
                 
                 for (int s = 0; s < nb_samples; ++s) {

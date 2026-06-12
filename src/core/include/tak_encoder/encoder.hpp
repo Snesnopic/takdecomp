@@ -31,6 +31,7 @@ struct EncoderConfig {
     bool test_filters = true;      // whether to test predictors at all
     bool test_subframe_splits = true; // whether to do 2-way and 4-way subframe splits
     int max_frame_lpc_mode = 3;    // up to mode 3
+    bool write_ape_tag = true;
 };
 
 struct EncodeResult {

@@ -18,6 +18,27 @@
 
 namespace takenc {
 
+// Helper: write a metadata block (type byte, 3-byte LE size, payload, 3-byte BE CRC)
+static void write_metadata_block(std::ostream& os, uint8_t type_byte,
+                                  const uint8_t* payload, int payload_len) {
+    os.write(reinterpret_cast<const char*>(&type_byte), 1);
+    int block_size = payload_len + 3; // payload + CRC
+    uint8_t size_le[3] = {
+        static_cast<uint8_t>(block_size & 0xff),
+        static_cast<uint8_t>((block_size >> 8) & 0xff),
+        static_cast<uint8_t>((block_size >> 16) & 0xff)
+    };
+    os.write(reinterpret_cast<char*>(size_le), 3);
+    os.write(reinterpret_cast<const char*>(payload), payload_len);
+    uint32_t crc = takdecomp::compute_crc24(payload, payload_len);
+    uint8_t crc_be[3] = {
+        static_cast<uint8_t>((crc >> 16) & 0xff),
+        static_cast<uint8_t>((crc >> 8) & 0xff),
+        static_cast<uint8_t>(crc & 0xff)
+    };
+    os.write(reinterpret_cast<char*>(crc_be), 3);
+}
+
 EncodeResult Encoder::encode_file(const char* wav_path, const char* tak_path, const EncoderConfig& cfg, ProgressCallback progress) {
     std::ifstream is(wav_path, std::ios::binary);
     if (!is) throw std::runtime_error("Could not open WAV file");
@@ -55,24 +76,78 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
     si_gb.write_bit(0);
     si_gb.align_write_bits();
 
-    os.write("\x01", 1);
+    // --- StreamInfo metadata block (Type 1) ---
     int si_len = si_gb.get_position_bytes();
-    int md_block_size = si_len + 3;
-    uint8_t size_le[3] = {
-        static_cast<uint8_t>(md_block_size & 0xff),
-        static_cast<uint8_t>((md_block_size >> 8) & 0xff),
-        static_cast<uint8_t>((md_block_size >> 16) & 0xff)
-    };
-    os.write(reinterpret_cast<char*>(size_le), 3);
-    os.write(reinterpret_cast<const char*>(si_gb.get_data().data()), si_len);
-    uint32_t si_crc = takdecomp::compute_crc24(si_gb.get_data().data(), si_len);
-    uint8_t crc_le[3] = {
-        static_cast<uint8_t>(si_crc & 0xff),
-        static_cast<uint8_t>((si_crc >> 8) & 0xff),
-        static_cast<uint8_t>((si_crc >> 16) & 0xff)
-    };
-    os.write(reinterpret_cast<char*>(crc_le), 3);
-    os.write("\x00\x00\x00\x00", 4); // End of metadata
+    write_metadata_block(os, 0x01, si_gb.get_data().data(), si_len);
+
+    // --- LastFrame metadata block (Type 7, placeholder) ---
+    // NOTE: is_last bit must NOT be set (0x07, not 0x87)
+    os.write("\x07", 1);
+    uint8_t lf_size_le[3] = { 11, 0, 0 }; // 8 payload + 3 CRC = 11
+    os.write(reinterpret_cast<char*>(lf_size_le), 3);
+    
+    size_t last_frame_md_offset = os.tellp();
+    // Write placeholder payload (will be patched at the end)
+    uint8_t lf_placeholder[8] = {0};
+    os.write(reinterpret_cast<const char*>(lf_placeholder), 8);
+    os.write("\x00\x00\x00", 3); // Dummy CRC (will be patched)
+
+    // --- EncoderInfo metadata block (Type 4) ---
+    // Payload: version/profile info matching takc.exe
+    uint8_t enc_info[4] = { 0x03, 0x03, 0x02, 0x00 };
+    write_metadata_block(os, 0x04, enc_info, 4);
+
+    // --- SimpleWaveData metadata block (Type 3) ---
+    // Stores the original WAV header for perfect reconstruction
+    {
+        // Reconstruct standard 44-byte PCM WAV header
+        uint32_t wav_header_size = 44;
+        uint32_t data_chunk_size = total_samples * channels * (bps / 8);
+        uint32_t riff_size = 36 + data_chunk_size;
+        uint32_t byte_rate = sample_rate * channels * (bps / 8);
+        uint16_t block_align_wav = channels * (bps / 8);
+
+        // SimpleWaveData format: uint32_t header_size (LE) + uint16_t flags + raw WAV header
+        std::vector<uint8_t> swd_payload(6 + wav_header_size);
+        // First 4 bytes: WAV header size
+        swd_payload[0] = wav_header_size & 0xFF;
+        swd_payload[1] = (wav_header_size >> 8) & 0xFF;
+        swd_payload[2] = (wav_header_size >> 16) & 0xFF;
+        swd_payload[3] = (wav_header_size >> 24) & 0xFF;
+        // Next 2 bytes: flags (0)
+        swd_payload[4] = 0;
+        swd_payload[5] = 0;
+        // WAV header (44 bytes)
+        uint8_t* w = swd_payload.data() + 6;
+        std::memcpy(w, "RIFF", 4); w += 4;
+        w[0] = riff_size & 0xFF; w[1] = (riff_size >> 8) & 0xFF;
+        w[2] = (riff_size >> 16) & 0xFF; w[3] = (riff_size >> 24) & 0xFF; w += 4;
+        std::memcpy(w, "WAVE", 4); w += 4;
+        std::memcpy(w, "fmt ", 4); w += 4;
+        uint32_t fmt_size = 16;
+        w[0] = fmt_size & 0xFF; w[1] = (fmt_size >> 8) & 0xFF;
+        w[2] = (fmt_size >> 16) & 0xFF; w[3] = (fmt_size >> 24) & 0xFF; w += 4;
+        uint16_t audio_format = 1; // PCM
+        w[0] = audio_format & 0xFF; w[1] = (audio_format >> 8) & 0xFF; w += 2;
+        w[0] = channels & 0xFF; w[1] = (channels >> 8) & 0xFF; w += 2;
+        w[0] = sample_rate & 0xFF; w[1] = (sample_rate >> 8) & 0xFF;
+        w[2] = (sample_rate >> 16) & 0xFF; w[3] = (sample_rate >> 24) & 0xFF; w += 4;
+        w[0] = byte_rate & 0xFF; w[1] = (byte_rate >> 8) & 0xFF;
+        w[2] = (byte_rate >> 16) & 0xFF; w[3] = (byte_rate >> 24) & 0xFF; w += 4;
+        w[0] = block_align_wav & 0xFF; w[1] = (block_align_wav >> 8) & 0xFF; w += 2;
+        w[0] = bps & 0xFF; w[1] = (bps >> 8) & 0xFF; w += 2;
+        std::memcpy(w, "data", 4); w += 4;
+        w[0] = data_chunk_size & 0xFF; w[1] = (data_chunk_size >> 8) & 0xFF;
+        w[2] = (data_chunk_size >> 16) & 0xFF; w[3] = (data_chunk_size >> 24) & 0xFF;
+
+        write_metadata_block(os, 0x03, swd_payload.data(), static_cast<int>(swd_payload.size()));
+    }
+
+    // --- EndOfMetaData block (Type 0) ---
+    os.write("\x00\x00\x00\x00", 4); // type=0, size=0
+
+    size_t audio_start_offset = os.tellp();
+    size_t last_frame_start = 0;
 
     // Encode frames
     // Frame size for Fs250ms is exactly 250ms worth of samples
@@ -192,10 +267,46 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
 
         // Frame tail
         fw.align_write_bits();
-        fw.write_bits(0, 24);
+        last_frame_start = os.tellp();
+        int frame_size = fw.get_position_bytes();
+        int payload_size = frame_size - (header_bytes + 3);
+        uint32_t frame_crc = takdecomp::compute_crc24(fw.get_data().data() + header_bytes + 3, payload_size);
+        fw.write_bits((frame_crc >> 16) & 0xff, 8);
+        fw.write_bits((frame_crc >> 8) & 0xff, 8);
+        fw.write_bits(frame_crc & 0xff, 8);
 
-        os.write(reinterpret_cast<const char*>(fw.get_data().data()),
-                 fw.get_position_bytes());
+        int frame_bytes = fw.get_position_bytes();
+        
+        if (remaining_samples - current_frame_samples <= 0) {
+            size_t last_frame_end = last_frame_start + frame_bytes;
+            int last_frame_size = frame_bytes;
+            os.seekp(last_frame_md_offset);
+            
+            uint64_t lf_pos = last_frame_start - audio_start_offset;
+            uint8_t lf_payload[8];
+            lf_payload[0] = lf_pos & 0xFF;
+            lf_payload[1] = (lf_pos >> 8) & 0xFF;
+            lf_payload[2] = (lf_pos >> 16) & 0xFF;
+            lf_payload[3] = (lf_pos >> 24) & 0xFF;
+            lf_payload[4] = (lf_pos >> 32) & 0xFF;
+            lf_payload[5] = last_frame_size & 0xFF;
+            lf_payload[6] = (last_frame_size >> 8) & 0xFF;
+            lf_payload[7] = (last_frame_size >> 16) & 0xFF;
+            
+            os.write(reinterpret_cast<const char*>(lf_payload), 8);
+            uint32_t up_crc = takdecomp::compute_crc24(lf_payload, 8);
+            uint8_t up_crc_be[3] = {
+                static_cast<uint8_t>((up_crc >> 16) & 0xff),
+                static_cast<uint8_t>((up_crc >> 8) & 0xff),
+                static_cast<uint8_t>(up_crc & 0xff)
+            };
+            os.write(reinterpret_cast<char*>(up_crc_be), 3);
+            
+            // Seek back to where the last frame data should be written
+            os.seekp(last_frame_start);
+        }
+
+        os.write(reinterpret_cast<const char*>(fw.get_data().data()), frame_bytes);
         remaining_samples -= current_frame_samples;
         frame_num++;
     }

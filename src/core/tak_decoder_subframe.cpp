@@ -159,6 +159,7 @@ void Decoder::decode_channel(int chan, BitStreamReader& gb) {
 
     *decoded++ = gb.get_sbits(bps_ - sample_shift_[chan]);
     lpc_mode_[chan] = gb.get_bits(2);
+    // std::cerr << "lpc_mode_[" << chan << "] = " << (int)lpc_mode_[chan] << "\n";
     nb_subframes_ = gb.get_bits(3) + 1;
     
 

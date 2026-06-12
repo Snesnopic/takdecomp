@@ -1,3 +1,4 @@
+#include <iostream>
 #include "tak_decoder/constants.hpp"
 #include "tak_decoder/decoder.hpp"
 #include "tak_decoder/bitstream.hpp"
@@ -273,7 +274,12 @@ auto Decoder::decode_frame(std::span<const uint8_t> data, StreamInfo& info, std:
     output = decoded_;
     
     if (gb.get_bits_left() >= 24) {
-        gb.skip_bits(24);
+        uint32_t tail_val = gb.get_bits(24);
+        
+        // Compute CRC over the frame bytes (up to the current byte index minus the 3 bytes we just read?)
+        // Wait, to compute CRC of the frame, we need the exact bytes.
+        // Let's just print the tail_val for now.
+        std::cerr << "Frame tail 24 bits: " << std::hex << tail_val << std::dec << "\n";
     }
     
     gb.align_get_bits();
