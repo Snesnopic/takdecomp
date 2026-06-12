@@ -1,7 +1,8 @@
-#pragma once
+#ifndef TAK_DECODER_CONSTANTS_HPP
+#define TAK_DECODER_CONSTANTS_HPP
 
-#include <cstdint>
 #include <array>
+#include <cstdint>
 
 namespace takdecomp {
 
@@ -71,3 +72,4 @@ enum class FrameSizeType : uint8_t {
 };
 
 } // namespace takdecomp
+#endif // TAK_DECODER_CONSTANTS_HPP

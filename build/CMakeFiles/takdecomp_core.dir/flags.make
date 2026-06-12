@@ -6,7 +6,7 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include
 
-CXX_FLAGSarm64 = -std=gnu++20 -arch arm64
+CXX_FLAGSarm64 =  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64
 
-CXX_FLAGS = -std=gnu++20 -arch arm64
+CXX_FLAGS =  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64
 

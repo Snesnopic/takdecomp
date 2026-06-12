@@ -1,33 +1,36 @@
+#include "tak_decoder/constants.hpp"
 #include "tak_decoder/decoder.hpp"
 #include "tak_decoder/bitstream.hpp"
+#include <cstdint>
+#include "tak_decoder/streaminfo.hpp"
+#include <exception>
 #include <iostream>
 #include <fstream>
+#include <span>
 #include <vector>
-#include <stdexcept>
 #include <cstring>
-#include <iomanip>
 
 using namespace takdecomp;
 
-uint32_t read_le32(std::ifstream& is) {
+static auto read_le32(std::ifstream& is) -> uint32_t {
     uint8_t buf[4];
     is.read(reinterpret_cast<char*>(buf), 4);
     return buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
 }
 
-uint32_t read_le24(std::ifstream& is) {
+static auto read_le24(std::ifstream& is) -> uint32_t {
     uint8_t buf[3];
     is.read(reinterpret_cast<char*>(buf), 3);
     return buf[0] | (buf[1] << 8) | (buf[2] << 16);
 }
 
-uint8_t read_u8(std::ifstream& is) {
+static auto read_u8(std::ifstream& is) -> uint8_t {
     uint8_t buf;
     is.read(reinterpret_cast<char*>(&buf), 1);
     return buf;
 }
 
-void write_wav_header(std::ofstream& os, int sample_rate, int channels, int bps, int total_samples) {
+static void write_wav_header(std::ofstream& os, int sample_rate, int channels, int bps, int total_samples) {
     os.write("RIFF", 4);
     uint32_t data_size = total_samples * channels * (bps / 8);
     uint32_t file_size = 36 + data_size;
@@ -52,7 +55,7 @@ void write_wav_header(std::ofstream& os, int sample_rate, int channels, int bps,
     os.write(reinterpret_cast<const char*>(&data_size), 4);
 }
 
-int main(int argc, char* argv[]) {
+auto main(int argc, char* argv[]) -> int {
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0] << " <input.tak> <output.wav>\n";
         return 1;
@@ -64,7 +67,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    uint32_t magic = read_le32(is);
+    uint32_t const magic = read_le32(is);
     if (magic != 0x4B614274) { // "tBaK" in LE
         std::cerr << "Not a valid TAK file.\n";
         return 1;
@@ -77,13 +80,14 @@ int main(int argc, char* argv[]) {
 
     // Demux metadata
     while (is) {
-        uint8_t type_byte = read_u8(is);
-        MetaDataType type = static_cast<MetaDataType>(type_byte & 0x7f);
-        uint32_t size = read_le24(is);
+        uint8_t const type_byte = read_u8(is);
+        auto const type = static_cast<MetaDataType>(type_byte & 0x7f);
+        uint32_t const size = read_le24(is);
 
         if (type == MetaDataType::End) {
-            uint64_t curpos = is.tellg();
-            if (!has_data_end) data_end = curpos; // Will compute properly below
+            uint64_t const curpos = is.tellg();
+            if (!has_data_end) { data_end = curpos; // Will compute properly below
+}
             break;
         }
 
@@ -128,14 +132,14 @@ int main(int argc, char* argv[]) {
     int total_samples_written = 0;
     
     // Read remaining file into memory
-    size_t current_pos = is.tellg();
+    size_t const current_pos = is.tellg();
     is.seekg(0, std::ios::end);
-    size_t file_size = is.tellg();
+    size_t const file_size = is.tellg();
     if (data_end == 0 || !has_data_end || data_end > file_size) {
         data_end = file_size;
     }
     
-    size_t data_len = data_end - current_pos;
+    size_t const data_len = data_end - current_pos;
     std::vector<uint8_t> file_data(data_len);
     is.seekg(current_pos, std::ios::beg);
     is.read(reinterpret_cast<char*>(file_data.data()), data_len);
@@ -150,7 +154,7 @@ int main(int argc, char* argv[]) {
                 if (file_data[next_sync] == 0xFF && file_data[next_sync+1] == 0xA0) {
                     // Validate if it's a real frame header by reading the first few bits
                     try {
-                        std::span<const uint8_t> check_span(file_data.data() + next_sync, file_data.size() - next_sync);
+                        std::span<const uint8_t> const check_span(file_data.data() + next_sync, file_data.size() - next_sync);
                         BitStreamReader check_gb(check_span);
                         StreamInfo dummy_info;
                         decoder.decode_frame_header(check_gb, dummy_info);
@@ -163,30 +167,29 @@ int main(int argc, char* argv[]) {
                 next_sync++;
             }
             
-            size_t frame_size = next_sync - pos;
+            size_t const frame_size = next_sync - pos;
             
             // Pad the frame with 64 bytes of zeroes for the bitstream reader to safely over-read
             std::vector<uint8_t> padded_frame(frame_size + 64, 0);
             std::memcpy(padded_frame.data(), file_data.data() + pos, frame_size);
             
             try {
-                std::span<const uint8_t> frame_span(padded_frame);
+                std::span<const uint8_t> const frame_span(padded_frame);
                 std::vector<std::vector<int32_t>> decoded_channels;
                 
                 decoder.decode_frame(frame_span, stream_info, decoded_channels);
                 
-                int nb_samples = decoded_channels[0].size();
-                int channels = stream_info.channels;
-                int bytes_per_sample = stream_info.bps / 8;
+                int const nb_samples = decoded_channels[0].size();
+                int const channels = stream_info.channels;
                 
                 for (int s = 0; s < nb_samples; ++s) {
                     for (int c = 0; c < channels; ++c) {
                         int32_t sample = decoded_channels[c][s];
                         if (stream_info.bps == 8) {
-                            uint8_t out = static_cast<uint8_t>(sample + 0x80);
+                            auto out = static_cast<uint8_t>(sample + 0x80);
                             os.write(reinterpret_cast<char*>(&out), 1);
                         } else if (stream_info.bps == 16) {
-                            int16_t out = static_cast<int16_t>(sample);
+                            auto out = static_cast<int16_t>(sample);
                             os.write(reinterpret_cast<char*>(&out), 2);
                         } else if (stream_info.bps == 24) {
                             os.write(reinterpret_cast<char*>(&sample), 3);

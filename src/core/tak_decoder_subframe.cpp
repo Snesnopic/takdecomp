@@ -1,4 +1,4 @@
-#include <iostream>
+#include <cstdint>
 #include "tak_decoder/decoder.hpp"
 #include "tak_decoder/bitstream.hpp"
 #include <algorithm>
@@ -14,27 +14,26 @@ constexpr std::array<uint16_t, 16> predictor_sizes = {
     4, 8, 12, 16, 24, 32, 48, 64, 80, 96, 128, 160, 192, 224, 256, 0,
 };
 
-constexpr std::array<int8_t, 4> mc_dmodes = { 1, 3, 4, 6 };
 
-int32_t clip_intp2(int32_t a, int p) {
-    if (((unsigned)a + (1 << p)) & ~((2U << p) - 1)) {
+
+auto clip_intp2(int32_t a, int p) -> int32_t {
+    if (((static_cast<unsigned>(a) + (1 << p)) & ~((2U << p) - 1)) != 0u) {
         return (a >> 31) ^ ((1 << p) - 1);
-    } else {
-        return a;
-    }
+    }         return a;
+   
 }
 
 } // namespace
 
 void Decoder::decode_subframe(int32_t* decoded, int subframe_size, int prev_subframe_size, BitStreamReader& gb) {
-    if (!gb.get_bits1()) {
+    if (gb.get_bits1() == 0u) {
         decode_residues(decoded, subframe_size, gb);
         return;
     }
 
-    int filter_order = predictor_sizes[gb.get_bits(4)];
+    int const filter_order = predictor_sizes[gb.get_bits(4)];
 
-    if (prev_subframe_size > 0 && gb.get_bits1()) {
+    if (prev_subframe_size > 0 && (gb.get_bits1() != 0u)) {
         if (filter_order > prev_subframe_size) {
             throw std::runtime_error("Filter order > prev_subframe_size");
         }
@@ -50,23 +49,23 @@ void Decoder::decode_subframe(int32_t* decoded, int subframe_size, int prev_subf
             throw std::runtime_error("Filter order > subframe_size");
         }
 
-        int lpc_mode = gb.get_bits(2);
+        int const lpc_mode = gb.get_bits(2);
         if (lpc_mode > 2) {
             throw std::runtime_error("Invalid lpc_mode");
         }
 
         decode_residues(decoded, filter_order, gb);
 
-        if (lpc_mode) {
+        if (lpc_mode != 0) {
             decode_lpc(decoded, lpc_mode, filter_order);
         }
     }
 
-    int dshift = gb.get_bits1() ? gb.get_bits(4) + 1 : 0;
-    int size = gb.get_bits1() + 6;
+    int const dshift = (gb.get_bits1() != 0u) ? gb.get_bits(4) + 1 : 0;
+    int const size = gb.get_bits1() + 6;
 
     int filter_quant = 10;
-    if (gb.get_bits1()) {
+    if (gb.get_bits1() != 0u) {
         filter_quant -= gb.get_bits(3) + 1;
         if (filter_quant < 3) {
             throw std::runtime_error("Invalid filter_quant");
@@ -75,7 +74,7 @@ void Decoder::decode_subframe(int32_t* decoded, int subframe_size, int prev_subf
 
     
 
-    if (gb.get_bits_left() < 2 * 10 + 2 * size) {
+    if (gb.get_bits_left() < static_cast<size_t>((2 * 10) + (2 * size))) {
         throw std::runtime_error("Not enough bits");
     }
 
@@ -85,10 +84,10 @@ void Decoder::decode_subframe(int32_t* decoded, int subframe_size, int prev_subf
     predictors_[3] = gb.get_sbits(size) * (1 << (10 - size));
     
     if (filter_order > 4) {
-        int tmp = size - gb.get_bits1();
+        int const tmp = size - gb.get_bits1();
         int x = tmp;
         for (int i = 4; i < filter_order; i++) {
-            if (!(i & 3)) {
+            if ((i & 3) == 0) {
                 x = tmp - gb.get_bits(2);
             }
             predictors_[i] = gb.get_sbits(x) * (1 << (10 - size));
@@ -99,10 +98,10 @@ void Decoder::decode_subframe(int32_t* decoded, int subframe_size, int prev_subf
     tfilter[0] = predictors_[0] * 64;
     for (int i = 1; i < filter_order; i++) {
         for (int j = 0; j < (i + 1) / 2; j++) {
-            int32_t v1 = tfilter[j];
-            int32_t v2 = tfilter[i - 1 - j];
-            int32_t x = v1 + ((static_cast<int32_t>(predictors_[i]) * v2 + 256) >> 9);
-            tfilter[i - 1 - j] = v2 + ((static_cast<int32_t>(predictors_[i]) * v1 + 256) >> 9);
+            int32_t const v1 = tfilter[j];
+            int32_t const v2 = tfilter[i - 1 - j];
+            int32_t const x = v1 + (((static_cast<int32_t>(predictors_[i]) * v2) + 256) >> 9);
+            tfilter[i - 1 - j] = v2 + (((static_cast<int32_t>(predictors_[i]) * v1) + 256) >> 9);
             tfilter[j] = x;
         }
 
@@ -128,7 +127,7 @@ void Decoder::decode_subframe(int32_t* decoded, int subframe_size, int prev_subf
     int32_t* dec_ptr = decoded + filter_order;
     
     while (x > 0) {
-        int tmp = std::min(y, x);
+        int const tmp = std::min(y, x);
 
         for (int i = 0; i < tmp; i++) {
             int v = 1 << (filter_quant - 1);
@@ -136,7 +135,7 @@ void Decoder::decode_subframe(int32_t* decoded, int subframe_size, int prev_subf
             for (int j = 0; j < filter_order; j++) {
                 v += residues_[i + j] * static_cast<unsigned>(filter_[j]);
             }
-            v = (clip_intp2(v >> filter_quant, 13) * (1 << dshift)) - (unsigned)*dec_ptr;
+            v = (clip_intp2(v >> filter_quant, 13) * (1 << dshift)) - static_cast<unsigned>(*dec_ptr);
             *dec_ptr++ = v;
             residues_[filter_order + i] = v >> dshift;
         }
@@ -153,7 +152,7 @@ void Decoder::decode_channel(int chan, BitStreamReader& gb) {
     int left = nb_samples_ - 1;
     int prev = 0;
 
-    sample_shift_[chan] = gb.get_bits1() ? gb.get_bits(4) + 1 : 0;
+    sample_shift_[chan] = (gb.get_bits1() != 0u) ? gb.get_bits(4) + 1 : 0;
     if (sample_shift_[chan] >= bps_) {
         throw std::runtime_error("Invalid sample shift");
     }
@@ -165,12 +164,12 @@ void Decoder::decode_channel(int chan, BitStreamReader& gb) {
 
     int i = 0;
     if (nb_subframes_ > 1) {
-        if (gb.get_bits_left() < (nb_subframes_ - 1) * 6) {
+        if (gb.get_bits_left() < static_cast<size_t>((nb_subframes_ - 1) * 6)) {
             throw std::runtime_error("Not enough bits");
         }
 
         for (; i < nb_subframes_ - 1; i++) {
-            int v = gb.get_bits(6);
+            int const v = gb.get_bits(6);
 
             subframe_len_[i] = (v - prev) * subframe_scale_;
             if (subframe_len_[i] <= 0) {

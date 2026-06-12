@@ -1,0 +1,32 @@
+[
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takdecomp_core.dir/src/core/tak_decoder.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder.cpp",
+  "output": "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_entropy.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp",
+  "output": "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_entropy.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_subframe.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_subframe.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_subframe.cpp",
+  "output": "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_subframe.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_decorrelate.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_decorrelate.cpp",
+  "output": "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/cli -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takdecomp.dir/src/cli/main.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/cli/main.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/cli/main.cpp",
+  "output": "CMakeFiles/takdecomp.dir/src/cli/main.cpp.o"
+}
+]
