@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    takenc::EncoderConfig cfg;
     std::string input_file;
     std::string output_file;
     bool encode_mode = true;
@@ -35,7 +36,20 @@ int main(int argc, char** argv) {
             print_help(argv[0]);
             return 0;
         } else if (arg.starts_with("-p")) {
-            // Ignore preset for now
+            std::string p = arg.substr(2);
+            if (p == "0") {
+                cfg.max_lpc_mode = 20; cfg.max_filter_order_idx = 0; cfg.max_frame_lpc_mode = 1;
+            } else if (p == "1") {
+                cfg.max_lpc_mode = 30; cfg.max_filter_order_idx = 1; cfg.max_frame_lpc_mode = 2;
+            } else if (p == "2") {
+                cfg.max_lpc_mode = 50; cfg.max_filter_order_idx = 1; cfg.max_frame_lpc_mode = 3;
+            } else if (p == "3") {
+                cfg.max_lpc_mode = 50; cfg.max_filter_order_idx = 6; cfg.max_frame_lpc_mode = 3;
+            } else if (p == "4") {
+                cfg.max_lpc_mode = 50; cfg.max_filter_order_idx = 8; cfg.max_frame_lpc_mode = 3;
+            } else if (p == "5" || p == "E" || p == "Max" || p == "2m" || p == "2e") {
+                cfg.max_lpc_mode = 50; cfg.max_filter_order_idx = 14; cfg.max_frame_lpc_mode = 3;
+            }
         } else {
             if (input_file.empty()) {
                 input_file = arg;
@@ -92,7 +106,7 @@ int main(int argc, char** argv) {
     };
 
     try {
-        takenc::EncodeResult result = takenc::Encoder::encode_file(input_file.c_str(), output_file.c_str(), progress);
+        takenc::EncodeResult result = takenc::Encoder::encode_file(input_file.c_str(), output_file.c_str(), cfg, progress);
         std::cout << "\n\nMD5: " << result.md5 << "\n";
     } catch (const std::exception& e) {
         std::cerr << "\nError: " << e.what() << "\n";

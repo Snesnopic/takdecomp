@@ -18,15 +18,15 @@
 
 namespace takenc {
 
-EncodeResult Encoder::encode_file(const char* wav_path, const char* tak_path, ProgressCallback progress) {
+EncodeResult Encoder::encode_file(const char* wav_path, const char* tak_path, const EncoderConfig& cfg, ProgressCallback progress) {
     std::ifstream is(wav_path, std::ios::binary);
     if (!is) throw std::runtime_error("Could not open WAV file");
     std::ofstream os(tak_path, std::ios::binary);
     if (!os) throw std::runtime_error("Could not open TAK file for writing");
-    return encode_stream(is, os, progress);
+    return encode_stream(is, os, cfg, progress);
 }
 
-EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, ProgressCallback progress) {
+EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const EncoderConfig& cfg, ProgressCallback progress) {
     WavInfo wav = read_wav_header(is);
     int channels = wav.channels;
     int bps = wav.bps;
@@ -41,7 +41,8 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, Progress
     si_gb.write_bits(static_cast<int>(takdecomp::CodecType::MonoStereo),
                      takdecomp::constants::ENCODER_CODEC_BITS);
     si_gb.write_bits(0, takdecomp::constants::ENCODER_PROFILE_BITS);
-    si_gb.write_bits(static_cast<int>(takdecomp::FrameSizeType::Fs4096),
+    // Use Fs250ms for all presets
+    si_gb.write_bits(static_cast<int>(takdecomp::FrameSizeType::Fs250ms),
                      takdecomp::constants::SIZE_FRAME_DURATION_BITS);
     si_gb.write_bits64(total_samples, takdecomp::constants::SIZE_SAMPLES_NUM_BITS);
     si_gb.write_bits(0, takdecomp::constants::FORMAT_DATA_TYPE_BITS);
@@ -74,7 +75,8 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, Progress
     os.write("\x00\x00\x00\x00", 4); // End of metadata
 
     // Encode frames
-    int frame_samples = 4096;
+    // Frame size for Fs250ms is exactly 250ms worth of samples
+    int frame_samples = (sample_rate * 250) / 1000;
     int remaining_samples = total_samples;
     int frame_num = 0;
     Decorrelator decorr;
@@ -147,15 +149,16 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, Progress
         // Choose LPC mode
         int lpc_mode_c1 = 0, lpc_mode_c2 = 0;
         if (current_frame_samples >= 16) {
+            int max_lpc = cfg.max_frame_lpc_mode;
             int costs[4];
-            for (int m = 0; m < 4; m++) costs[m] = estimate_lpc_cost(c1.data(), current_frame_samples, m);
+            for (int m = 0; m <= max_lpc; m++) costs[m] = estimate_lpc_cost(c1.data(), current_frame_samples, m);
             lpc_mode_c1 = 0;
-            for (int m = 1; m < 4; m++) if (costs[m] < costs[lpc_mode_c1]) lpc_mode_c1 = m;
+            for (int m = 1; m <= max_lpc; m++) if (costs[m] < costs[lpc_mode_c1]) lpc_mode_c1 = m;
 
             if (channels == 2) {
-                for (int m = 0; m < 4; m++) costs[m] = estimate_lpc_cost(c2.data(), current_frame_samples, m);
+                for (int m = 0; m <= max_lpc; m++) costs[m] = estimate_lpc_cost(c2.data(), current_frame_samples, m);
                 lpc_mode_c2 = 0;
-                for (int m = 1; m < 4; m++) if (costs[m] < costs[lpc_mode_c2]) lpc_mode_c2 = m;
+                for (int m = 1; m <= max_lpc; m++) if (costs[m] < costs[lpc_mode_c2]) lpc_mode_c2 = m;
             }
         }
 
@@ -175,7 +178,7 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, Progress
         for (int ch = 0; ch < channels; ch++) {
             const int32_t* d = (ch == 0) ? c1.data() : c2.data();
             int lpc = (ch == 0) ? lpc_mode_c1 : lpc_mode_c2;
-            encode_channel(d, current_frame_samples, bps, lpc, sample_rate, fw);
+            encode_channel(d, current_frame_samples, bps, lpc, sample_rate, cfg, fw);
         }
 
         // Stereo decorrelation info

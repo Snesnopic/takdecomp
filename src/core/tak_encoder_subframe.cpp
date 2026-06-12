@@ -9,13 +9,13 @@ namespace takenc {
 
 
 
-SubframeChoice evaluate_subframe(const int32_t* subframe_data, int subframe_size) {
+SubframeChoice evaluate_subframe(const int32_t* subframe_data, int subframe_size, const EncoderConfig& cfg) {
     SubframeChoice choice = {};
     choice.use_filter = false;
 
     // Estimate cost of no-filter path
     int best = Encoder::calc_bits_needed(1, subframe_data, subframe_size);
-    for (int m = 2; m <= 50; m++) {
+    for (int m = 2; m <= cfg.max_lpc_mode; m++) {
         int c = Encoder::calc_bits_needed(m, subframe_data, subframe_size);
         if (c < best) best = c;
     }
@@ -25,13 +25,16 @@ SubframeChoice evaluate_subframe(const int32_t* subframe_data, int subframe_size
     // Try predictor filter with different orders
     bool have_filter = false;
     FilterConfig best_filter;
-    // Try orders: 4, 8, 12, 16 (indices 0-3)
-    for (int idx = 0; idx < 4; idx++) {
-        FilterConfig cfg;
-        if (try_filter_encode(subframe_data, subframe_size, idx, cfg)) {
-            if (!have_filter || cfg.total_bits < best_filter.total_bits) {
-                best_filter = cfg;
-                have_filter = true;
+    
+    if (cfg.test_filters) {
+        int max_idx = std::min(cfg.max_filter_order_idx, 14); // 14 is max predictor_sizes index
+        for (int idx = 0; idx <= max_idx; idx++) {
+            FilterConfig fcfg;
+            if (try_filter_encode(subframe_data, subframe_size, idx, fcfg)) {
+                if (!have_filter || fcfg.total_bits < best_filter.total_bits) {
+                    best_filter = fcfg;
+                    have_filter = true;
+                }
             }
         }
     }
@@ -120,12 +123,12 @@ void write_subframe(const SubframeChoice& choice, const int32_t* subframe_data,
 // ============================================================================
 
 void encode_channel(const int32_t* samples, int nb_samples, int bps,
-                    int lpc_mode, int sample_rate, BitStreamWriter& fw) {
+                    int lpc_mode, int sample_rate, const EncoderConfig& cfg, BitStreamWriter& fw) {
     int subframe_size = nb_samples - 1;
     const int32_t* subframe_data = samples + 1;
 
     // Evaluate 1 subframe
-    SubframeChoice c1 = evaluate_subframe(subframe_data, subframe_size);
+    SubframeChoice c1 = evaluate_subframe(subframe_data, subframe_size, cfg);
     int best_cost = c1.total_bits;
     int best_splits = 1;
     std::vector<SubframeChoice> best_choices = { c1 };
@@ -136,13 +139,13 @@ void encode_channel(const int32_t* samples, int nb_samples, int bps,
     int base_align = (((sample_rate + 511) >> 9) + 3) & ~3;
     int subframe_scale = base_align << 1;
     
-    if (subframe_size > subframe_scale * 4) {
+    if (cfg.test_subframe_splits && subframe_size > subframe_scale * 4) {
         int v_mid = (subframe_size / 2) / subframe_scale;
         int len1 = v_mid * subframe_scale;
         int len2 = subframe_size - len1;
         if (len1 > 0 && len2 > 0) {
-            SubframeChoice c2_1 = evaluate_subframe(subframe_data, len1);
-            SubframeChoice c2_2 = evaluate_subframe(subframe_data + len1, len2);
+            SubframeChoice c2_1 = evaluate_subframe(subframe_data, len1, cfg);
+            SubframeChoice c2_2 = evaluate_subframe(subframe_data + len1, len2, cfg);
             int cost2 = c2_1.total_bits + c2_2.total_bits + 6; // +6 bits for v
             if (cost2 < best_cost) {
                 best_cost = cost2;
@@ -161,10 +164,10 @@ void encode_channel(const int32_t* samples, int nb_samples, int bps,
         int l3 = (v_3 - v_mid) * subframe_scale;
         int l4 = subframe_size - (l1 + l2 + l3);
         if (l1 > 0 && l2 > 0 && l3 > 0 && l4 > 0) {
-            SubframeChoice c4_1 = evaluate_subframe(subframe_data, l1);
-            SubframeChoice c4_2 = evaluate_subframe(subframe_data + l1, l2);
-            SubframeChoice c4_3 = evaluate_subframe(subframe_data + l1 + l2, l3);
-            SubframeChoice c4_4 = evaluate_subframe(subframe_data + l1 + l2 + l3, l4);
+            SubframeChoice c4_1 = evaluate_subframe(subframe_data, l1, cfg);
+            SubframeChoice c4_2 = evaluate_subframe(subframe_data + l1, l2, cfg);
+            SubframeChoice c4_3 = evaluate_subframe(subframe_data + l1 + l2, l3, cfg);
+            SubframeChoice c4_4 = evaluate_subframe(subframe_data + l1 + l2 + l3, l4, cfg);
             int cost4 = c4_1.total_bits + c4_2.total_bits + c4_3.total_bits + c4_4.total_bits + 18; // +18 bits for v
             if (cost4 < best_cost) {
                 best_cost = cost4;

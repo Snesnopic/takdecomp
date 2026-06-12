@@ -25,6 +25,14 @@ struct CParam {
 
 extern const CParam xcodes[50];
 
+struct EncoderConfig {
+    int max_lpc_mode = 50;         // max LPC evaluation order (2..50)
+    int max_filter_order_idx = 14; // max filter order index to test (0..14)
+    bool test_filters = true;      // whether to test predictors at all
+    bool test_subframe_splits = true; // whether to do 2-way and 4-way subframe splits
+    int max_frame_lpc_mode = 3;    // up to mode 3
+};
+
 struct EncodeResult {
     std::string md5;
 };
@@ -38,8 +46,8 @@ public:
     static void encode_segment(int mode, const int32_t* data, int len, BitStreamWriter& bw);
     static int calc_bits_needed(int mode, const int32_t* data, int len);
 
-    static EncodeResult encode_file(const char* wav_path, const char* tak_path, ProgressCallback progress = nullptr);
-    static EncodeResult encode_stream(std::istream& is, std::ostream& os, ProgressCallback progress = nullptr);
+    static EncodeResult encode_file(const char* wav_path, const char* tak_path, const EncoderConfig& cfg, ProgressCallback progress = nullptr);
+    static EncodeResult encode_stream(std::istream& is, std::ostream& os, const EncoderConfig& cfg, ProgressCallback progress = nullptr);
 };
 
 } // namespace takenc
