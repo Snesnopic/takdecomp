@@ -17,11 +17,27 @@ add_library(takdecomp_core STATIC
             src/core/tak_decoder.cpp
             src/core/tak_decoder_entropy.cpp
             src/core/tak_decoder_subframe.cpp
-            src/core/tak_decoder_decorrelate.cpp)
+            src/core/tak_decoder_decorrelate.cpp
+            src/core/tak_crc.cpp)
 
 target_include_directories(takdecomp_core PUBLIC src/core/include)
 
-# --- CLI Executable ---
+# --- CLI Executable (Decoder) ---
 add_executable(takdecomp src/cli/main.cpp)
 target_link_libraries(takdecomp PRIVATE takdecomp_core)
 target_include_directories(takdecomp PRIVATE src/cli)
+
+# --- Encoder Core Library ---
+add_library(takenc_core STATIC
+            src/core/tak_encoder.cpp
+            src/core/tak_encoder_bitstream.cpp
+            src/core/tak_encoder_entropy.cpp
+            src/core/tak_encoder_decorrelate.cpp
+            src/core/tak_crc.cpp)
+
+target_include_directories(takenc_core PUBLIC src/core/include)
+
+# --- CLI Executable (Encoder) ---
+add_executable(takenc src/cli/takenc.cpp)
+target_link_libraries(takenc PRIVATE takenc_core)
+target_include_directories(takenc PRIVATE src/cli)
