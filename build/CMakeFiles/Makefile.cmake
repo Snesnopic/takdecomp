@@ -50,4 +50,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/takdecomp_core.dir/DependInfo.cmake"
   "CMakeFiles/takdecomp.dir/DependInfo.cmake"
+  "CMakeFiles/takenc_core.dir/DependInfo.cmake"
+  "CMakeFiles/takenc.dir/DependInfo.cmake"
   )

@@ -2,7 +2,7 @@
 
 namespace takenc {
 
-void BitStreamWriter::init(std::vector<uint8_t>& buffer) {
+void BitStreamWriter::init(std::vector<uint8_t>& /*buffer*/) {
     // we ignore the passed buffer and use our own
     buffer_.clear();
     bit_buf_ = 0;

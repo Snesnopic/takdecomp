@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp" "CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o" "gcc" "CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o.d"
   "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder.cpp" "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder.cpp.o" "gcc" "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder.cpp.o.d"
   "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_decorrelate.cpp" "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.o" "gcc" "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.o.d"
   "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp" "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_entropy.cpp.o" "gcc" "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_entropy.cpp.o.d"

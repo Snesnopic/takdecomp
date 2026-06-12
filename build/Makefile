@@ -142,6 +142,32 @@ takdecomp/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/takdecomp.dir/build.make CMakeFiles/takdecomp.dir/build
 .PHONY : takdecomp/fast
 
+#=============================================================================
+# Target rules for targets named takenc_core
+
+# Build rule for target.
+takenc_core: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 takenc_core
+.PHONY : takenc_core
+
+# fast build rule for target.
+takenc_core/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/build
+.PHONY : takenc_core/fast
+
+#=============================================================================
+# Target rules for targets named takenc
+
+# Build rule for target.
+takenc: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 takenc
+.PHONY : takenc
+
+# fast build rule for target.
+takenc/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc.dir/build.make CMakeFiles/takenc.dir/build
+.PHONY : takenc/fast
+
 src/cli/main.o: src/cli/main.cpp.o
 .PHONY : src/cli/main.o
 
@@ -165,6 +191,57 @@ src/cli/main.s: src/cli/main.cpp.s
 src/cli/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/takdecomp.dir/build.make CMakeFiles/takdecomp.dir/src/cli/main.cpp.s
 .PHONY : src/cli/main.cpp.s
+
+src/cli/takenc.o: src/cli/takenc.cpp.o
+.PHONY : src/cli/takenc.o
+
+# target to build an object file
+src/cli/takenc.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc.dir/build.make CMakeFiles/takenc.dir/src/cli/takenc.cpp.o
+.PHONY : src/cli/takenc.cpp.o
+
+src/cli/takenc.i: src/cli/takenc.cpp.i
+.PHONY : src/cli/takenc.i
+
+# target to preprocess a source file
+src/cli/takenc.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc.dir/build.make CMakeFiles/takenc.dir/src/cli/takenc.cpp.i
+.PHONY : src/cli/takenc.cpp.i
+
+src/cli/takenc.s: src/cli/takenc.cpp.s
+.PHONY : src/cli/takenc.s
+
+# target to generate assembly for a file
+src/cli/takenc.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc.dir/build.make CMakeFiles/takenc.dir/src/cli/takenc.cpp.s
+.PHONY : src/cli/takenc.cpp.s
+
+src/core/tak_crc.o: src/core/tak_crc.cpp.o
+.PHONY : src/core/tak_crc.o
+
+# target to build an object file
+src/core/tak_crc.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takdecomp_core.dir/build.make CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o
+.PHONY : src/core/tak_crc.cpp.o
+
+src/core/tak_crc.i: src/core/tak_crc.cpp.i
+.PHONY : src/core/tak_crc.i
+
+# target to preprocess a source file
+src/core/tak_crc.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takdecomp_core.dir/build.make CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.i
+.PHONY : src/core/tak_crc.cpp.i
+
+src/core/tak_crc.s: src/core/tak_crc.cpp.s
+.PHONY : src/core/tak_crc.s
+
+# target to generate assembly for a file
+src/core/tak_crc.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takdecomp_core.dir/build.make CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.s
+.PHONY : src/core/tak_crc.cpp.s
 
 src/core/tak_decoder.o: src/core/tak_decoder.cpp.o
 .PHONY : src/core/tak_decoder.o
@@ -262,6 +339,198 @@ src/core/tak_decoder_subframe.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/takdecomp_core.dir/build.make CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_subframe.cpp.s
 .PHONY : src/core/tak_decoder_subframe.cpp.s
 
+src/core/tak_encoder.o: src/core/tak_encoder.cpp.o
+.PHONY : src/core/tak_encoder.o
+
+# target to build an object file
+src/core/tak_encoder.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder.cpp.o
+.PHONY : src/core/tak_encoder.cpp.o
+
+src/core/tak_encoder.i: src/core/tak_encoder.cpp.i
+.PHONY : src/core/tak_encoder.i
+
+# target to preprocess a source file
+src/core/tak_encoder.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder.cpp.i
+.PHONY : src/core/tak_encoder.cpp.i
+
+src/core/tak_encoder.s: src/core/tak_encoder.cpp.s
+.PHONY : src/core/tak_encoder.s
+
+# target to generate assembly for a file
+src/core/tak_encoder.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder.cpp.s
+.PHONY : src/core/tak_encoder.cpp.s
+
+src/core/tak_encoder_bitstream.o: src/core/tak_encoder_bitstream.cpp.o
+.PHONY : src/core/tak_encoder_bitstream.o
+
+# target to build an object file
+src/core/tak_encoder_bitstream.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_bitstream.cpp.o
+.PHONY : src/core/tak_encoder_bitstream.cpp.o
+
+src/core/tak_encoder_bitstream.i: src/core/tak_encoder_bitstream.cpp.i
+.PHONY : src/core/tak_encoder_bitstream.i
+
+# target to preprocess a source file
+src/core/tak_encoder_bitstream.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_bitstream.cpp.i
+.PHONY : src/core/tak_encoder_bitstream.cpp.i
+
+src/core/tak_encoder_bitstream.s: src/core/tak_encoder_bitstream.cpp.s
+.PHONY : src/core/tak_encoder_bitstream.s
+
+# target to generate assembly for a file
+src/core/tak_encoder_bitstream.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_bitstream.cpp.s
+.PHONY : src/core/tak_encoder_bitstream.cpp.s
+
+src/core/tak_encoder_decorrelate.o: src/core/tak_encoder_decorrelate.cpp.o
+.PHONY : src/core/tak_encoder_decorrelate.o
+
+# target to build an object file
+src/core/tak_encoder_decorrelate.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_decorrelate.cpp.o
+.PHONY : src/core/tak_encoder_decorrelate.cpp.o
+
+src/core/tak_encoder_decorrelate.i: src/core/tak_encoder_decorrelate.cpp.i
+.PHONY : src/core/tak_encoder_decorrelate.i
+
+# target to preprocess a source file
+src/core/tak_encoder_decorrelate.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_decorrelate.cpp.i
+.PHONY : src/core/tak_encoder_decorrelate.cpp.i
+
+src/core/tak_encoder_decorrelate.s: src/core/tak_encoder_decorrelate.cpp.s
+.PHONY : src/core/tak_encoder_decorrelate.s
+
+# target to generate assembly for a file
+src/core/tak_encoder_decorrelate.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_decorrelate.cpp.s
+.PHONY : src/core/tak_encoder_decorrelate.cpp.s
+
+src/core/tak_encoder_entropy.o: src/core/tak_encoder_entropy.cpp.o
+.PHONY : src/core/tak_encoder_entropy.o
+
+# target to build an object file
+src/core/tak_encoder_entropy.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_entropy.cpp.o
+.PHONY : src/core/tak_encoder_entropy.cpp.o
+
+src/core/tak_encoder_entropy.i: src/core/tak_encoder_entropy.cpp.i
+.PHONY : src/core/tak_encoder_entropy.i
+
+# target to preprocess a source file
+src/core/tak_encoder_entropy.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_entropy.cpp.i
+.PHONY : src/core/tak_encoder_entropy.cpp.i
+
+src/core/tak_encoder_entropy.s: src/core/tak_encoder_entropy.cpp.s
+.PHONY : src/core/tak_encoder_entropy.s
+
+# target to generate assembly for a file
+src/core/tak_encoder_entropy.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_entropy.cpp.s
+.PHONY : src/core/tak_encoder_entropy.cpp.s
+
+src/core/tak_encoder_filter.o: src/core/tak_encoder_filter.cpp.o
+.PHONY : src/core/tak_encoder_filter.o
+
+# target to build an object file
+src/core/tak_encoder_filter.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_filter.cpp.o
+.PHONY : src/core/tak_encoder_filter.cpp.o
+
+src/core/tak_encoder_filter.i: src/core/tak_encoder_filter.cpp.i
+.PHONY : src/core/tak_encoder_filter.i
+
+# target to preprocess a source file
+src/core/tak_encoder_filter.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_filter.cpp.i
+.PHONY : src/core/tak_encoder_filter.cpp.i
+
+src/core/tak_encoder_filter.s: src/core/tak_encoder_filter.cpp.s
+.PHONY : src/core/tak_encoder_filter.s
+
+# target to generate assembly for a file
+src/core/tak_encoder_filter.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_filter.cpp.s
+.PHONY : src/core/tak_encoder_filter.cpp.s
+
+src/core/tak_encoder_md5.o: src/core/tak_encoder_md5.cpp.o
+.PHONY : src/core/tak_encoder_md5.o
+
+# target to build an object file
+src/core/tak_encoder_md5.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_md5.cpp.o
+.PHONY : src/core/tak_encoder_md5.cpp.o
+
+src/core/tak_encoder_md5.i: src/core/tak_encoder_md5.cpp.i
+.PHONY : src/core/tak_encoder_md5.i
+
+# target to preprocess a source file
+src/core/tak_encoder_md5.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_md5.cpp.i
+.PHONY : src/core/tak_encoder_md5.cpp.i
+
+src/core/tak_encoder_md5.s: src/core/tak_encoder_md5.cpp.s
+.PHONY : src/core/tak_encoder_md5.s
+
+# target to generate assembly for a file
+src/core/tak_encoder_md5.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_md5.cpp.s
+.PHONY : src/core/tak_encoder_md5.cpp.s
+
+src/core/tak_encoder_subframe.o: src/core/tak_encoder_subframe.cpp.o
+.PHONY : src/core/tak_encoder_subframe.o
+
+# target to build an object file
+src/core/tak_encoder_subframe.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_subframe.cpp.o
+.PHONY : src/core/tak_encoder_subframe.cpp.o
+
+src/core/tak_encoder_subframe.i: src/core/tak_encoder_subframe.cpp.i
+.PHONY : src/core/tak_encoder_subframe.i
+
+# target to preprocess a source file
+src/core/tak_encoder_subframe.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_subframe.cpp.i
+.PHONY : src/core/tak_encoder_subframe.cpp.i
+
+src/core/tak_encoder_subframe.s: src/core/tak_encoder_subframe.cpp.s
+.PHONY : src/core/tak_encoder_subframe.s
+
+# target to generate assembly for a file
+src/core/tak_encoder_subframe.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_subframe.cpp.s
+.PHONY : src/core/tak_encoder_subframe.cpp.s
+
+src/core/tak_encoder_wav.o: src/core/tak_encoder_wav.cpp.o
+.PHONY : src/core/tak_encoder_wav.o
+
+# target to build an object file
+src/core/tak_encoder_wav.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_wav.cpp.o
+.PHONY : src/core/tak_encoder_wav.cpp.o
+
+src/core/tak_encoder_wav.i: src/core/tak_encoder_wav.cpp.i
+.PHONY : src/core/tak_encoder_wav.i
+
+# target to preprocess a source file
+src/core/tak_encoder_wav.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_wav.cpp.i
+.PHONY : src/core/tak_encoder_wav.cpp.i
+
+src/core/tak_encoder_wav.s: src/core/tak_encoder_wav.cpp.s
+.PHONY : src/core/tak_encoder_wav.s
+
+# target to generate assembly for a file
+src/core/tak_encoder_wav.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/tak_encoder_wav.cpp.s
+.PHONY : src/core/tak_encoder_wav.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -272,9 +541,17 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... takdecomp"
 	@echo "... takdecomp_core"
+	@echo "... takenc"
+	@echo "... takenc_core"
 	@echo "... src/cli/main.o"
 	@echo "... src/cli/main.i"
 	@echo "... src/cli/main.s"
+	@echo "... src/cli/takenc.o"
+	@echo "... src/cli/takenc.i"
+	@echo "... src/cli/takenc.s"
+	@echo "... src/core/tak_crc.o"
+	@echo "... src/core/tak_crc.i"
+	@echo "... src/core/tak_crc.s"
 	@echo "... src/core/tak_decoder.o"
 	@echo "... src/core/tak_decoder.i"
 	@echo "... src/core/tak_decoder.s"
@@ -287,6 +564,30 @@ help:
 	@echo "... src/core/tak_decoder_subframe.o"
 	@echo "... src/core/tak_decoder_subframe.i"
 	@echo "... src/core/tak_decoder_subframe.s"
+	@echo "... src/core/tak_encoder.o"
+	@echo "... src/core/tak_encoder.i"
+	@echo "... src/core/tak_encoder.s"
+	@echo "... src/core/tak_encoder_bitstream.o"
+	@echo "... src/core/tak_encoder_bitstream.i"
+	@echo "... src/core/tak_encoder_bitstream.s"
+	@echo "... src/core/tak_encoder_decorrelate.o"
+	@echo "... src/core/tak_encoder_decorrelate.i"
+	@echo "... src/core/tak_encoder_decorrelate.s"
+	@echo "... src/core/tak_encoder_entropy.o"
+	@echo "... src/core/tak_encoder_entropy.i"
+	@echo "... src/core/tak_encoder_entropy.s"
+	@echo "... src/core/tak_encoder_filter.o"
+	@echo "... src/core/tak_encoder_filter.i"
+	@echo "... src/core/tak_encoder_filter.s"
+	@echo "... src/core/tak_encoder_md5.o"
+	@echo "... src/core/tak_encoder_md5.i"
+	@echo "... src/core/tak_encoder_md5.s"
+	@echo "... src/core/tak_encoder_subframe.o"
+	@echo "... src/core/tak_encoder_subframe.i"
+	@echo "... src/core/tak_encoder_subframe.s"
+	@echo "... src/core/tak_encoder_wav.o"
+	@echo "... src/core/tak_encoder_wav.i"
+	@echo "... src/core/tak_encoder_wav.s"
 .PHONY : help
 
 

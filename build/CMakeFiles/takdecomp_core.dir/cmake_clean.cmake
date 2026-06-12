@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o"
+  "CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o.d"
   "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder.cpp.o"
   "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder.cpp.o.d"
   "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.o"

@@ -30,9 +30,13 @@ target_include_directories(takdecomp PRIVATE src/cli)
 # --- Encoder Core Library ---
 add_library(takenc_core STATIC
             src/core/tak_encoder.cpp
+            src/core/tak_encoder_wav.cpp
+            src/core/tak_encoder_filter.cpp
+            src/core/tak_encoder_subframe.cpp
             src/core/tak_encoder_bitstream.cpp
             src/core/tak_encoder_entropy.cpp
             src/core/tak_encoder_decorrelate.cpp
+            src/core/tak_encoder_md5.cpp
             src/core/tak_crc.cpp)
 
 target_include_directories(takenc_core PUBLIC src/core/include)

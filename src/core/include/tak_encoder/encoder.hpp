@@ -11,6 +11,8 @@
 #include <span>
 #include "tak_encoder/bitstream_writer.hpp"
 
+#include <functional>
+
 namespace takenc {
 
 struct CParam {
@@ -23,6 +25,12 @@ struct CParam {
 
 extern const CParam xcodes[50];
 
+struct EncodeResult {
+    std::string md5;
+};
+
+using ProgressCallback = std::function<void(int64_t processed, int64_t total)>;
+
 class Encoder {
 public:
     Encoder() = default;
@@ -30,8 +38,8 @@ public:
     static void encode_segment(int mode, const int32_t* data, int len, BitStreamWriter& bw);
     static int calc_bits_needed(int mode, const int32_t* data, int len);
 
-    static void encode_file(const char* wav_path, const char* tak_path);
-    static void encode_stream(std::istream& is, std::ostream& os);
+    static EncodeResult encode_file(const char* wav_path, const char* tak_path, ProgressCallback progress = nullptr);
+    static EncodeResult encode_stream(std::istream& is, std::ostream& os, ProgressCallback progress = nullptr);
 };
 
 } // namespace takenc

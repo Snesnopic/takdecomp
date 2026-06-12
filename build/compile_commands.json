@@ -25,8 +25,74 @@
 },
 {
   "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp",
+  "output": "CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
   "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/cli -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takdecomp.dir/src/cli/main.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/cli/main.cpp",
   "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/cli/main.cpp",
   "output": "CMakeFiles/takdecomp.dir/src/cli/main.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takenc_core.dir/src/core/tak_encoder.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp",
+  "output": "CMakeFiles/takenc_core.dir/src/core/tak_encoder.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takenc_core.dir/src/core/tak_encoder_wav.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_wav.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_wav.cpp",
+  "output": "CMakeFiles/takenc_core.dir/src/core/tak_encoder_wav.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takenc_core.dir/src/core/tak_encoder_filter.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp",
+  "output": "CMakeFiles/takenc_core.dir/src/core/tak_encoder_filter.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takenc_core.dir/src/core/tak_encoder_subframe.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_subframe.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_subframe.cpp",
+  "output": "CMakeFiles/takenc_core.dir/src/core/tak_encoder_subframe.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takenc_core.dir/src/core/tak_encoder_bitstream.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_bitstream.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_bitstream.cpp",
+  "output": "CMakeFiles/takenc_core.dir/src/core/tak_encoder_bitstream.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takenc_core.dir/src/core/tak_encoder_entropy.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_entropy.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_entropy.cpp",
+  "output": "CMakeFiles/takenc_core.dir/src/core/tak_encoder_entropy.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takenc_core.dir/src/core/tak_encoder_decorrelate.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp",
+  "output": "CMakeFiles/takenc_core.dir/src/core/tak_encoder_decorrelate.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takenc_core.dir/src/core/tak_encoder_md5.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp",
+  "output": "CMakeFiles/takenc_core.dir/src/core/tak_encoder_md5.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp",
+  "output": "CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/cli -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takenc.dir/src/cli/takenc.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/cli/takenc.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/cli/takenc.cpp",
+  "output": "CMakeFiles/takenc.dir/src/cli/takenc.cpp.o"
 }
 ]

@@ -197,10 +197,14 @@ bool try_filter_encode(const int32_t* samples, int subframe_size,
     compute_filter_residuals(samples, subframe_size, filter, filter_order,
                               cfg.filter_quant, cfg.dshift, cfg.filter_residuals.data());
 
-    // Cost of overhead (predictors + sizes)
-    int overhead = 1 + 4 + 2 + 1 + 1 + 1 + 20 + (2 * cfg.size);
+    // Total bit cost estimate:
+    // 1 (filter flag) + 4 (order) + 1 (new filter) + 2 (warmup lpc) +
+    // warmup_bits + 1 (dshift=0) + 1 (size) + 1 (quant=default) +
+    // 2*10 (predictors 0-1) + 2*size (predictors 2-3) + filter_residual_bits
+    int overhead = 1 + 4 + 1 + 2 + 1 + 1 + 1 + 20 + 2 * cfg.size;
     if (filter_order > 4) {
-        overhead += 1;
+        // Additional predictor bits for orders > 4
+        overhead += 1; // tmp flag
         for (int i = 4; i < filter_order; i++) {
             if ((i & 3) == 0) overhead += 2;
             overhead += cfg.size; // approximate

@@ -128,12 +128,27 @@ CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.s: cmake_forc
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_decorrelate.cpp -o CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.s
 
+CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o: CMakeFiles/takdecomp_core.dir/flags.make
+CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o: /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp
+CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o: CMakeFiles/takdecomp_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o -MF CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o.d -o CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp
+
+CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp > CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.i
+
+CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp -o CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.s
+
 # Object files for target takdecomp_core
 takdecomp_core_OBJECTS = \
 "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder.cpp.o" \
 "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_entropy.cpp.o" \
 "CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_subframe.cpp.o" \
-"CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.o"
+"CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.o" \
+"CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o"
 
 # External object files for target takdecomp_core
 takdecomp_core_EXTERNAL_OBJECTS =
@@ -142,9 +157,10 @@ lib/libtakdecomp_core.a: CMakeFiles/takdecomp_core.dir/src/core/tak_decoder.cpp.
 lib/libtakdecomp_core.a: CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_entropy.cpp.o
 lib/libtakdecomp_core.a: CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_subframe.cpp.o
 lib/libtakdecomp_core.a: CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.o
+lib/libtakdecomp_core.a: CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o
 lib/libtakdecomp_core.a: CMakeFiles/takdecomp_core.dir/build.make
 lib/libtakdecomp_core.a: CMakeFiles/takdecomp_core.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX static library lib/libtakdecomp_core.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX static library lib/libtakdecomp_core.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/takdecomp_core.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/takdecomp_core.dir/link.txt --verbose=$(VERBOSE)
 

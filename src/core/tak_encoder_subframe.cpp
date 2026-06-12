@@ -191,16 +191,6 @@ void encode_channel(const int32_t* samples, int nb_samples, int bps,
 
 
     
-    static int dbg = 0;
-    if (dbg < 4) {
-        std::cerr << "  splits=" << best_splits << " vs=";
-        for (int v : best_vs) std::cerr << v << ",";
-        std::cerr << " lengths=";
-        for (int l : best_lens) std::cerr << l << ",";
-        std::cerr << "\n";
-        dbg++;
-    }
-
     // Write subframes
     int prev_len = 0;
     int offset = 0;

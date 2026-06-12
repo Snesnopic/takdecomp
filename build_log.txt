@@ -1,0 +1,24 @@
+[ 12%] Building CXX object CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_subframe.cpp.o
+[ 12%] Building CXX object CMakeFiles/takenc_core.dir/src/core/tak_encoder.cpp.o
+[ 25%] Building CXX object CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.o
+[ 25%] Building CXX object CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o
+[ 31%] Building CXX object CMakeFiles/takenc_core.dir/src/core/tak_encoder_bitstream.cpp.o
+[ 37%] Building CXX object CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_entropy.cpp.o
+[ 43%] Building CXX object CMakeFiles/takdecomp_core.dir/src/core/tak_decoder.cpp.o
+[ 50%] Building CXX object CMakeFiles/takenc_core.dir/src/core/tak_encoder_entropy.cpp.o
+[ 56%] Building CXX object CMakeFiles/takenc_core.dir/src/core/tak_encoder_decorrelate.cpp.o
+[ 62%] Building CXX object CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_bitstream.cpp:5:50: warning: unused parameter 'buffer' [-Wunused-parameter]
+    5 | void BitStreamWriter::init(std::vector<uint8_t>& buffer) {
+      |                                                  ^
+1 warning generated.
+[ 68%] Linking CXX static library lib/libtakdecomp_core.a
+[ 68%] Built target takdecomp_core
+[ 75%] Building CXX object CMakeFiles/takdecomp.dir/src/cli/main.cpp.o
+[ 81%] Linking CXX static library lib/libtakenc_core.a
+[ 81%] Built target takenc_core
+[ 87%] Building CXX object CMakeFiles/takenc.dir/src/cli/takenc.cpp.o
+[ 93%] Linking CXX executable bin/takdecomp
+[ 93%] Built target takdecomp
+[100%] Linking CXX executable bin/takenc
+[100%] Built target takenc

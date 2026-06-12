@@ -1,4 +1,6 @@
 /Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles/takdecomp_core.dir
 /Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles/takdecomp.dir
+/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles/takenc_core.dir
+/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles/takenc.dir
 /Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles/edit_cache.dir
 /Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles/rebuild_cache.dir

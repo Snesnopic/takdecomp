@@ -1,2 +1,2 @@
-/usr/bin/ar qc lib/libtakdecomp_core.a CMakeFiles/takdecomp_core.dir/src/core/tak_decoder.cpp.o CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_entropy.cpp.o CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_subframe.cpp.o CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.o
+/usr/bin/ar qc lib/libtakdecomp_core.a CMakeFiles/takdecomp_core.dir/src/core/tak_decoder.cpp.o CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_entropy.cpp.o CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_subframe.cpp.o CMakeFiles/takdecomp_core.dir/src/core/tak_decoder_decorrelate.cpp.o CMakeFiles/takdecomp_core.dir/src/core/tak_crc.cpp.o
 /usr/bin/ranlib lib/libtakdecomp_core.a

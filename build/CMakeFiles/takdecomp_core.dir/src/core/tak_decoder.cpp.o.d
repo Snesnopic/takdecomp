@@ -931,4 +931,5 @@ CMakeFiles/takdecomp_core.dir/src/core/tak_decoder.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__locale_dir/wbuffer_convert.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__locale_dir/wstring_convert.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/cstdarg \
-  /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/bitstream.hpp
+  /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/bitstream.hpp \
+  /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/tak_crc.hpp
