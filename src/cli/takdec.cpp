@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Write dummy WAV header, will update later
+    // Write the WAV header (total samples is known from StreamInfo)
     write_wav_header(os, stream_info.sample_rate, stream_info.channels, stream_info.bps, stream_info.samples);
 
     Decoder decoder;
