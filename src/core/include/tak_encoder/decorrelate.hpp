@@ -14,6 +14,8 @@ struct DecorrelationResult {
     int mode;
     int shift;
     int factor;
+    int filter_order;
+    std::vector<int> filter;
 };
 
     // Evaluates and applies the best stereo decorrelation mode.
@@ -23,7 +25,7 @@ struct DecorrelationResult {
     DecorrelationResult apply_decorrelation(int32_t* data_c1, int32_t* data_c2, int len);
 
 private:
-    void apply_mode(int mode, int shift, int factor, const int32_t* src1, const int32_t* src2, int32_t* dst1, int32_t* dst2, int len);
+    void apply_mode(int mode, int shift, int factor, const std::vector<int>& filter, const int32_t* src1, const int32_t* src2, int32_t* dst1, int32_t* dst2, int len);
 };
 
 } // namespace takenc

@@ -1,1 +1,0 @@
-/usr/bin/c++  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -fsanitize=address,undefined CMakeFiles/takenc.dir/src/cli/takenc.cpp.o -o bin/takenc  lib/libtakenc_core.a

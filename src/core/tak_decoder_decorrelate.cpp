@@ -5,16 +5,19 @@
 #include <array>
 #include <cstring>
 #include <stdexcept>
+#include <iostream>
 
 namespace takdecomp {
 
 void Decoder::decorrelate(int c1, int c2, int length, BitStreamReader& gb) {
     int32_t* p1 = decoded_[c1].data() + (dmode_ > 5 ? 1 : 0);
     int32_t* p2 = decoded_[c2].data() + (dmode_ > 5 ? 1 : 0);
+
     int32_t bp1 = p1[0];
     int32_t bp2 = p2[0];
     int dshift = 0;
     int dfactor = 0;
+
 
     length += (dmode_ < 6 ? 1 : 0);
 
@@ -64,9 +67,11 @@ void Decoder::decorrelate(int c1, int c2, int length, BitStreamReader& gb) {
 }
 
         dshift = (gb.get_bits1() != 0u) ? gb.get_bits(4) + 1 : 0;
+
         int const filter_order = 8 << gb.get_bits1();
         int const dval1 = gb.get_bits1();
         int const dval2 = gb.get_bits1();
+
 
         int code_size = 0;
         for (int i = 0; i < filter_order; i++) {
@@ -79,18 +84,10 @@ void Decoder::decorrelate(int c1, int c2, int length, BitStreamReader& gb) {
         int const order_half = filter_order / 2;
         int length2 = length - (filter_order - 1);
 
+
         /* decorrelate beginning samples */
         if (dval1 != 0) {
             for (int i = 0; i < order_half; i++) {
-                int32_t const a = p1[i];
-                int32_t const b = p2[i];
-                p1[i] = a + b;
-            }
-        }
-
-        /* decorrelate ending samples */
-        if (dval2 != 0) {
-            for (int i = length2 + order_half; i < length; i++) {
                 int32_t const a = p1[i];
                 int32_t const b = p2[i];
                 p1[i] = a + b;
@@ -131,7 +128,7 @@ void Decoder::decorrelate(int c1, int c2, int length, BitStreamReader& gb) {
 
                 auto clip_intp2 = [](int32_t a, int p) -> int32_t {
                     if ((static_cast<unsigned>(a) + (1 << p)) & ~((2U << p) - 1)) {
-                        return (a >> 31) ^ ((1 << p) - 1);
+                        return (a < 0 ? -1 : 0) ^ ((1 << p) - 1);
                     }
                     return a;
                 };
@@ -141,6 +138,18 @@ void Decoder::decorrelate(int c1, int c2, int length, BitStreamReader& gb) {
             }
 
             memmove(residues_.data(), &residues_[tmp], 2 * filter_order);
+        }
+
+        p1 = decoded_[c1].data() + (dmode_ > 5 ? 1 : 0);
+        p2 = decoded_[c2].data() + (dmode_ > 5 ? 1 : 0);
+        if (dmode_ == 6) std::swap(p1, p2);
+
+        if (dval2 != 0) {
+            for (int i = length - order_half; i < length; i++) {
+                int32_t const a = p1[i];
+                int32_t const b = p2[i];
+                p1[i] = a + b;
+            }
         }
         break;
     }
