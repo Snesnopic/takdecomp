@@ -21,6 +21,11 @@ WavInfo read_wav_header(std::istream& is) {
     }
     if (!is) throw std::runtime_error("No fmt chunk");
     auto fmt_start = is.tellg();
+    
+    info.fmt_chunk.resize(chunk_size);
+    is.read(reinterpret_cast<char*>(info.fmt_chunk.data()), chunk_size);
+    is.seekg(fmt_start);
+
     uint16_t audio_format;
     is.read(reinterpret_cast<char*>(&audio_format), 2);
     is.read(reinterpret_cast<char*>(&info.channels), 2);

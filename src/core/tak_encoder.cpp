@@ -59,7 +59,8 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
 
     // StreamInfo metadata
     BitStreamWriter si_gb;
-    si_gb.write_bits(static_cast<int>(takdecomp::CodecType::MonoStereo),
+    takdecomp::CodecType codec = (channels > 2) ? takdecomp::CodecType::MultiChannel : takdecomp::CodecType::MonoStereo;
+    si_gb.write_bits(static_cast<int>(codec),
                      takdecomp::constants::ENCODER_CODEC_BITS);
     si_gb.write_bits(0, takdecomp::constants::ENCODER_PROFILE_BITS);
     // Use Fs250ms for all presets
@@ -101,13 +102,11 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
     // Stores the original WAV header for perfect reconstruction
     {
         // Reconstruct standard 44-byte PCM WAV header
-        uint32_t wav_header_size = 44;
+        uint32_t fmt_chunk_size = wav.fmt_chunk.size();
+        uint32_t wav_header_size = 20 + fmt_chunk_size + 8; // RIFF(12) + fmt(8+fmt_chunk_size) + data(8)
         uint32_t data_chunk_size = total_samples * channels * (bps / 8);
-        uint32_t riff_size = 36 + data_chunk_size;
-        uint32_t byte_rate = sample_rate * channels * (bps / 8);
-        uint16_t block_align_wav = channels * (bps / 8);
-
-        // SimpleWaveData format: uint32_t header_size (LE) + uint16_t flags + raw WAV header
+        uint32_t riff_size = 4 + 8 + fmt_chunk_size + 8 + data_chunk_size; // WAVE + fmt header + fmt data + data header + data size
+        
         std::vector<uint8_t> swd_payload(6 + wav_header_size);
         // First 4 bytes: WAV header size
         swd_payload[0] = wav_header_size & 0xFF;
@@ -117,25 +116,17 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
         // Next 2 bytes: flags (0)
         swd_payload[4] = 0;
         swd_payload[5] = 0;
-        // WAV header (44 bytes)
+        // WAV header
         uint8_t* w = swd_payload.data() + 6;
         std::memcpy(w, "RIFF", 4); w += 4;
         w[0] = riff_size & 0xFF; w[1] = (riff_size >> 8) & 0xFF;
         w[2] = (riff_size >> 16) & 0xFF; w[3] = (riff_size >> 24) & 0xFF; w += 4;
         std::memcpy(w, "WAVE", 4); w += 4;
         std::memcpy(w, "fmt ", 4); w += 4;
-        uint32_t fmt_size = 16;
-        w[0] = fmt_size & 0xFF; w[1] = (fmt_size >> 8) & 0xFF;
-        w[2] = (fmt_size >> 16) & 0xFF; w[3] = (fmt_size >> 24) & 0xFF; w += 4;
-        uint16_t audio_format = 1; // PCM
-        w[0] = audio_format & 0xFF; w[1] = (audio_format >> 8) & 0xFF; w += 2;
-        w[0] = channels & 0xFF; w[1] = (channels >> 8) & 0xFF; w += 2;
-        w[0] = sample_rate & 0xFF; w[1] = (sample_rate >> 8) & 0xFF;
-        w[2] = (sample_rate >> 16) & 0xFF; w[3] = (sample_rate >> 24) & 0xFF; w += 4;
-        w[0] = byte_rate & 0xFF; w[1] = (byte_rate >> 8) & 0xFF;
-        w[2] = (byte_rate >> 16) & 0xFF; w[3] = (byte_rate >> 24) & 0xFF; w += 4;
-        w[0] = block_align_wav & 0xFF; w[1] = (block_align_wav >> 8) & 0xFF; w += 2;
-        w[0] = bps & 0xFF; w[1] = (bps >> 8) & 0xFF; w += 2;
+        w[0] = fmt_chunk_size & 0xFF; w[1] = (fmt_chunk_size >> 8) & 0xFF;
+        w[2] = (fmt_chunk_size >> 16) & 0xFF; w[3] = (fmt_chunk_size >> 24) & 0xFF; w += 4;
+        std::memcpy(w, wav.fmt_chunk.data(), fmt_chunk_size); w += fmt_chunk_size;
+        
         std::memcpy(w, "data", 4); w += 4;
         w[0] = data_chunk_size & 0xFF; w[1] = (data_chunk_size >> 8) & 0xFF;
         w[2] = (data_chunk_size >> 16) & 0xFF; w[3] = (data_chunk_size >> 24) & 0xFF;
@@ -167,36 +158,21 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
         is.read(reinterpret_cast<char*>(raw_bytes.data()), raw_bytes.size());
         md5.update(raw_bytes.data(), raw_bytes.size());
 
-        std::vector<int32_t> c1(current_frame_samples);
-        std::vector<int32_t> c2(current_frame_samples);
+        std::vector<std::vector<int32_t>> c(channels, std::vector<int32_t>(current_frame_samples));
 
         int byte_idx = 0;
+        int const bytes_per_sample = bps / 8;
         for (int i = 0; i < current_frame_samples; i++) {
-            if (bps == 16) {
-                if (channels == 2) {
-                    int16_t l = raw_bytes[byte_idx] | (raw_bytes[byte_idx+1] << 8);
-                    int16_t r = raw_bytes[byte_idx+2] | (raw_bytes[byte_idx+3] << 8);
-                    c1[i] = l; c2[i] = r;
-                    byte_idx += 4;
-                } else {
-                    int16_t l = raw_bytes[byte_idx] | (raw_bytes[byte_idx+1] << 8);
-                    c1[i] = l;
-                    byte_idx += 2;
+            for (int ch = 0; ch < channels; ch++) {
+                if (bps == 16) {
+                    int16_t val = raw_bytes[byte_idx] | (raw_bytes[byte_idx+1] << 8);
+                    c[ch][i] = val;
+                } else if (bps == 24) {
+                    int32_t val = raw_bytes[byte_idx] | (raw_bytes[byte_idx+1] << 8) | (raw_bytes[byte_idx+2] << 16);
+                    if (val & 0x800000) val |= 0xFF000000;
+                    c[ch][i] = val;
                 }
-            } else if (bps == 24) {
-                if (channels == 2) {
-                    int32_t l = raw_bytes[byte_idx] | (raw_bytes[byte_idx+1] << 8) | (raw_bytes[byte_idx+2] << 16);
-                    if (l & 0x800000) l |= 0xFF000000;
-                    int32_t r = raw_bytes[byte_idx+3] | (raw_bytes[byte_idx+4] << 8) | (raw_bytes[byte_idx+5] << 16);
-                    if (r & 0x800000) r |= 0xFF000000;
-                    c1[i] = l; c2[i] = r;
-                    byte_idx += 6;
-                } else {
-                    int32_t l = raw_bytes[byte_idx] | (raw_bytes[byte_idx+1] << 8) | (raw_bytes[byte_idx+2] << 16);
-                    if (l & 0x800000) l |= 0xFF000000;
-                    c1[i] = l;
-                    byte_idx += 3;
-                }
+                byte_idx += bytes_per_sample;
             }
         }
 
@@ -222,39 +198,38 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
         fw.write_bits(header_crc & 0xff, 8);
 
         // Choose LPC mode
-        int lpc_mode_c1 = 0, lpc_mode_c2 = 0;
+        std::vector<int> lpc_mode(channels, 0);
         if (current_frame_samples >= 16) {
             int max_lpc = cfg.max_frame_lpc_mode;
             int costs[4];
-            for (int m = 0; m <= max_lpc; m++) costs[m] = estimate_lpc_cost(c1.data(), current_frame_samples, m);
-            lpc_mode_c1 = 0;
-            for (int m = 1; m <= max_lpc; m++) if (costs[m] < costs[lpc_mode_c1]) lpc_mode_c1 = m;
-
-            if (channels == 2) {
-                for (int m = 0; m <= max_lpc; m++) costs[m] = estimate_lpc_cost(c2.data(), current_frame_samples, m);
-                lpc_mode_c2 = 0;
-                for (int m = 1; m <= max_lpc; m++) if (costs[m] < costs[lpc_mode_c2]) lpc_mode_c2 = m;
+            for (int ch = 0; ch < channels; ch++) {
+                for (int m = 0; m <= max_lpc; m++) costs[m] = estimate_lpc_cost(c[ch].data(), current_frame_samples, m);
+                for (int m = 1; m <= max_lpc; m++) if (costs[m] < costs[lpc_mode[ch]]) lpc_mode[ch] = m;
             }
         }
 
         // Apply inverse LPC
-        inverse_lpc(c1.data(), lpc_mode_c1, current_frame_samples);
-        if (channels == 2) inverse_lpc(c2.data(), lpc_mode_c2, current_frame_samples);
+        for (int ch = 0; ch < channels; ch++) {
+            inverse_lpc(c[ch].data(), lpc_mode[ch], current_frame_samples);
+        }
 
-        // Apply inverse decorrelation
+        // Apply inverse decorrelation (only for stereo currently)
         Decorrelator::DecorrelationResult dmode_res = {0, 0, 0};
         if (channels == 2) {
-            dmode_res = decorr.apply_decorrelation(c1.data(), c2.data(), current_frame_samples);
+            dmode_res = decorr.apply_decorrelation(c[0].data(), c[1].data(), current_frame_samples);
+        }
+
+        // Multichannel decorrelation info is written BEFORE channels
+        if (channels > 2) {
+            fw.write_bit(0); // custom routing map present? 0 = false (no decorrelation)
         }
 
         // Encode channels
         for (int ch = 0; ch < channels; ch++) {
-            const int32_t* d = (ch == 0) ? c1.data() : c2.data();
-            int lpc = (ch == 0) ? lpc_mode_c1 : lpc_mode_c2;
-            encode_channel(d, current_frame_samples, bps, lpc, sample_rate, cfg, fw);
+            encode_channel(c[ch].data(), current_frame_samples, bps, lpc_mode[ch], sample_rate, cfg, fw);
         }
 
-        // Stereo decorrelation info
+        // Stereo decorrelation info is written AFTER channels
         if (channels == 2) {
             fw.write_bit(0); // nb_subframes - 1
             fw.write_bits(dmode_res.mode, 3);
@@ -268,9 +243,6 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
                 fw.write_bits(dmode_res.factor & 0x3FF, 10);
             }
         }
-
-        // Final sample_shift
-        for (int ch = 0; ch < channels; ch++) fw.write_bit(0);
 
         // Frame tail
         fw.align_write_bits();
