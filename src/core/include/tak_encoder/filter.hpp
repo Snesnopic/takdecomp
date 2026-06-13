@@ -27,7 +27,7 @@ struct FilterConfig {
 
 // Evaluate and populate FilterConfig. Returns false if signal is degenerate or size is too small.
 bool try_filter_encode(const int32_t* samples, int subframe_size,
-                       int order_idx, FilterConfig& cfg);
+                       int order_idx, FilterConfig& cfg, bool max_compression = false);
 
 void inverse_lpc(int32_t* data, int mode, int length);
 int estimate_lpc_cost(const int32_t* samples, int length, int lpc_mode);

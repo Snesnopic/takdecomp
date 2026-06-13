@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
                 cfg.max_lpc_mode = 50; cfg.max_filter_order_idx = 8; cfg.max_frame_lpc_mode = 3;
             } else if (p == "5" || p == "E" || p == "Max" || p == "2m" || p == "2e") {
                 cfg.max_lpc_mode = 50; cfg.max_filter_order_idx = 14; cfg.max_frame_lpc_mode = 3;
+                if (p == "Max") cfg.max_compression = true;
             }
         } else {
             if (input_file.empty()) {

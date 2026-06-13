@@ -31,7 +31,7 @@ SubframeChoice evaluate_subframe(const int32_t* subframe_data, int subframe_size
         int max_idx = std::min(cfg.max_filter_order_idx, 14); // 14 is max predictor_sizes index
         for (int idx = 0; idx <= max_idx; idx++) {
             FilterConfig fcfg;
-            if (try_filter_encode(subframe_data, subframe_size, idx, fcfg)) {
+            if (try_filter_encode(subframe_data, subframe_size, idx, fcfg, cfg.max_compression)) {
                 if (!have_filter || fcfg.total_bits < best_filter.total_bits) {
                     best_filter = fcfg;
                     have_filter = true;
@@ -85,8 +85,8 @@ void write_subframe(const SubframeChoice& choice, const int32_t* subframe_data,
             fw.write_bit(0);
         }
         
-        // size = 6 (write 0)
-        fw.write_bit(0);
+        // size
+        fw.write_bit(choice.filter.size == 7 ? 1 : 0);
         // filter_quant = 10 (default, write 0)
         fw.write_bit(0);
 

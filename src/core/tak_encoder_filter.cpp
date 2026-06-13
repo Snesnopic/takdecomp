@@ -137,8 +137,44 @@ int estimate_lpc_cost(const int32_t* samples, int length, int lpc_mode) {
     return best;
 }
 
+
+static int evaluate_filter_cost(FilterConfig& cfg, const int32_t* samples, int subframe_size, int filter_order) {
+    int overhead = 1 + 4 + 1 + 2 + 1 + 1 + 1 + 20 + 2 * cfg.size;
+    if (filter_order > 4) {
+        overhead += 1;
+        for (int i = 4; i < filter_order; i++) {
+            if ((i & 3) == 0) overhead += 2;
+            overhead += cfg.size;
+        }
+    }
+
+    cfg.warmup_residuals.assign(samples, samples + filter_order);
+    cfg.warmup_lpc_mode = 0;
+    int warmup_cost = 0;
+    {
+        int best = Encoder::calc_bits_needed(1, cfg.warmup_residuals.data(), filter_order);
+        for (int m = 2; m <= 34; m++) {
+            int c = Encoder::calc_bits_needed(m, cfg.warmup_residuals.data(), filter_order);
+            if (c < best) best = c;
+        }
+        warmup_cost = 1 + 6 + best;
+    }
+
+    int resid_cost = 0;
+    {
+        int best = Encoder::calc_bits_needed(1, cfg.filter_residuals.data(), subframe_size - filter_order);
+        for (int m = 2; m <= 34; m++) {
+            int c = Encoder::calc_bits_needed(m, cfg.filter_residuals.data(), subframe_size - filter_order);
+            if (c < best) best = c;
+        }
+        resid_cost = 1 + 6 + best;
+    }
+
+    return overhead + warmup_cost + resid_cost;
+}
+
 bool try_filter_encode(const int32_t* samples, int subframe_size,
-                              int order_idx, FilterConfig& cfg) {
+                              int order_idx, FilterConfig& cfg, bool max_compression) {
     int filter_order = predictor_sizes[order_idx];
     if (subframe_size <= filter_order) return false;
 
@@ -168,77 +204,99 @@ bool try_filter_encode(const int32_t* samples, int subframe_size,
     }
 
     cfg.predictors.resize(std::max(4, filter_order));
-    for (int i = 0; i < filter_order; i++) {
-        double k = parcor[i];
-        int q;
-        if (i < 2) {
-            // 10-bit: range [-512, 511], representing k * ~512
-            q = static_cast<int>(std::round(k * 512.0));
-            q = std::clamp(q, -512, 511);
+    
+    auto init_predictors = [&](int size_val) {
+        for (int i = 0; i < filter_order; i++) {
+            double k = parcor[i];
+            int q;
+            if (i < 2) {
+                q = static_cast<int>(std::round(k * 512.0));
+                q = std::clamp(q, -512, 511);
+            } else {
+                int shift = 10 - size_val;
+                int max_val = (1 << (size_val - 1)) - 1;
+                int min_val = -(1 << (size_val - 1));
+                int raw = static_cast<int>(std::round(k * 512.0 / (1 << shift)));
+                raw = std::clamp(raw, min_val, max_val);
+                q = raw * (1 << shift);
+            }
+            cfg.predictors[i] = q;
+        }
+        for (int i = filter_order; i < 4; i++) cfg.predictors[i] = 0;
+    };
+
+    auto evaluate_configuration = [&]() -> int {
+        int16_t filter[256];
+        build_filter(cfg.predictors.data(), filter_order, cfg.filter_quant, filter);
+        cfg.filter_residuals.resize(subframe_size - filter_order);
+        compute_filter_residuals(samples, subframe_size, filter, filter_order,
+                                  cfg.filter_quant, cfg.dshift, cfg.filter_residuals.data());
+        return evaluate_filter_cost(cfg, samples, subframe_size, filter_order);
+    };
+
+    init_predictors(cfg.size);
+    cfg.total_bits = evaluate_configuration();
+
+    if (max_compression) {
+        // Try size 7
+        FilterConfig best_cfg = cfg;
+        
+        cfg.size = 7;
+        init_predictors(7);
+        int cost7 = evaluate_configuration();
+        if (cost7 < best_cfg.total_bits) {
+            cfg.total_bits = cost7;
+            best_cfg = cfg;
         } else {
-            // 'size'-bit: the decoder reads get_sbits(size) * (1 << (10-size))
-            // For size=6: range [-32, 31] * 16 = [-512, 496], step 16
-            int shift = 10 - cfg.size;
-            int max_val = (1 << (cfg.size - 1)) - 1;  // 31 for size=6
-            int min_val = -(1 << (cfg.size - 1));      // -32 for size=6
-            int raw = static_cast<int>(std::round(k * 512.0 / (1 << shift)));
-            raw = std::clamp(raw, min_val, max_val);
-            q = raw * (1 << shift);
+            cfg = best_cfg;
         }
-        cfg.predictors[i] = q;
+
+        // Coordinate descent on first 16 coefficients
+        int N = std::min(filter_order, 16);
+        bool improved = true;
+        for (int pass = 0; pass < 2 && improved; pass++) {
+            improved = false;
+            for (int i = 0; i < N; i++) {
+                int orig_q = cfg.predictors[i];
+                int step = (i < 2) ? 1 : (1 << (10 - cfg.size));
+                int min_val, max_val;
+                if (i < 2) {
+                    min_val = -512; max_val = 511;
+                } else {
+                    min_val = -(1 << (cfg.size - 1)) * (1 << (10 - cfg.size));
+                    max_val = ((1 << (cfg.size - 1)) - 1) * (1 << (10 - cfg.size));
+                }
+
+                int best_q = orig_q;
+                int best_cost = cfg.total_bits;
+
+                for (int dir : {-1, 1}) {
+                    int test_q = orig_q + dir * step;
+                    if (test_q < min_val || test_q > max_val) continue;
+
+                    cfg.predictors[i] = test_q;
+                    int test_cost = evaluate_configuration();
+
+                    if (test_cost < best_cost) {
+                        best_cost = test_cost;
+                        best_q = test_q;
+                    }
+                }
+
+                if (best_q != orig_q) {
+                    cfg.predictors[i] = best_q;
+                    cfg.total_bits = best_cost;
+                    improved = true;
+                } else {
+                    cfg.predictors[i] = orig_q;
+                }
+            }
+        }
+        
+        // Ensure final state is correct
+        evaluate_configuration();
     }
 
-    // Build filter from quantized predictors
-    int16_t filter[256];
-    build_filter(cfg.predictors.data(), filter_order, cfg.filter_quant, filter);
-
-    // Compute prediction residuals
-    cfg.filter_residuals.resize(subframe_size - filter_order);
-    compute_filter_residuals(samples, subframe_size, filter, filter_order,
-                              cfg.filter_quant, cfg.dshift, cfg.filter_residuals.data());
-
-    // Total bit cost estimate:
-    // 1 (filter flag) + 4 (order) + 1 (new filter) + 2 (warmup lpc) +
-    // warmup_bits + 1 (dshift=0) + 1 (size) + 1 (quant=default) +
-    // 2*10 (predictors 0-1) + 2*size (predictors 2-3) + filter_residual_bits
-    int overhead = 1 + 4 + 1 + 2 + 1 + 1 + 1 + 20 + 2 * cfg.size;
-    if (filter_order > 4) {
-        // Additional predictor bits for orders > 4
-        overhead += 1; // tmp flag
-        for (int i = 4; i < filter_order; i++) {
-            if ((i & 3) == 0) overhead += 2;
-            overhead += cfg.size; // approximate
-        }
-    }
-
-    // Try applying LPC on warmup samples to save bits
-    cfg.warmup_residuals.assign(samples, samples + filter_order);
-    cfg.warmup_lpc_mode = 0;
-
-    int warmup_cost = 0;
-    {
-        int best = Encoder::calc_bits_needed(1, cfg.warmup_residuals.data(), filter_order);
-        for (int m = 2; m <= 34; m++) {
-            int c = Encoder::calc_bits_needed(m, cfg.warmup_residuals.data(), filter_order);
-            if (c < best) best = c;
-        }
-        warmup_cost = 1 + 6 + best; // flag + mode bits + data
-    }
-
-    // Cost of filter residuals
-    int resid_cost = 0;
-    {
-        int best = Encoder::calc_bits_needed(1, cfg.filter_residuals.data(),
-                                              subframe_size - filter_order);
-        for (int m = 2; m <= 34; m++) {
-            int c = Encoder::calc_bits_needed(m, cfg.filter_residuals.data(),
-                                               subframe_size - filter_order);
-            if (c < best) best = c;
-        }
-        resid_cost = 1 + 6 + best;
-    }
-
-    cfg.total_bits = overhead + warmup_cost + resid_cost;
     return true;
 }
 

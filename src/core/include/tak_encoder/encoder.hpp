@@ -29,6 +29,7 @@ struct EncoderConfig {
     int max_lpc_mode = 50;         // max LPC evaluation order (2..50)
     int max_filter_order_idx = 14; // max filter order index to test (0..14)
     bool test_filters = true;      // whether to test predictors at all
+    bool max_compression = false;  // whether to perform LPC grid search
     bool test_subframe_splits = true; // whether to do 2-way and 4-way subframe splits
     int max_frame_lpc_mode = 3;    // up to mode 3
     bool write_ape_tag = true;
