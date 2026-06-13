@@ -2,63 +2,61 @@
 #include <cstring>
 
 namespace takenc {
-
-void ApeTagWriter::add_item(const std::string& key, const std::string& value) {
-    items[key] = value;
-}
-
-static void write_le32(std::vector<uint8_t>& out, uint32_t val) {
-    out.push_back(val & 0xFF);
-    out.push_back((val >> 8) & 0xFF);
-    out.push_back((val >> 16) & 0xFF);
-    out.push_back((val >> 24) & 0xFF);
-}
-
-std::vector<uint8_t> ApeTagWriter::generate() const {
-    if (items.empty()) return {};
-
-    std::vector<uint8_t> out;
-    std::vector<uint8_t> items_data;
-
-    for (const auto& pair : items) {
-        uint32_t val_size = pair.second.size();
-        uint32_t flags = 0; // UTF-8 string, Read-Write
-
-        // Write Value Size
-        write_le32(items_data, val_size);
-        // Write Flags
-        write_le32(items_data, flags);
-        // Write Key (ASCII + \0)
-        for (char c : pair.first) items_data.push_back(c);
-        items_data.push_back(0);
-        // Write Value
-        for (char c : pair.second) items_data.push_back(c);
+    void ApeTagWriter::add_item(const std::string &key, const std::string &value) {
+        items[key] = value;
     }
 
-    uint32_t tag_size = items_data.size() + 32; // size of items + footer
-    uint32_t item_count = items.size();
+    static void write_le32(std::vector<uint8_t> &out, uint32_t val) {
+        out.push_back(val & 0xFF);
+        out.push_back((val >> 8) & 0xFF);
+        out.push_back((val >> 16) & 0xFF);
+        out.push_back((val >> 24) & 0xFF);
+    }
 
-    // Header
-    const char* magic = "APETAGEX";
-    for (int i = 0; i < 8; i++) out.push_back(magic[i]);
-    write_le32(out, 2000); // Version
-    write_le32(out, tag_size);
-    write_le32(out, item_count);
-    write_le32(out, 0xA0000000); // Contains Header | Is Header
-    for (int i = 0; i < 8; i++) out.push_back(0);
+    std::vector<uint8_t> ApeTagWriter::generate() const {
+        if (items.empty()) return {};
 
-    // Items
-    out.insert(out.end(), items_data.begin(), items_data.end());
+        std::vector<uint8_t> out;
+        std::vector<uint8_t> items_data;
 
-    // Footer
-    for (int i = 0; i < 8; i++) out.push_back(magic[i]);
-    write_le32(out, 2000); // Version
-    write_le32(out, tag_size);
-    write_le32(out, item_count);
-    write_le32(out, 0x80000000); // Contains Header | Is NOT Header
-    for (int i = 0; i < 8; i++) out.push_back(0);
+        for (const auto &pair: items) {
+            uint32_t val_size = pair.second.size();
+            uint32_t flags = 0; // UTF-8 string, Read-Write
 
-    return out;
-}
+            // Write Value Size
+            write_le32(items_data, val_size);
+            // Write Flags
+            write_le32(items_data, flags);
+            // Write Key (ASCII + \0)
+            for (char c: pair.first) items_data.push_back(c);
+            items_data.push_back(0);
+            // Write Value
+            for (char c: pair.second) items_data.push_back(c);
+        }
 
+        uint32_t tag_size = items_data.size() + 32; // size of items + footer
+        uint32_t item_count = items.size();
+
+        // Header
+        const char *magic = "APETAGEX";
+        for (int i = 0; i < 8; i++) out.push_back(magic[i]);
+        write_le32(out, 2000); // Version
+        write_le32(out, tag_size);
+        write_le32(out, item_count);
+        write_le32(out, 0xA0000000); // Contains Header | Is Header
+        for (int i = 0; i < 8; i++) out.push_back(0);
+
+        // Items
+        out.insert(out.end(), items_data.begin(), items_data.end());
+
+        // Footer
+        for (int i = 0; i < 8; i++) out.push_back(magic[i]);
+        write_le32(out, 2000); // Version
+        write_le32(out, tag_size);
+        write_le32(out, item_count);
+        write_le32(out, 0x80000000); // Contains Header | Is NOT Header
+        for (int i = 0; i < 8; i++) out.push_back(0);
+
+        return out;
+    }
 } // namespace takenc

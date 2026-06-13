@@ -6,19 +6,19 @@
 #include <fstream>
 #include <sstream>
 
-void print_help(const char* prog_name) {
+void print_help(const char *prog_name) {
     std::cout << "TAK Audio Compressor 0.1.0 (Compatible replica)\n"
-              << "\n"
-              << "Usage: " << prog_name << " [options] <input.wav> [output.tak]\n"
-              << "\n"
-              << "Options:\n"
-              << "  -e       Encode input.wav to output.tak (default)\n"
-              << "  -pM      Preset M (e.g. -p2) - Ignored, defaults to Max\n"
-              << "  -tt #    Add textual tag item # (\"key=value\" or \"key=@file\")\n"
-              << "\n";
+            << "\n"
+            << "Usage: " << prog_name << " [options] <input.wav> [output.tak]\n"
+            << "\n"
+            << "Options:\n"
+            << "  -e       Encode input.wav to output.tak (default)\n"
+            << "  -pM      Preset M (e.g. -p2) - Ignored, defaults to Max\n"
+            << "  -tt #    Add textual tag item # (\"key=value\" or \"key=@file\")\n"
+            << "\n";
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     if (argc < 2) {
         print_help(argv[0]);
         return 1;
@@ -41,17 +41,29 @@ int main(int argc, char** argv) {
         } else if (arg.starts_with("-p")) {
             std::string p = arg.substr(2);
             if (p == "0") {
-                cfg.max_lpc_mode = 20; cfg.max_filter_order_idx = 0; cfg.max_frame_lpc_mode = 1;
+                cfg.max_lpc_mode = 20;
+                cfg.max_filter_order_idx = 0;
+                cfg.max_frame_lpc_mode = 1;
             } else if (p == "1") {
-                cfg.max_lpc_mode = 30; cfg.max_filter_order_idx = 1; cfg.max_frame_lpc_mode = 2;
+                cfg.max_lpc_mode = 30;
+                cfg.max_filter_order_idx = 1;
+                cfg.max_frame_lpc_mode = 2;
             } else if (p == "2") {
-                cfg.max_lpc_mode = 50; cfg.max_filter_order_idx = 1; cfg.max_frame_lpc_mode = 3;
+                cfg.max_lpc_mode = 50;
+                cfg.max_filter_order_idx = 1;
+                cfg.max_frame_lpc_mode = 3;
             } else if (p == "3") {
-                cfg.max_lpc_mode = 50; cfg.max_filter_order_idx = 6; cfg.max_frame_lpc_mode = 3;
+                cfg.max_lpc_mode = 50;
+                cfg.max_filter_order_idx = 6;
+                cfg.max_frame_lpc_mode = 3;
             } else if (p == "4") {
-                cfg.max_lpc_mode = 50; cfg.max_filter_order_idx = 8; cfg.max_frame_lpc_mode = 3;
+                cfg.max_lpc_mode = 50;
+                cfg.max_filter_order_idx = 8;
+                cfg.max_frame_lpc_mode = 3;
             } else if (p == "5" || p == "E" || p == "Max" || p == "2m" || p == "2e") {
-                cfg.max_lpc_mode = 50; cfg.max_filter_order_idx = 14; cfg.max_frame_lpc_mode = 3;
+                cfg.max_lpc_mode = 50;
+                cfg.max_filter_order_idx = 14;
+                cfg.max_frame_lpc_mode = 3;
                 if (p == "Max") cfg.max_compression = true;
             }
         } else if (arg == "-tt") {
@@ -70,7 +82,8 @@ int main(int argc, char** argv) {
                             val = buffer.str();
                         } else {
                             std::cerr << "Warning: could not read tag file '" << filename << "'\n";
-                            val = ""; // or keep the @file literal? takc probably fails or ignores. We'll ignore the tag if file doesn't exist.
+                            val = "";
+                            // or keep the @file literal? takc probably fails or ignores. We'll ignore the tag if file doesn't exist.
                             continue;
                         }
                     }
@@ -84,7 +97,8 @@ int main(int argc, char** argv) {
         } else if (arg.starts_with("-wm")) {
             cfg.wave_metadata_mode = std::stoi(arg.substr(3));
         } else if (arg == "-md5") {
-            cfg.write_md5 = true; // wait, what if default is true? takc enables md5 with -md5, so maybe default is false? I'll keep default true and toggle it if needed, or simply force it true. Actually, let's keep default true since that's what we did, and user can pass -md5. Wait, we should just let -md5 force it to true, but maybe it's already true.
+            cfg.write_md5 = true;
+            // wait, what if default is true? takc enables md5 with -md5, so maybe default is false? I'll keep default true and toggle it if needed, or simply force it true. Actually, let's keep default true since that's what we did, and user can pass -md5. Wait, we should just let -md5 force it to true, but maybe it's already true.
         } else if (arg == "-ihs") {
             cfg.ignore_header_size = true;
         } else if (arg == "-v") {
@@ -155,15 +169,15 @@ int main(int argc, char** argv) {
 
     takenc::ProgressCallback progress = [&](int64_t processed, int64_t total) {
         if (total == 0) return;
-        double pct = (double)processed * 100.0 / total;
-        
+        double pct = (double) processed * 100.0 / total;
+
         auto now = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed = now - start_time;
         double speed = 0.0;
         if (elapsed.count() > 0) {
             // Speed = amount of audio processed / wall clock time
             // We assume 44100 Hz for speed calculation approximation
-            double audio_time = (double)processed / 44100.0; 
+            double audio_time = (double) processed / 44100.0;
             speed = audio_time / elapsed.count();
         }
 
@@ -175,7 +189,8 @@ int main(int argc, char** argv) {
     };
 
     try {
-        takenc::EncodeResult result = takenc::Encoder::encode_file(input_file.c_str(), output_file.c_str(), cfg, progress);
+        takenc::EncodeResult result = takenc::Encoder::encode_file(input_file.c_str(), output_file.c_str(), cfg,
+                                                                   progress);
         if (cfg.write_md5) std::cout << "\n\nMD5: " << result.md5 << "\n";
         else std::cout << "\n\n";
 
@@ -192,7 +207,7 @@ int main(int argc, char** argv) {
             }
             std::cout << "Verification successful.\n";
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         std::cerr << "\nError: " << e.what() << "\n";
         return 1;
     }

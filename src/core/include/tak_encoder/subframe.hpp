@@ -6,22 +6,22 @@
 #include <cstdint>
 
 namespace takenc {
+    struct EncoderConfig;
 
-struct EncoderConfig;
+    struct SubframeChoice {
+        bool use_filter;
+        FilterConfig filter;
+        int nofilter_cost;
+        int total_bits;
+    };
 
-struct SubframeChoice {
-    bool use_filter;
-    FilterConfig filter;
-    int nofilter_cost;
-    int total_bits;
-};
+    SubframeChoice evaluate_subframe(const int32_t *subframe_data, int subframe_size);
 
-SubframeChoice evaluate_subframe(const int32_t* subframe_data, int subframe_size);
-void write_subframe(const SubframeChoice& choice, const int32_t* subframe_data,
-                    int subframe_size, int prev_subframe_size, BitStreamWriter& fw);
-void encode_channel(const int32_t* samples, int nb_samples, int bps,
-                    int lpc_mode, int sample_rate, const EncoderConfig& cfg, BitStreamWriter& fw);
+    void write_subframe(const SubframeChoice &choice, const int32_t *subframe_data,
+                        int subframe_size, int prev_subframe_size, BitStreamWriter &fw);
 
+    void encode_channel(const int32_t *samples, int nb_samples, int bps,
+                        int lpc_mode, int sample_rate, const EncoderConfig &cfg, BitStreamWriter &fw);
 } // namespace takenc
 
 #endif // TAK_ENCODER_SUBFRAME_HPP
