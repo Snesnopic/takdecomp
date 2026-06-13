@@ -161,9 +161,9 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
     int frame_num = 0;
     MD5 md5;
 
-    struct FrameRes { std::vector<uint8_t> data; bool is_last; };
+    struct FrameRes { std::vector<uint8_t> data; bool is_last = false; };
 
-    auto process_frame = [channels, bps, sample_rate, cfg](std::vector<uint8_t> raw_bytes, int current_frame_samples, int f_num, bool is_last) -> FrameRes {
+    auto process_frame = [channels, bps, sample_rate, cfg](const std::vector<uint8_t>& raw_bytes, int current_frame_samples, int f_num, bool is_last) -> FrameRes {
         Decorrelator decorr;
         std::vector<std::vector<int32_t>> c(channels, std::vector<int32_t>(current_frame_samples));
         int byte_idx = 0;
