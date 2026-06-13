@@ -140,8 +140,6 @@ auto main(int argc, char* argv[]) -> int {
     is.read(reinterpret_cast<char*>(file_data.data()), data_len);
     
     size_t pos = 0;
-    std::cerr << "data_end = " << data_end << ", data_len = " << data_len << ", current_pos = " << current_pos << "\n";
-    std::cerr << "file_data[0..4] = " << std::hex << (int)file_data[0] << " " << (int)file_data[1] << " " << (int)file_data[2] << " " << (int)file_data[3] << " " << (int)file_data[4] << std::dec << "\n";
     while (pos < file_data.size() - 2) {
         // Find sync 0xA0FF
         if (file_data[pos] == 0xFF && file_data[pos+1] == 0xA0) {
@@ -158,7 +156,6 @@ auto main(int argc, char* argv[]) -> int {
                         // If it succeeds without throwing, it's highly likely a valid sync word
                         break;
                     } catch (const std::exception& e) {
-                        std::cerr << "next_sync " << next_sync << " threw: " << e.what() << "\n";
                         // Not a valid sync word, continue searching
                     }
                 }
@@ -174,12 +171,8 @@ auto main(int argc, char* argv[]) -> int {
             try {
                 std::span<const uint8_t> const frame_span(padded_frame);
                 std::vector<std::vector<int32_t>> decoded_channels;
-                
-                std::cerr << "Calling decode_frame for pos " << pos << ", frame_size " << frame_size << "\n";
                 decoder.decode_frame(frame_span, stream_info, decoded_channels);
-                
                 int const nb_samples = decoded_channels.empty() ? 0 : decoded_channels[0].size();
-                std::cerr << "decode_frame returned " << nb_samples << " samples\n";
                 
                 int const channels = stream_info.channels;
                 
@@ -202,7 +195,6 @@ auto main(int argc, char* argv[]) -> int {
                 pos = next_sync;
             } catch (const std::exception& e) {
                 // If decode fails, it might be a false sync. Advance by 1 to search for next sync.
-                std::cerr << "Frame decode failed at pos " << pos << ": " << e.what() << "\n";
                 pos++;
             }
         } else {

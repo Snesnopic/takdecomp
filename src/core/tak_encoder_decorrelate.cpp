@@ -54,6 +54,11 @@ void Decorrelator::apply_mode(int mode, int shift, int factor, const int32_t* sr
     default:
         throw std::runtime_error("Advanced decorrelation modes not implemented yet");
     }
+
+    if (mode > 0 && mode < 6) {
+        dst1[0] = src1[0];
+        dst2[0] = src2[0];
+    }
 }
 
 static int estimate_entropy_fast(const int32_t* data, int len) {
@@ -107,10 +112,8 @@ Decorrelator::DecorrelationResult Decorrelator::apply_decorrelation(int32_t* dat
         }
     };
 
-    // Evaluate modes 0 to 1
-    for (int mode = 0; mode <= 1; mode++) {
-        evaluate(mode, 0, 0);
-    }
+    // Force mode 2
+    evaluate(2, 0, 0);
     apply_mode(best_mode, best_shift, best_factor, data_c1, data_c2, buf1.data(), buf2.data(), len);
     for (int i = 0; i < len; i++) {
         data_c1[i] = buf1[i];

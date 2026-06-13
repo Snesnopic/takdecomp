@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #include "tak_decoder/tak_crc.hpp"
 
@@ -201,8 +202,7 @@ auto Decoder::decode_frame(std::span<const uint8_t> data, StreamInfo& info, std:
                 }
 
                 dmode_ = gb.get_bits(3);
-                if (dmode_ == 7) { throw std::runtime_error("Invalid dmode");
-}
+                if (dmode_ == 7) { throw std::runtime_error("Invalid dmode"); }
                 decorrelate(0, 1, nb_samples_ - 1, gb);
             }
         } else if (info.codec == CodecType::MultiChannel) {
@@ -257,7 +257,6 @@ auto Decoder::decode_frame(std::span<const uint8_t> data, StreamInfo& info, std:
         }
 
         for (int chan = 0; chan < channels_; chan++) {
-            sample_shift_[chan] = (gb.get_bits1() != 0u) ? gb.get_bits(4) + 1 : 0;
             if (lpc_mode_[chan] != 0) {
                 decode_lpc(decoded_[chan].data(), lpc_mode_[chan], nb_samples_);
             }
