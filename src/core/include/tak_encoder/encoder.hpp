@@ -10,7 +10,7 @@
 #include <vector>
 #include <span>
 #include "tak_encoder/bitstream_writer.hpp"
-
+#include <map>
 #include <functional>
 
 namespace takenc {
@@ -33,6 +33,7 @@ struct EncoderConfig {
     bool test_subframe_splits = true; // whether to do 2-way and 4-way subframe splits
     int max_frame_lpc_mode = 3;    // up to mode 3
     bool write_ape_tag = true;
+    std::map<std::string, std::string> ape_tags;
 };
 
 struct EncodeResult {

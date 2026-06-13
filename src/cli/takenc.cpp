@@ -3,6 +3,8 @@
 #include <iomanip>
 #include <chrono>
 #include <string>
+#include <fstream>
+#include <sstream>
 
 void print_help(const char* prog_name) {
     std::cout << "TAK Audio Compressor 0.1.0 (Compatible replica)\n"
@@ -12,6 +14,7 @@ void print_help(const char* prog_name) {
               << "Options:\n"
               << "  -e       Encode input.wav to output.tak (default)\n"
               << "  -pM      Preset M (e.g. -p2) - Ignored, defaults to Max\n"
+              << "  -tt #    Add textual tag item # (\"key=value\" or \"key=@file\")\n"
               << "\n";
 }
 
@@ -50,6 +53,29 @@ int main(int argc, char** argv) {
             } else if (p == "5" || p == "E" || p == "Max" || p == "2m" || p == "2e") {
                 cfg.max_lpc_mode = 50; cfg.max_filter_order_idx = 14; cfg.max_frame_lpc_mode = 3;
                 if (p == "Max") cfg.max_compression = true;
+            }
+        } else if (arg == "-tt") {
+            if (i + 1 < argc) {
+                std::string tag = argv[++i];
+                size_t eq = tag.find('=');
+                if (eq != std::string::npos) {
+                    std::string key = tag.substr(0, eq);
+                    std::string val = tag.substr(eq + 1);
+                    if (!val.empty() && val[0] == '@') {
+                        std::string filename = val.substr(1);
+                        std::ifstream fs(filename);
+                        if (fs) {
+                            std::stringstream buffer;
+                            buffer << fs.rdbuf();
+                            val = buffer.str();
+                        } else {
+                            std::cerr << "Warning: could not read tag file '" << filename << "'\n";
+                            val = ""; // or keep the @file literal? takc probably fails or ignores. We'll ignore the tag if file doesn't exist.
+                            continue;
+                        }
+                    }
+                    cfg.ape_tags[key] = val;
+                }
             }
         } else {
             if (input_file.empty()) {

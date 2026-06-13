@@ -7,6 +7,7 @@
 #include "tak_encoder/filter.hpp"
 #include "tak_encoder/subframe.hpp"
 #include "tak_encoder/md5.hpp"
+#include "tak_encoder/ape_tag.hpp"
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
@@ -321,7 +322,17 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
         progress(total_samples, total_samples);
     }
     
-    md5.finalize();
+    if (cfg.write_ape_tag && !cfg.ape_tags.empty()) {
+        ApeTagWriter ape;
+        for (const auto& pair : cfg.ape_tags) {
+            ape.add_item(pair.first, pair.second);
+        }
+        std::vector<uint8_t> ape_data = ape.generate();
+        if (!ape_data.empty()) {
+            os.write(reinterpret_cast<const char*>(ape_data.data()), ape_data.size());
+        }
+    }
+
     return EncodeResult{ md5.to_string() };
 }
 
