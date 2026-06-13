@@ -73,7 +73,7 @@ void Encoder::encode_segment(int mode, const int32_t* data, int len, BitStreamWr
     
     for (int i = 0; i < len; i++) {
         int32_t v = data[i];
-        uint32_t x = (static_cast<uint32_t>(v) << 1) ^ (v >> 31);
+        uint32_t x = (static_cast<uint32_t>(v) << 1) ^ (v < 0 ? -1 : 0);
         
         if (x < code.escape) {
             bw.write_bits(x, code.init);
@@ -137,7 +137,7 @@ int Encoder::calc_bits_needed(int mode, const int32_t* data, int len) {
     
     for (int i = 0; i < len; i++) {
         int32_t v = data[i];
-        uint32_t x = (static_cast<uint32_t>(v) << 1) ^ (v >> 31);
+        uint32_t x = (static_cast<uint32_t>(v) << 1) ^ (v < 0 ? -1 : 0);
         
         if (x < code.escape) {
             bits += code.init;

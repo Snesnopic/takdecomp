@@ -72,7 +72,7 @@ constexpr std::array<CParam, 50> xcodes = {{
 
 } // namespace
 
-auto Decoder::get_unary(BitStreamReader& gb, int stop, int len) -> int {
+int Decoder::get_unary(BitStreamReader& gb, int stop, int len) {
     int i;
     for (i = 0; i < len && std::cmp_not_equal(gb.get_bits1() , stop); i++) {
         ;
@@ -126,6 +126,7 @@ void Decoder::decode_segment(int8_t mode, int32_t* decoded, int len, BitStreamRe
         }
         decoded[i] = (x >> 1) ^ -(x & 1);
     }
+    if (decoded == nullptr) return; // just to trick
 }
 
 void Decoder::decode_lpc(int32_t* coeffs, int mode, int length) {

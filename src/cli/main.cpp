@@ -12,19 +12,19 @@
 
 using namespace takdecomp;
 
-static auto read_le32(std::ifstream& is) -> uint32_t {
+static uint32_t read_le32(std::ifstream& is) {
     uint8_t buf[4];
     is.read(reinterpret_cast<char*>(buf), 4);
     return buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
 }
 
-static auto read_le24(std::ifstream& is) -> uint32_t {
+static uint32_t read_le24(std::ifstream& is) {
     uint8_t buf[3];
     is.read(reinterpret_cast<char*>(buf), 3);
     return buf[0] | (buf[1] << 8) | (buf[2] << 16);
 }
 
-static auto read_u8(std::ifstream& is) -> uint8_t {
+static uint8_t read_u8(std::ifstream& is) {
     uint8_t buf;
     is.read(reinterpret_cast<char*>(&buf), 1);
     return buf;
@@ -55,7 +55,7 @@ static void write_wav_header(std::ofstream& os, int sample_rate, int channels, i
     os.write(reinterpret_cast<const char*>(&data_size), 4);
 }
 
-auto main(int argc, char* argv[]) -> int {
+int main(int argc, char* argv[]) {
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0] << " <input.tak> <output.wav>\n";
         return 1;
@@ -194,6 +194,7 @@ auto main(int argc, char* argv[]) -> int {
                 
                 pos = next_sync;
             } catch (const std::exception& e) {
+                std::cerr << "Decode error at pos " << pos << ": " << e.what() << "\n";
                 // If decode fails, it might be a false sync. Advance by 1 to search for next sync.
                 pos++;
             }

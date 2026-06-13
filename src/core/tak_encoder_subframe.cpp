@@ -173,7 +173,7 @@ void encode_channel(const int32_t* samples, int nb_samples, int bps,
             SubframeChoice c4_4 = evaluate_subframe(subframe_data + l1 + l2 + l3, l4, cfg);
             int cost4 = c4_1.total_bits + c4_2.total_bits + c4_3.total_bits + c4_4.total_bits + 18; // +18 bits for v
             if (cost4 < best_cost) {
-                best_cost = cost4;
+                
                 best_splits = 4;
                 best_choices = { c4_1, c4_2, c4_3, c4_4 };
                 best_lens = { l1, l2, l3, l4 };

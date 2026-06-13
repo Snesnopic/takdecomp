@@ -16,27 +16,27 @@ public:
 
     // Parse the stream info block from the bitstream.
     // Throws std::runtime_error on invalid data.
-    auto parse_streaminfo(BitStreamReader& gb) -> StreamInfo;
+    StreamInfo parse_streaminfo(BitStreamReader& gb);
 
 
     // Decode a frame header
     void decode_frame_header(BitStreamReader& gb, StreamInfo& info);
 
     // Decodes the current frame from the bitstream. Returns consumed bytes.
-    auto decode_frame(std::span<const uint8_t> data, StreamInfo& info, std::vector<std::vector<int32_t>>& output) -> size_t;
+    size_t decode_frame(std::span<const uint8_t> data, StreamInfo& info, std::vector<std::vector<int32_t>>& output);
 
 private:
     static void decode_lpc(int32_t* coeffs, int mode, int length);
     void decode_segment(int8_t mode, int32_t* decoded, int len, BitStreamReader& gb);
     void decode_residues(int32_t* decoded, int length, BitStreamReader& gb);
-    static auto get_unary(BitStreamReader& gb, int step, int max) -> int;
+    static int get_unary(BitStreamReader& gb, int step, int max);
     
     void decode_subframe(int32_t* decoded, int subframe_size, int prev_subframe_size, BitStreamReader& gb);
     void decode_channel(int chan, BitStreamReader& gb);
     void decorrelate(int c1, int c2, int length, BitStreamReader& gb);
 
-    static auto get_nb_samples(int sample_rate, FrameSizeType type) -> int;
-    static auto check_crc24(std::span<const uint8_t> data) -> bool;
+    static int get_nb_samples(int sample_rate, FrameSizeType type);
+    static bool check_crc24(std::span<const uint8_t> data);
 
     int uval_ = 0;
     int subframe_scale_ = 0;

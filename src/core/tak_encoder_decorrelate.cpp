@@ -90,7 +90,7 @@ void Decorrelator::apply_mode(int mode, int shift, int factor, const std::vector
             for (int j = 0; j < K; j++) {
                 v += (p_src[i + j] >> shift) * filter[j];
             }
-            int32_t v_clip = ((v >> 10) + (1 << 13)) & ~((2U << 13) - 1) ? ((v >> 31) ^ ((1 << 13) - 1)) : (v >> 10);
+            int32_t v_clip = (((v >> 10) + (1 << 13)) & ~((2U << 13) - 1)) ? ((v < 0 ? -1 : 0) ^ ((1 << 13) - 1)) : (v >> 10);
             int32_t v_scale = v_clip * (1 << shift);
             
             p_tgt_dst[order_half + i] = v_scale - p_tgt[order_half + i];
@@ -288,7 +288,7 @@ Decorrelator::DecorrelationResult Decorrelator::apply_decorrelation(int32_t* dat
         }
     }
 
-    std::cerr << "ENCODER APPLYING BEST MODE: " << best_mode << std::endl;
+    
     apply_mode(best_mode, best_shift, best_factor, best_filter, data_c1, data_c2, buf1.data(), buf2.data(), len);
     for (int i = 0; i < len; i++) {
         data_c1[i] = buf1[i];

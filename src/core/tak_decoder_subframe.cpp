@@ -1,3 +1,4 @@
+#include <iostream>
 #include <cstdint>
 #include "tak_decoder/decoder.hpp"
 #include "tak_decoder/bitstream.hpp"
@@ -16,9 +17,9 @@ constexpr std::array<uint16_t, 16> predictor_sizes = {
 
 
 
-auto clip_intp2(int32_t a, int p) -> int32_t {
+int32_t clip_intp2(int32_t a, int p) {
     if (((static_cast<unsigned>(a) + (1 << p)) & ~((2U << p) - 1)) != 0u) {
-        return (a >> 31) ^ ((1 << p) - 1);
+        return (a < 0 ? -1 : 0) ^ ((1 << p) - 1);
     }         return a;
    
 }
@@ -159,7 +160,7 @@ void Decoder::decode_channel(int chan, BitStreamReader& gb) {
 
     *decoded++ = gb.get_sbits(bps_ - sample_shift_[chan]);
     lpc_mode_[chan] = gb.get_bits(2);
-    // std::cerr << "lpc_mode_[" << chan << "] = " << (int)lpc_mode_[chan] << "\n";
+
     nb_subframes_ = gb.get_bits(3) + 1;
     
 
@@ -191,6 +192,7 @@ void Decoder::decode_channel(int chan, BitStreamReader& gb) {
     for (i = 0; i < nb_subframes_; i++) {
         decode_subframe(decoded, subframe_len_[i], prev, gb);
         decoded += subframe_len_[i];
+
         prev = subframe_len_[i];
     }
 }

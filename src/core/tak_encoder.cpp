@@ -23,7 +23,7 @@ static void write_metadata_block(std::ostream& os, uint8_t type_byte,
                                   const uint8_t* payload, int payload_len) {
     os.write(reinterpret_cast<const char*>(&type_byte), 1);
     int block_size = payload_len + 3; // payload + CRC
-    uint8_t size_le[3] = {
+    const uint8_t size_le[3] = {
         static_cast<uint8_t>(block_size & 0xff),
         static_cast<uint8_t>((block_size >> 8) & 0xff),
         static_cast<uint8_t>((block_size >> 16) & 0xff)
@@ -31,7 +31,7 @@ static void write_metadata_block(std::ostream& os, uint8_t type_byte,
     os.write(reinterpret_cast<char*>(size_le), 3);
     os.write(reinterpret_cast<const char*>(payload), payload_len);
     uint32_t crc = takdecomp::compute_crc24(payload, payload_len);
-    uint8_t crc_be[3] = {
+    const uint8_t crc_be[3] = {
         static_cast<uint8_t>((crc >> 16) & 0xff),
         static_cast<uint8_t>((crc >> 8) & 0xff),
         static_cast<uint8_t>(crc & 0xff)
@@ -138,7 +138,7 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
     os.write("\x00\x00\x00\x00", 4); // type=0, size=0
 
     size_t audio_start_offset = os.tellp();
-    size_t last_frame_start = 0;
+    
 
     // Encode frames
     // Frame size for Fs250ms is exactly 250ms worth of samples
@@ -214,7 +214,7 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
         }
 
         // Apply inverse decorrelation (only for stereo currently)
-        Decorrelator::DecorrelationResult dmode_res = {0, 0, 0};
+        Decorrelator::DecorrelationResult dmode_res = {0, 0, 0, 0, {}};
         if (channels == 2) {
             dmode_res = decorr.apply_decorrelation(c[0].data(), c[1].data(), current_frame_samples);
         }
@@ -225,7 +225,7 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
         }
 
         // Encode channels
-        std::cerr << "Before encode_channel: c[0][11022]=" << c[0][11022] << std::endl;
+        
         for (int ch = 0; ch < channels; ch++) {
             encode_channel(c[ch].data(), current_frame_samples, bps, lpc_mode[ch], sample_rate, cfg, fw);
         }
@@ -281,7 +281,7 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
         int frame_bytes = fw.get_position_bytes();
         
         if (remaining_samples - current_frame_samples <= 0) {
-            size_t last_frame_end = last_frame_start + frame_bytes;
+            
             int last_frame_size = frame_bytes;
             os.seekp(last_frame_md_offset);
             
@@ -306,6 +306,8 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
             os.write(reinterpret_cast<char*>(up_crc_be), 3);
             
             // Seek back to where the last frame data should be written
+            
+            
             os.seekp(last_frame_start);
         }
 

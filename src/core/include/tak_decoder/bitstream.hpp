@@ -13,7 +13,7 @@ public:
     explicit BitStreamReader(std::span<const uint8_t> data) 
         : data_(data) {}
 
-    auto get_bits(int n) -> uint32_t {
+    uint32_t get_bits(int n) {
         if (n <= 0) { return 0;
 }
         if (n > 32) { throw std::invalid_argument("get_bits supports up to 32 bits");
@@ -26,7 +26,7 @@ public:
         return result;
     }
 
-    auto get_bits64(int n) -> uint64_t {
+    uint64_t get_bits64(int n) {
         if (n <= 0) { return 0;
 }
         if (n > 64) { throw std::invalid_argument("get_bits64 supports up to 64 bits");
@@ -39,7 +39,7 @@ public:
         return result;
     }
 
-    auto get_sbits(int n) -> int32_t {
+    int32_t get_sbits(int n) {
         if (n <= 0) { return 0;
 }
         uint32_t const val = get_bits(n);
@@ -50,7 +50,7 @@ public:
         return sval;
     }
 
-    auto get_bits1() -> uint8_t {
+    uint8_t get_bits1() {
         if (byte_idx_ >= data_.size()) {
             return 0;
         }
@@ -83,16 +83,16 @@ public:
         }
     }
 
-    [[nodiscard]] auto get_bits_left() const -> size_t {
+    [[nodiscard]] size_t get_bits_left() const {
         if (byte_idx_ >= data_.size()) { return 0;
 }
         return ((data_.size() - byte_idx_) * 8) - bit_idx_;
     }
 
-    [[nodiscard]] auto get_data() const -> std::span<const uint8_t> { return data_; }
+    [[nodiscard]] std::span<const uint8_t> get_data() const { return data_; }
 
-    [[nodiscard]] auto get_position_bytes() const -> size_t { return byte_idx_; }
-    [[nodiscard]] auto get_bit_idx() const -> int { return bit_idx_; }
+    [[nodiscard]] size_t get_position_bytes() const { return byte_idx_; }
+    [[nodiscard]] int get_bit_idx() const { return bit_idx_; }
 
 private:
     std::span<const uint8_t> data_;

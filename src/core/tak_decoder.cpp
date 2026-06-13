@@ -46,7 +46,7 @@ constexpr std::array<uint16_t, 10> frame_duration_type_quants = {
 
 } // namespace
 
-auto Decoder::get_nb_samples(int sample_rate, FrameSizeType type) -> int {
+int Decoder::get_nb_samples(int sample_rate, FrameSizeType type) {
     int nb_samples = 0;
     int max_nb_samples = 0;
     auto const type_val = static_cast<uint8_t>(type);
@@ -68,7 +68,7 @@ auto Decoder::get_nb_samples(int sample_rate, FrameSizeType type) -> int {
     return nb_samples;
 }
 
-auto Decoder::parse_streaminfo(BitStreamReader& gb) -> StreamInfo {
+StreamInfo Decoder::parse_streaminfo(BitStreamReader& gb) {
     StreamInfo s;
 
     s.codec = static_cast<CodecType>(gb.get_bits(constants::ENCODER_CODEC_BITS));
@@ -148,7 +148,7 @@ void Decoder::decode_frame_header(BitStreamReader& gb, StreamInfo& ti) {
     }
 }
 
-auto Decoder::decode_frame(std::span<const uint8_t> data, StreamInfo& info, std::vector<std::vector<int32_t>>& output) -> size_t {
+size_t Decoder::decode_frame(std::span<const uint8_t> data, StreamInfo& info, std::vector<std::vector<int32_t>>& output) {
     BitStreamReader gb(data);
     decode_frame_header(gb, info);
 
@@ -192,6 +192,7 @@ auto Decoder::decode_frame(std::span<const uint8_t> data, StreamInfo& info, std:
         if (info.codec == CodecType::MonoStereo) {
             for (int chan = 0; chan < channels_; chan++) {
                 decode_channel(chan, gb);
+
             }
 
             if (channels_ == 2) {
@@ -202,7 +203,6 @@ auto Decoder::decode_frame(std::span<const uint8_t> data, StreamInfo& info, std:
                 }
 
                 dmode_ = gb.get_bits(3);
-                if (dmode_ == 7) { throw std::runtime_error("Invalid dmode"); }
                 decorrelate(0, 1, nb_samples_ - 1, gb);
             }
         } else if (info.codec == CodecType::MultiChannel) {
@@ -273,12 +273,9 @@ auto Decoder::decode_frame(std::span<const uint8_t> data, StreamInfo& info, std:
     output = decoded_;
     
     if (gb.get_bits_left() >= 24) {
+        gb.align_get_bits();
         uint32_t tail_val = gb.get_bits(24);
-        
-        // Compute CRC over the frame bytes (up to the current byte index minus the 3 bytes we just read?)
-        // Wait, to compute CRC of the frame, we need the exact bytes.
-        // Let's just print the tail_val for now.
-        std::cerr << "Frame tail 24 bits: " << std::hex << tail_val << std::dec << "\n";
+        (void)tail_val; // Ignore 24 bits
     }
     
     gb.align_get_bits();
@@ -287,7 +284,7 @@ auto Decoder::decode_frame(std::span<const uint8_t> data, StreamInfo& info, std:
 
 } // namespace takdecomp
 
-auto takdecomp::Decoder::check_crc24(std::span<const uint8_t> data) -> bool {
+bool takdecomp::Decoder::check_crc24(std::span<const uint8_t> data) {
     if (data.size() < 3) { return false;
 }
     

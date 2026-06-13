@@ -7,7 +7,7 @@ namespace takenc {
 
 static int32_t clip_intp2(int32_t a, int p) {
     if (((static_cast<unsigned>(a) + (1 << p)) & ~((2U << p) - 1)) != 0u)
-        return (a >> 31) ^ ((1 << p) - 1);
+        return (a < 0 ? -1 : 0) ^ ((1 << p) - 1);
     return a;
 }
 
