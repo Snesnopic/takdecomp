@@ -81,7 +81,7 @@ private:
         int8_t index = 0;
         int8_t chan1 = 0;
         int8_t chan2 = 0;
-    } __attribute__((aligned(4)));
+    };
     std::array<MCDParam, constants::MAX_CHANNELS> mcdparams_{};
 
     int8_t dmode_ = 0;

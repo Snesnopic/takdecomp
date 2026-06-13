@@ -15,7 +15,7 @@ struct CParam {
     uint32_t scale;
     uint32_t aescape;
     uint32_t bias;
-} __attribute__((packed)) __attribute__((aligned(32)));
+};
 
 constexpr std::array<CParam, 50> xcodes = {{
     { .init=0x01, .escape=0x0000001, .scale=0x0000001, .aescape=0x0000003, .bias=0x0000008 },
