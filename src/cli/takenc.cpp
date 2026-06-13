@@ -13,8 +13,14 @@ void print_help(const char *prog_name) {
             << "\n"
             << "Options:\n"
             << "  -e       Encode input.wav to output.tak (default)\n"
-            << "  -pM      Preset M (e.g. -p2) - Ignored, defaults to Max\n"
-            << "  -tt #    Add textual tag item # (\"key=value\" or \"key=@file\")\n"
+            << "  -p#      Compression preset (0 to 5, e.g. -p2)\n"
+            << "           Modifiers: m (Max effort), e (Extra Max effort) (e.g. -p2m)\n"
+            << "  -tn#     Number of threads to use (default: 1)\n"
+            << "  -tt #    Add APEv2 textual tag item (e.g. -tt \"Artist=Name\")\n"
+            << "  -wm#     Wave metadata mode (0=ignore, 1=copy foreign chunks)\n"
+            << "  -ihs     Ignore header size (for streaming unknown lengths)\n"
+            << "  -overwrite Silently overwrite the destination file\n"
+            << "  -v       Verify frame integrity after encoding\n"
             << "\n";
 }
 
