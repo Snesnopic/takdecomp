@@ -146,7 +146,7 @@ namespace takdecomp {
         }
     }
 
-    size_t Decoder::decode_frame(std::span<const uint8_t> data, StreamInfo &info,
+    size_t Decoder::decode_frame(const std::span<const uint8_t> data, StreamInfo &info,
                                  std::vector<std::vector<int32_t> > &output) {
         BitStreamReader gb(data);
         decode_frame_header(gb, info);
