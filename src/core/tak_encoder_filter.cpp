@@ -1,4 +1,6 @@
 #include "tak_encoder/filter.hpp"
+#include <algorithm>
+
 #include "tak_encoder/encoder.hpp"
 #include <cmath>
 #include <algorithm>
@@ -45,7 +47,7 @@ namespace takenc {
 
             E *= (1.0 - k * k);
             if (E <= 0.0) return false;
-            std::ranges::copy(a, a_prev.begin());
+            std::copy(a.begin(), a.end(), a_prev.begin());
         }
         return true;
     }

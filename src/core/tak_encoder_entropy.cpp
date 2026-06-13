@@ -1,4 +1,6 @@
 #include "tak_encoder/encoder.hpp"
+#include <algorithm>
+
 #include <stdexcept>
 
 namespace takenc {
@@ -226,7 +228,7 @@ namespace takenc {
         current_cost.assign(35, 0);
 
         for (int start_v = 0; start_v <= max_v; start_v++) {
-            std::ranges::fill(current_cost, 0);
+            std::fill(current_cost.begin(), current_cost.end(), 0);
             for (int end_v = start_v + 1; end_v <= max_v + 1; end_v++) {
                 int best_m = 1;
                 int best_c = 1e9;
