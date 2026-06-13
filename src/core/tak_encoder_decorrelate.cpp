@@ -112,8 +112,27 @@ Decorrelator::DecorrelationResult Decorrelator::apply_decorrelation(int32_t* dat
         }
     };
 
-    // Force mode 2
+    evaluate(0, 0, 0);
+    evaluate(1, 0, 0);
     evaluate(2, 0, 0);
+    evaluate(3, 0, 0);
+
+    // Mode 4: Side / Left with scale. target is Side (Left - Right). pred_source is Left.
+    // Actually, mode 4: p1=Left, p2=Left_scaled - Right
+    // To predict p2 optimally, we want to scale Left to match Right.
+    // If factor = 0, Left_scaled = 0, so p2 = -Right.
+    // If factor corresponds to Right/Left, then Left_scaled ~ Right, so p2 ~ 0.
+    // So target = Right, pred_source = Left.
+    for (int shift = 0; shift <= 4; shift++) {
+        int factor = compute_optimal_factor(data_c1, data_c2, len, shift);
+        evaluate(4, shift, factor);
+    }
+
+    // Mode 5: Side / Right with scale. target is Left. pred_source is Right.
+    for (int shift = 0; shift <= 4; shift++) {
+        int factor = compute_optimal_factor(data_c2, data_c1, len, shift);
+        evaluate(5, shift, factor);
+    }
     apply_mode(best_mode, best_shift, best_factor, data_c1, data_c2, buf1.data(), buf2.data(), len);
     for (int i = 0; i < len; i++) {
         data_c1[i] = buf1[i];
