@@ -47,7 +47,7 @@ namespace takenc {
     }
 
 
-    static void encode_residues(const int32_t *data, int length, BitStreamWriter &fw) {
+    static void encode_residues(const int32_t *data, const int length, BitStreamWriter &fw) {
         int best_m = 1;
         int best_c = Encoder::calc_bits_needed(1, data, length);
         for (int m = 2; m <= 34; m++) {
@@ -63,7 +63,7 @@ namespace takenc {
     }
 
     void write_subframe(const SubframeChoice &choice, const int32_t *subframe_data,
-                        int subframe_size, int prev_subframe_size, BitStreamWriter &fw) {
+                        const int subframe_size, const int prev_subframe_size, BitStreamWriter &fw) {
         if (choice.use_filter) {
             // filter flag
             fw.write_bit(1);
@@ -92,9 +92,9 @@ namespace takenc {
             // Predictors
             fw.write_bits(choice.filter.predictors[0] & 0x3FF, 10);
             fw.write_bits(choice.filter.predictors[1] & 0x3FF, 10); {
-                int shift = 10 - choice.filter.size;
-                int raw2 = choice.filter.predictors[2] >> shift;
-                int raw3 = choice.filter.predictors[3] >> shift;
+                const int shift = 10 - choice.filter.size;
+                const int raw2 = choice.filter.predictors[2] >> shift;
+                const int raw3 = choice.filter.predictors[3] >> shift;
                 fw.write_bits(raw2 & ((1 << choice.filter.size) - 1), choice.filter.size);
                 fw.write_bits(raw3 & ((1 << choice.filter.size) - 1), choice.filter.size);
             }
@@ -104,8 +104,8 @@ namespace takenc {
                     if ((i & 3) == 0) {
                         fw.write_bits(0, 2); // diff=0
                     }
-                    int shift = 10 - choice.filter.size;
-                    int raw = choice.filter.predictors[i] >> shift;
+                    const int shift = 10 - choice.filter.size;
+                    const int raw = choice.filter.predictors[i] >> shift;
                     fw.write_bits(raw & ((1 << choice.filter.size) - 1), choice.filter.size);
                 }
             }

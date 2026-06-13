@@ -43,7 +43,7 @@ namespace takdecomp {
         };
     } // namespace
 
-    int Decoder::get_nb_samples(int sample_rate, FrameSizeType type) {
+    int Decoder::get_nb_samples(const int sample_rate, FrameSizeType type) {
         int nb_samples = 0;
         int max_nb_samples = 0;
         auto const type_val = static_cast<uint8_t>(type);
@@ -72,7 +72,7 @@ namespace takdecomp {
         s.codec = static_cast<CodecType>(gb.get_bits(constants::ENCODER_CODEC_BITS));
         gb.skip_bits(constants::ENCODER_PROFILE_BITS);
 
-        auto frame_type = static_cast<FrameSizeType>(gb.get_bits(constants::SIZE_FRAME_DURATION_BITS));
+        const auto frame_type = static_cast<FrameSizeType>(gb.get_bits(constants::SIZE_FRAME_DURATION_BITS));
         s.samples = gb.get_bits64(constants::SIZE_SAMPLES_NUM_BITS);
 
         s.data_type = gb.get_bits(constants::FORMAT_DATA_TYPE_BITS);
@@ -99,22 +99,22 @@ namespace takdecomp {
         return s;
     }
 
-    void Decoder::decode_frame_header(BitStreamReader &gb, StreamInfo &ti) {
+    void Decoder::decode_frame_header(BitStreamReader &gb, StreamInfo &info) {
         if (gb.get_bits(constants::FRAME_HEADER_SYNC_ID_BITS) != constants::FRAME_HEADER_SYNC_ID) {
             throw std::runtime_error("Missing sync id");
         }
 
-        ti.flags = gb.get_bits(constants::FRAME_HEADER_FLAGS_BITS);
-        ti.frame_num = gb.get_bits(constants::FRAME_HEADER_NO_BITS);
+        info.flags = gb.get_bits(constants::FRAME_HEADER_FLAGS_BITS);
+        info.frame_num = gb.get_bits(constants::FRAME_HEADER_NO_BITS);
 
-        if ((ti.flags & constants::FRAME_FLAG_IS_LAST) != 0) {
-            ti.last_frame_samples = gb.get_bits(constants::FRAME_HEADER_SAMPLE_COUNT_BITS) + 1;
+        if ((info.flags & constants::FRAME_FLAG_IS_LAST) != 0) {
+            info.last_frame_samples = gb.get_bits(constants::FRAME_HEADER_SAMPLE_COUNT_BITS) + 1;
             gb.skip_bits(2);
         } else {
-            ti.last_frame_samples = 0;
+            info.last_frame_samples = 0;
         }
 
-        if ((ti.flags & constants::FRAME_FLAG_HAS_INFO) != 0) {
+        if ((info.flags & constants::FRAME_FLAG_HAS_INFO) != 0) {
             parse_streaminfo(gb);
 
             if (gb.get_bits(6) != 0u) {
@@ -123,7 +123,7 @@ namespace takdecomp {
             gb.align_get_bits();
         }
 
-        if ((ti.flags & constants::FRAME_FLAG_HAS_METADATA) != 0) {
+        if ((info.flags & constants::FRAME_FLAG_HAS_METADATA) != 0) {
             throw std::runtime_error("Metadata decoding not supported yet");
         }
 
@@ -139,7 +139,7 @@ namespace takdecomp {
 
         gb.skip_bits(24);
 
-        uint32_t crc = compute_crc24(buf, header_len);
+        const uint32_t crc = compute_crc24(buf, header_len);
 
         if (crc != expected_crc) {
             throw std::runtime_error("CRC mismatch in frame header");
@@ -275,7 +275,7 @@ namespace takdecomp {
 
         if (gb.get_bits_left() >= 24) {
             gb.align_get_bits();
-            uint32_t tail_val = gb.get_bits(24);
+            const uint32_t tail_val = gb.get_bits(24);
             (void) tail_val; // Ignore 24 bits
         }
 
@@ -284,13 +284,13 @@ namespace takdecomp {
     }
 } // namespace takdecomp
 
-bool takdecomp::Decoder::check_crc24(std::span<const uint8_t> data) {
+bool takdecomp::Decoder::check_crc24(const std::span<const uint8_t> data) {
     if (data.size() < 3) {
         return false;
     }
 
     size_t const len = data.size() - 3;
-    uint32_t crc = compute_crc24(data.data(), len);
+    const uint32_t crc = compute_crc24(data.data(), len);
 
     uint32_t const expected_crc = data[len] | (data[len + 1] << 8) | (data[len + 2] << 16);
     return crc == expected_crc;

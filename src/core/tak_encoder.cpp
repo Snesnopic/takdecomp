@@ -22,10 +22,10 @@
 
 namespace takenc {
     // Helper: write a metadata block (type byte, 3-byte LE size, payload, 3-byte BE CRC)
-    static void write_metadata_block(std::ostream &os, uint8_t type_byte,
-                                     const uint8_t *payload, int payload_len) {
+    static void write_metadata_block(std::ostream &os, const uint8_t type_byte,
+                                     const uint8_t *payload, const int payload_len) {
         os.write(reinterpret_cast<const char *>(&type_byte), 1);
-        int block_size = payload_len + 3; // payload + CRC
+        const int block_size = payload_len + 3; // payload + CRC
         const uint8_t size_le[3] = {
             static_cast<uint8_t>(block_size & 0xff),
             static_cast<uint8_t>((block_size >> 8) & 0xff),
@@ -33,7 +33,7 @@ namespace takenc {
         };
         os.write(reinterpret_cast<const char *>(size_le), 3);
         os.write(reinterpret_cast<const char *>(payload), payload_len);
-        uint32_t crc = takdecomp::compute_crc24(payload, payload_len);
+        const uint32_t crc = takdecomp::compute_crc24(payload, payload_len);
         const uint8_t crc_be[3] = {
             static_cast<uint8_t>((crc >> 16) & 0xff),
             static_cast<uint8_t>((crc >> 8) & 0xff),
@@ -43,7 +43,7 @@ namespace takenc {
     }
 
     EncodeResult Encoder::encode_file(const char *wav_path, const char *tak_path, const EncoderConfig &cfg,
-                                      ProgressCallback progress) {
+                                      const ProgressCallback& progress) {
         std::ifstream is(wav_path, std::ios::binary);
         if (!is) throw std::runtime_error("Could not open WAV file");
         std::ofstream os(tak_path, std::ios::binary);
@@ -52,7 +52,7 @@ namespace takenc {
     }
 
     EncodeResult Encoder::encode_stream(std::istream &is, std::ostream &os, const EncoderConfig &cfg,
-                                        ProgressCallback progress) {
+                                        const ProgressCallback& progress) {
         WavInfo wav = read_wav_header(is);
         int channels = wav.channels;
         int bps = wav.bps;
@@ -66,7 +66,7 @@ namespace takenc {
         os.write("tBaK", 4);
         size_t si_md_offset = os.tellp();
 
-        auto write_si = [&](int64_t ts) {
+        auto write_si = [&](const int64_t ts) {
             BitStreamWriter si_gb;
             takdecomp::CodecType codec = (channels > 2)
                                              ? takdecomp::CodecType::MultiChannel
@@ -74,7 +74,7 @@ namespace takenc {
             si_gb.write_bits(static_cast<int>(codec), takdecomp::constants::ENCODER_CODEC_BITS);
             si_gb.write_bits(0, takdecomp::constants::ENCODER_PROFILE_BITS);
 
-            int fsl = cfg.frame_size_limit;
+            const int fsl = cfg.frame_size_limit;
             int frame_size_type = static_cast<int>(takdecomp::FrameSizeType::Fs250ms);
             if (fsl == 512) frame_size_type = 0;
             else if (fsl == 1024) frame_size_type = 1;
@@ -185,16 +185,15 @@ namespace takenc {
         };
 
         auto process_frame = [channels, bps, sample_rate, cfg](const std::vector<uint8_t> &raw_bytes,
-                                                               int current_frame_samples, int f_num,
-                                                               bool is_last) -> FrameRes {
-            Decorrelator decorr;
+                                                               const int current_frame_samples, const int f_num,
+                                                               const bool is_last) -> FrameRes {
             std::vector<std::vector<int32_t> > c(channels, std::vector<int32_t>(current_frame_samples));
             int byte_idx = 0;
             int const bytes_per_sample = bps / 8;
             for (int i = 0; i < current_frame_samples; i++) {
                 for (int ch = 0; ch < channels; ch++) {
                     if (bps == 16) {
-                        int16_t val = raw_bytes[byte_idx] | (raw_bytes[byte_idx + 1] << 8);
+                        const int16_t val = raw_bytes[byte_idx] | (raw_bytes[byte_idx + 1] << 8);
                         c[ch][i] = val;
                     } else if (bps == 24) {
                         int32_t val = raw_bytes[byte_idx] | (raw_bytes[byte_idx + 1] << 8) | (
@@ -217,15 +216,15 @@ namespace takenc {
                 fw.write_bits(0, 2);
             }
             fw.align_write_bits();
-            int header_bytes = fw.get_position_bytes();
-            uint32_t header_crc = takdecomp::compute_crc24(fw.get_data().data(), header_bytes);
+            const int header_bytes = fw.get_position_bytes();
+            const uint32_t header_crc = takdecomp::compute_crc24(fw.get_data().data(), header_bytes);
             fw.write_bits((header_crc >> 16) & 0xff, 8);
             fw.write_bits((header_crc >> 8) & 0xff, 8);
             fw.write_bits(header_crc & 0xff, 8);
 
             std::vector<int> lpc_mode(channels, 0);
             if (current_frame_samples >= 16) {
-                int max_lpc = cfg.max_frame_lpc_mode;
+                const int max_lpc = cfg.max_frame_lpc_mode;
                 int costs[4];
                 for (int ch = 0; ch < channels; ch++) {
                     for (int m = 0; m <= max_lpc; m++) costs[m] = estimate_lpc_cost(
@@ -240,6 +239,7 @@ namespace takenc {
 
             Decorrelator::DecorrelationResult dmode_res = {0, 0, 0, 0, {}};
             if (channels == 2) {
+                Decorrelator decorr;
                 dmode_res = decorr.apply_decorrelation(c[0].data(), c[1].data(), current_frame_samples);
             }
 
@@ -282,9 +282,9 @@ namespace takenc {
             }
 
             fw.align_write_bits();
-            int frame_size = fw.get_position_bytes();
-            int payload_size = frame_size - (header_bytes + 3);
-            uint32_t frame_crc = takdecomp::compute_crc24(fw.get_data().data() + header_bytes + 3, payload_size);
+            const int frame_size = fw.get_position_bytes();
+            const int payload_size = frame_size - (header_bytes + 3);
+            const uint32_t frame_crc = takdecomp::compute_crc24(fw.get_data().data() + header_bytes + 3, payload_size);
             fw.write_bits((frame_crc >> 16) & 0xff, 8);
             fw.write_bits((frame_crc >> 8) & 0xff, 8);
             fw.write_bits(frame_crc & 0xff, 8);

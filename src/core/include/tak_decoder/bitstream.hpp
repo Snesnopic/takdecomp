@@ -9,11 +9,11 @@
 namespace takdecomp {
     class BitStreamReader {
     public:
-        explicit BitStreamReader(std::span<const uint8_t> data)
+        explicit BitStreamReader(const std::span<const uint8_t> data)
             : data_(data) {
         }
 
-        uint32_t get_bits(int n) {
+        uint32_t get_bits(const int n) {
             if (n <= 0) {
                 return 0;
             }
@@ -28,7 +28,7 @@ namespace takdecomp {
             return result;
         }
 
-        uint64_t get_bits64(int n) {
+        uint64_t get_bits64(const int n) {
             if (n <= 0) {
                 return 0;
             }
@@ -43,7 +43,7 @@ namespace takdecomp {
             return result;
         }
 
-        int32_t get_sbits(int n) {
+        int32_t get_sbits(const int n) {
             if (n <= 0) {
                 return 0;
             }
@@ -70,7 +70,7 @@ namespace takdecomp {
             return bit;
         }
 
-        void skip_bits(int n) {
+        void skip_bits(const int n) {
             if (n <= 0) {
                 return;
             }

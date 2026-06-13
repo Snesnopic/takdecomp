@@ -7,14 +7,14 @@
 #include <array>
 
 namespace takenc {
-    static int32_t clip_intp2(int32_t a, int p) {
+    static int32_t clip_intp2(const int32_t a, const int p) {
         if (((static_cast<unsigned>(a) + (1 << p)) & ~((2U << p) - 1)) != 0u)
             return (a < 0 ? -1 : 0) ^ ((1 << p) - 1);
         return a;
     }
 
     // Compute autocorrelation r[0..order]
-    static void compute_autocorrelation(const int32_t *data, int len, double *r, int order) {
+    static void compute_autocorrelation(const int32_t *data, const int len, double *r, const int order) {
         for (int k = 0; k <= order; k++) {
             double sum = 0;
             for (int i = k; i < len; i++)
@@ -24,7 +24,7 @@ namespace takenc {
     }
 
     // Levinson-Durbin: compute PARCOR (reflection) coefficients from autocorrelation
-    static bool levinson_durbin(const double *r, int order, double *parcor) {
+    static bool levinson_durbin(const double *r, const int order, double *parcor) {
         if (r[0] <= 0.0) return false;
 
         std::vector<double> a(order), a_prev(order);
@@ -45,61 +45,61 @@ namespace takenc {
 
             E *= (1.0 - k * k);
             if (E <= 0.0) return false;
-            std::copy(a.begin(), a.end(), a_prev.begin());
+            std::ranges::copy(a, a_prev.begin());
         }
         return true;
     }
 
     // Build the filter from quantized predictors (exactly matches decoder)
-    static void build_filter(const int *predictors, int filter_order, int filter_quant,
+    static void build_filter(const int *predictors, const int filter_order, const int filter_quant,
                              int16_t *filter_out) {
         std::array<int, 256> tfilter{};
         tfilter[0] = predictors[0] * 64;
         for (int i = 1; i < filter_order; i++) {
             for (int j = 0; j < (i + 1) / 2; j++) {
-                int32_t v1 = tfilter[j];
-                int32_t v2 = tfilter[i - 1 - j];
-                int32_t x = v1 + ((predictors[i] * v2 + 256) >> 9);
+                const int32_t v1 = tfilter[j];
+                const int32_t v2 = tfilter[i - 1 - j];
+                const int32_t x = v1 + ((predictors[i] * v2 + 256) >> 9);
                 tfilter[i - 1 - j] = v2 + ((predictors[i] * v1 + 256) >> 9);
                 tfilter[j] = x;
             }
             tfilter[i] = predictors[i] * 64;
         }
 
-        int x = 1 << (32 - (15 - filter_quant));
-        int y = 1 << ((15 - filter_quant) - 1);
+        const int x = 1 << (32 - (15 - filter_quant));
+        const int y = 1 << ((15 - filter_quant) - 1);
         for (int i = 0, j = filter_order - 1; i < filter_order / 2; i++, j--) {
             filter_out[j] = static_cast<int16_t>(x - ((tfilter[i] + y) >> (15 - filter_quant)));
             filter_out[i] = static_cast<int16_t>(x - ((tfilter[j] + y) >> (15 - filter_quant)));
         }
         if (filter_order % 2 != 0) {
-            int m = filter_order / 2;
+            const int m = filter_order / 2;
             filter_out[m] = static_cast<int16_t>(x - ((tfilter[m] + y) >> (15 - filter_quant)));
         }
     }
 
     // Compute residuals and update history, perfectly matching the decoder loop
-    static void compute_filter_residuals(const int32_t *decoded, int subframe_size,
-                                         const int16_t *filter, int filter_order,
-                                         int filter_quant, int dshift,
+    static void compute_filter_residuals(const int32_t *decoded, const int subframe_size,
+                                         const int16_t *filter, const int filter_order,
+                                         const int filter_quant, const int dshift,
                                          int32_t *residuals_out) {
         std::array<int16_t, 544> residues{};
         for (int i = 0; i < filter_order; i++)
             residues[i] = static_cast<int16_t>(decoded[i] >> dshift);
 
-        int y = 544 - filter_order;
+        const int y = 544 - filter_order;
         int x = subframe_size - filter_order;
         int out_idx = 0;
 
         while (x > 0) {
-            int tmp = std::min(y, x);
+            const int tmp = std::min(y, x);
             for (int i = 0; i < tmp; i++) {
                 int32_t v = 1 << (filter_quant - 1);
                 for (int j = 0; j < filter_order; j++) {
                     v += residues[i + j] * static_cast<unsigned>(filter[j]);
                 }
-                int32_t pred = clip_intp2(v >> filter_quant, 13) * (1 << dshift);
-                int32_t actual = decoded[filter_order + out_idx];
+                const int32_t pred = clip_intp2(v >> filter_quant, 13) * (1 << dshift);
+                const int32_t actual = decoded[filter_order + out_idx];
                 residuals_out[out_idx] = pred - actual;
                 residues[filter_order + i] = static_cast<int16_t>(actual >> dshift);
                 out_idx++;
@@ -111,7 +111,7 @@ namespace takenc {
         }
     }
 
-    void inverse_lpc(int32_t *data, int mode, int length) {
+    void inverse_lpc(int32_t *data, const int mode, const int length) {
         if (mode == 0 || length < 2) return;
         if (mode == 1) {
             for (int i = length - 1; i >= 1; i--)
@@ -129,7 +129,7 @@ namespace takenc {
         }
     }
 
-    int estimate_lpc_cost(const int32_t *samples, int length, int lpc_mode) {
+    int estimate_lpc_cost(const int32_t *samples, const int length, const int lpc_mode) {
         std::vector<int32_t> tmp(samples, samples + length);
         inverse_lpc(tmp.data(), lpc_mode, length);
         int best = Encoder::calc_bits_needed(1, tmp.data() + 1, length - 1);
@@ -141,7 +141,7 @@ namespace takenc {
     }
 
 
-    static int evaluate_filter_cost(FilterConfig &cfg, const int32_t *samples, int subframe_size, int filter_order) {
+    static int evaluate_filter_cost(FilterConfig &cfg, const int32_t *samples, const int subframe_size, const int filter_order) {
         int overhead = 1 + 4 + 1 + 2 + 1 + 1 + 1 + 20 + 2 * cfg.size;
         if (filter_order > 4) {
             overhead += 1;
@@ -165,7 +165,7 @@ namespace takenc {
         int resid_cost = 0; {
             int best = Encoder::calc_bits_needed(1, cfg.filter_residuals.data(), subframe_size - filter_order);
             for (int m = 2; m <= 34; m++) {
-                int c = Encoder::calc_bits_needed(m, cfg.filter_residuals.data(), subframe_size - filter_order);
+                const int c = Encoder::calc_bits_needed(m, cfg.filter_residuals.data(), subframe_size - filter_order);
                 if (c < best) best = c;
             }
             resid_cost = 1 + 6 + best;
@@ -206,15 +206,15 @@ namespace takenc {
 
         cfg.predictors.resize(std::max(4, filter_order));
 
-        auto init_predictors = [&](int size_val) {
+        auto init_predictors = [&](const int size_val) {
             for (int i = 0; i < filter_order; i++) {
-                double k = parcor[i];
+                const double k = parcor[i];
                 int q;
                 if (i < 2) {
                     q = static_cast<int>(std::round(k * 512.0));
                     q = std::clamp(q, -512, 511);
                 } else {
-                    int shift = 10 - size_val;
+                    const int shift = 10 - size_val;
                     int max_val = (1 << (size_val - 1)) - 1;
                     int min_val = -(1 << (size_val - 1));
                     int raw = static_cast<int>(std::round(k * 512.0 / (1 << shift)));

@@ -39,7 +39,7 @@ namespace takdecomp {
         };
     } // namespace
 
-    uint32_t compute_crc24(const uint8_t *data, size_t len) {
+    uint32_t compute_crc24(const uint8_t *data, const size_t len) {
         uint32_t crc = 0xCE04B7;
         for (size_t i = 0; i < len; i++) {
             crc = crc24_table[static_cast<uint8_t>(crc) ^ data[i]] ^ (crc >> 8);

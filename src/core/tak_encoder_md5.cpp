@@ -23,13 +23,13 @@ namespace takenc {
         finalized = false;
     }
 
-    static void decode(uint32_t output[], const uint8_t input[], uint32_t len) {
+    static void decode(uint32_t output[], const uint8_t input[], const uint32_t len) {
         for (uint32_t i = 0, j = 0; j < len; i++, j += 4)
             output[i] = ((uint32_t) input[j]) | (((uint32_t) input[j + 1]) << 8) |
                         (((uint32_t) input[j + 2]) << 16) | (((uint32_t) input[j + 3]) << 24);
     }
 
-    static void encode(uint8_t output[], const uint32_t input[], uint32_t len) {
+    static void encode(uint8_t output[], const uint32_t input[], const uint32_t len) {
         for (uint32_t i = 0, j = 0; j < len; i++, j += 4) {
             output[j] = input[i] & 0xff;
             output[j + 1] = (input[i] >> 8) & 0xff;
@@ -117,22 +117,22 @@ namespace takenc {
         std::memset(x, 0, sizeof(x));
     }
 
-    void MD5::update(const uint8_t *input, size_t length) {
-        uint32_t i, index, partLen;
-        index = (uint32_t) ((count[0] >> 3) & 0x3F);
+    void MD5::update(const uint8_t *data, const size_t length) {
+        uint32_t i;
+        uint32_t index = ((count[0] >> 3) & 0x3F);
         if ((count[0] += ((uint32_t) length << 3)) < ((uint32_t) length << 3)) count[1]++;
         count[1] += ((uint32_t) length >> 29);
-        partLen = 64 - index;
+        const uint32_t partLen = 64 - index;
         if (length >= partLen) {
-            std::memcpy(&buffer[index], input, partLen);
+            std::memcpy(&buffer[index], data, partLen);
             transform(buffer);
             for (i = partLen; i + 63 < length; i += 64)
-                transform(&input[i]);
+                transform(&data[i]);
             index = 0;
         } else {
             i = 0;
         }
-        std::memcpy(&buffer[index], &input[i], length - i);
+        std::memcpy(&buffer[index], &data[i], length - i);
     }
 
     void MD5::finalize() {
@@ -145,8 +145,8 @@ namespace takenc {
         };
         uint8_t bits[8];
         encode(bits, count, 8);
-        uint32_t index = (uint32_t) ((count[0] >> 3) & 0x3f);
-        uint32_t padLen = (index < 56) ? (56 - index) : (120 - index);
+        const uint32_t index = ((count[0] >> 3) & 0x3f);
+        const uint32_t padLen = (index < 56) ? (56 - index) : (120 - index);
         update(padding, padLen);
         update(bits, 8);
         encode(digest_.data(), state, 16);
@@ -163,7 +163,7 @@ namespace takenc {
     std::string MD5::to_string() const {
         std::stringstream ss;
         for (int i = 0; i < 16; i++) {
-            ss << std::hex << std::setw(2) << std::setfill('0') << (int) digest_[i];
+            ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(digest_[i]);
         }
         return ss.str();
     }

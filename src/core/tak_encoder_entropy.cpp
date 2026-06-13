@@ -55,7 +55,7 @@ namespace takenc {
         {0x1A, 0x1800000, 0x1800000, 0x6800000, 0xC000000},
     };
 
-    static void write_unary(BitStreamWriter &bw, int val, int stop) {
+    static void write_unary(BitStreamWriter &bw, const int val, int stop) {
         for (int i = 0; i < val; i++) {
             bw.write_bit(stop == 1 ? 0 : 1);
         }
@@ -64,15 +64,15 @@ namespace takenc {
         }
     }
 
-    void Encoder::encode_segment(int mode, const int32_t *data, int len, BitStreamWriter &bw) {
+    void Encoder::encode_segment(const int mode, const int32_t *data, const int len, BitStreamWriter &bw) {
         if (mode == 0) return;
         if (mode < 0 || mode > 50) throw std::runtime_error("Invalid encode_segment mode");
 
         const auto &code = xcodes[mode - 1];
 
         for (int i = 0; i < len; i++) {
-            int32_t v = data[i];
-            uint32_t x = (static_cast<uint32_t>(v) << 1) ^ (v < 0 ? -1 : 0);
+            const int32_t v = data[i];
+            const uint32_t x = (static_cast<uint32_t>(v) << 1) ^ (v < 0 ? -1 : 0);
 
             if (x < code.escape) {
                 bw.write_bits(x, code.init);
@@ -84,7 +84,7 @@ namespace takenc {
                 continue;
             }
 
-            uint32_t v_base_test = x + code.escape;
+            const uint32_t v_base_test = x + code.escape;
             if (v_base_test < code.aescape) {
                 bw.write_bits(v_base_test & ((1U << code.init) - 1), code.init);
                 bw.write_bit(1);
@@ -94,8 +94,8 @@ namespace takenc {
             uint32_t val;
             if (x >= code.aescape + code.bias) {
                 val = x - code.bias - code.aescape;
-                uint32_t scale = val / code.scale;
-                uint32_t v_base = code.aescape + (val % code.scale);
+                const uint32_t scale = val / code.scale;
+                const uint32_t v_base = code.aescape + (val % code.scale);
 
                 bw.write_bits(v_base & ((1U << code.init) - 1), code.init);
                 bw.write_bit(1);
@@ -103,7 +103,7 @@ namespace takenc {
 
                 if (scale > 0) {
                     int scale_bits = 0;
-                    uint32_t s = scale - 1;
+                    const uint32_t s = scale - 1;
                     while ((1U << scale_bits) <= s) scale_bits++;
                     if (scale_bits == 0) scale_bits = 1;
 
@@ -119,8 +119,8 @@ namespace takenc {
                 }
             } else {
                 val = x + code.escape - code.aescape;
-                uint32_t scale = val / code.scale;
-                uint32_t v_base = code.aescape + (val % code.scale);
+                const uint32_t scale = val / code.scale;
+                const uint32_t v_base = code.aescape + (val % code.scale);
 
                 bw.write_bits(v_base & ((1U << code.init) - 1), code.init);
                 bw.write_bit(1);
@@ -129,14 +129,14 @@ namespace takenc {
         }
     }
 
-    int Encoder::calc_bits_needed(int mode, const int32_t *data, int len) {
+    int Encoder::calc_bits_needed(const int mode, const int32_t *data, const int len) {
         if (mode == 0) return 0;
         const auto &code = xcodes[mode - 1];
         int bits = 0;
 
         for (int i = 0; i < len; i++) {
-            int32_t v = data[i];
-            uint32_t x = (static_cast<uint32_t>(v) << 1) ^ (v < 0 ? -1 : 0);
+            const int32_t v = data[i];
+            const uint32_t x = (static_cast<uint32_t>(v) << 1) ^ (v < 0 ? -1 : 0);
 
             if (x < code.escape) {
                 bits += code.init;
@@ -147,7 +147,7 @@ namespace takenc {
                 continue;
             }
 
-            uint32_t v_base_test = x + code.escape;
+            const uint32_t v_base_test = x + code.escape;
             if (v_base_test < code.aescape) {
                 bits += code.init + 1;
                 continue;
@@ -156,14 +156,14 @@ namespace takenc {
             uint32_t val;
             if (x >= code.aescape + code.bias) {
                 val = x - code.bias - code.aescape;
-                uint32_t scale = val / code.scale;
+                const uint32_t scale = val / code.scale;
 
                 bits += code.init + 1; // v_base + flag
                 bits += 9; // unary 9 zeros
 
                 if (scale > 0) {
                     int scale_bits = 0;
-                    uint32_t s = scale - 1;
+                    const uint32_t s = scale - 1;
                     while ((1U << scale_bits) <= s) scale_bits++;
                     if (scale_bits == 0) scale_bits = 1;
 
@@ -178,7 +178,7 @@ namespace takenc {
                 }
             } else {
                 val = x + code.escape - code.aescape;
-                uint32_t scale = val / code.scale;
+                const uint32_t scale = val / code.scale;
                 bits += code.init + 1; // v_base + flag
                 bits += scale + 1; // unary zeros + 1 stop bit
             }
@@ -186,13 +186,13 @@ namespace takenc {
         return bits;
     }
 
-    Encoder::ResiduesPartition Encoder::plan_residues_partition(const int32_t *data, int length) {
-        int max_v = std::min(63, (length - 1) / 16);
+    Encoder::ResiduesPartition Encoder::plan_residues_partition(const int32_t *data, const int length) {
+        const int max_v = std::min(63, (length - 1) / 16);
         if (max_v <= 0) {
             int best_m = 1;
             int best_c = calc_bits_needed(1, data, length);
             for (int m = 2; m <= 34; m++) {
-                int c = calc_bits_needed(m, data, length);
+                const int c = calc_bits_needed(m, data, length);
                 if (c < best_c) {
                     best_c = c;
                     best_m = m;
@@ -203,7 +203,7 @@ namespace takenc {
 
         thread_local std::vector<int> block_costs;
         block_costs.assign((max_v + 1) * 35, 0);
-        auto get_block_cost = [&](int i, int m) -> int & { return block_costs[i * 35 + m]; };
+        auto get_block_cost = [&](const int i, const int m) -> int & { return block_costs[i * 35 + m]; };
 
         for (int i = 0; i < max_v; i++) {
             for (int m = 1; m <= 34; m++) {
@@ -220,13 +220,13 @@ namespace takenc {
         };
         thread_local std::vector<SC> best_seg;
         best_seg.assign((max_v + 1) * (max_v + 2), {0, 0});
-        auto get_best_seg = [&](int s, int e) -> SC & { return best_seg[s * (max_v + 2) + e]; };
+        auto get_best_seg = [&](const int s, const int e) -> SC & { return best_seg[s * (max_v + 2) + e]; };
 
         thread_local std::vector<int> current_cost;
         current_cost.assign(35, 0);
 
         for (int start_v = 0; start_v <= max_v; start_v++) {
-            std::fill(current_cost.begin(), current_cost.end(), 0);
+            std::ranges::fill(current_cost, 0);
             for (int end_v = start_v + 1; end_v <= max_v + 1; end_v++) {
                 int best_m = 1;
                 int best_c = 1e9;
@@ -241,7 +241,7 @@ namespace takenc {
             }
         }
 
-        const int INF = 1e9;
+        constexpr int INF = 1e9;
         thread_local std::vector<int> dp;
         thread_local std::vector<int> parent;
         thread_local std::vector<int> modes;
@@ -249,12 +249,12 @@ namespace takenc {
         parent.assign(9 * (max_v + 1), 0);
         modes.assign(9 * (max_v + 1), 0);
 
-        auto get_dp = [&](int n, int v) -> int & { return dp[n * (max_v + 1) + v]; };
-        auto get_parent = [&](int n, int v) -> int & { return parent[n * (max_v + 1) + v]; };
-        auto get_mode = [&](int n, int v) -> int & { return modes[n * (max_v + 1) + v]; };
+        auto get_dp = [&](const int n, const int v) -> int & { return dp[n * (max_v + 1) + v]; };
+        auto get_parent = [&](const int n, const int v) -> int & { return parent[n * (max_v + 1) + v]; };
+        auto get_mode = [&](const int n, const int v) -> int & { return modes[n * (max_v + 1) + v]; };
 
         for (int v = 1; v <= max_v; v++) {
-            SC sc = get_best_seg(0, v);
+            const SC sc = get_best_seg(0, v);
             get_dp(1, v) = sc.cost;
             get_mode(1, v) = sc.mode;
         }
@@ -263,8 +263,8 @@ namespace takenc {
             for (int v = n; v <= max_v; v++) {
                 for (int prev_v = n - 1; prev_v < v; prev_v++) {
                     if (get_dp(n - 1, prev_v) == INF) continue;
-                    SC sc = get_best_seg(prev_v, v);
-                    int cost = get_dp(n - 1, prev_v) + sc.cost;
+                    const SC sc = get_best_seg(prev_v, v);
+                    const int cost = get_dp(n - 1, prev_v) + sc.cost;
                     if (cost < get_dp(n, v)) {
                         get_dp(n, v) = cost;
                         get_parent(n, v) = prev_v;
@@ -280,16 +280,16 @@ namespace takenc {
         int best_last_mode = 0;
 
         SC sc_all = get_best_seg(0, max_v + 1);
-        int cost_all = sc_all.cost + 7;
+        const int cost_all = sc_all.cost + 7;
         best_total_cost = cost_all;
         best_n = 1;
 
         for (int n = 2; n <= 8; n++) {
             for (int v = n - 1; v <= max_v; v++) {
                 if (get_dp(n - 1, v) == INF) continue;
-                SC sc_last = get_best_seg(v, max_v + 1);
-                int cost = get_dp(n - 1, v) + sc_last.cost;
-                int total_cost = cost + 10 + 12 * (n - 1);
+                const SC sc_last = get_best_seg(v, max_v + 1);
+                const int cost = get_dp(n - 1, v) + sc_last.cost;
+                const int total_cost = cost + 10 + 12 * (n - 1);
                 if (total_cost < best_total_cost) {
                     best_total_cost = total_cost;
                     best_n = n;

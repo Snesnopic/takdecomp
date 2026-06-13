@@ -26,7 +26,7 @@ namespace takdecomp {
          * @return StreamInfo The parsed stream metadata.
          * @throws std::runtime_error if the data is invalid.
          */
-        StreamInfo parse_streaminfo(BitStreamReader &gb);
+        static StreamInfo parse_streaminfo(BitStreamReader &gb);
 
 
         /**
@@ -35,7 +35,7 @@ namespace takdecomp {
          * @param gb The BitStreamReader pointing to the start of the frame.
          * @param info Stream information to update or use during parsing.
          */
-        void decode_frame_header(BitStreamReader &gb, StreamInfo &info);
+        static void decode_frame_header(BitStreamReader &gb, StreamInfo &info);
 
         /**
          * @brief Decodes the current audio frame from the bitstream into PCM samples.
@@ -51,7 +51,7 @@ namespace takdecomp {
     private:
         static void decode_lpc(int32_t *coeffs, int mode, int length);
 
-        void decode_segment(int8_t mode, int32_t *decoded, int len, BitStreamReader &gb);
+        static void decode_segment(int8_t mode, int32_t *decoded, int len, BitStreamReader &gb);
 
         void decode_residues(int32_t *decoded, int length, BitStreamReader &gb);
 

@@ -8,7 +8,7 @@
 #include <iostream>
 
 namespace takdecomp {
-    void Decoder::decorrelate(int c1, int c2, int length, BitStreamReader &gb) {
+    void Decoder::decorrelate(const int c1,const int c2, int length, BitStreamReader &gb) {
         int32_t *p1 = decoded_[c1].data() + (dmode_ > 5 ? 1 : 0);
         int32_t *p2 = decoded_[c2].data() + (dmode_ > 5 ? 1 : 0);
 
@@ -127,7 +127,7 @@ namespace takdecomp {
                                     (residues_[i] * filter_[0]);
                         }
 
-                        auto clip_intp2 = [](int32_t a, int p) -> int32_t {
+                        auto clip_intp2 = [](const int32_t a, const int p) -> int32_t {
                             if ((static_cast<unsigned>(a) + (1 << p)) & ~((2U << p) - 1)) {
                                 return (a < 0 ? -1 : 0) ^ ((1 << p) - 1);
                             }

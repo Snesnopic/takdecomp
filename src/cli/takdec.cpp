@@ -30,26 +30,26 @@ static uint8_t read_u8(std::ifstream &is) {
     return buf;
 }
 
-static void write_wav_header(std::ofstream &os, int sample_rate, int channels, int bps, int total_samples) {
+static void write_wav_header(std::ofstream &os, const int sample_rate, const int channels, const int bps, const int total_samples) {
     os.write("RIFF", 4);
-    uint32_t data_size = total_samples * channels * (bps / 8);
-    uint32_t file_size = 36 + data_size;
+    const uint32_t data_size = total_samples * channels * (bps / 8);
+    const uint32_t file_size = 36 + data_size;
     os.write(reinterpret_cast<const char *>(&file_size), 4);
     os.write("WAVE", 4);
     os.write("fmt ", 4);
-    uint32_t fmt_size = 16;
+    constexpr uint32_t fmt_size = 16;
     os.write(reinterpret_cast<const char *>(&fmt_size), 4);
-    uint16_t audio_format = 1; // PCM
+    constexpr uint16_t audio_format = 1; // PCM
     os.write(reinterpret_cast<const char *>(&audio_format), 2);
-    uint16_t num_channels = channels;
+    const uint16_t num_channels = channels;
     os.write(reinterpret_cast<const char *>(&num_channels), 2);
-    uint32_t sr = sample_rate;
+    const uint32_t sr = sample_rate;
     os.write(reinterpret_cast<const char *>(&sr), 4);
-    uint32_t byte_rate = sample_rate * channels * (bps / 8);
+    const uint32_t byte_rate = sample_rate * channels * (bps / 8);
     os.write(reinterpret_cast<const char *>(&byte_rate), 4);
-    uint16_t block_align = channels * (bps / 8);
+    const uint16_t block_align = channels * (bps / 8);
     os.write(reinterpret_cast<const char *>(&block_align), 2);
-    uint16_t bits_per_sample = bps;
+    const uint16_t bits_per_sample = bps;
     os.write(reinterpret_cast<const char *>(&bits_per_sample), 2);
     os.write("data", 4);
     os.write(reinterpret_cast<const char *>(&data_size), 4);
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
         if (type == MetaDataType::StreamInfo) {
             Decoder dec;
             BitStreamReader gb(buffer);
-            stream_info = dec.parse_streaminfo(gb);
+            stream_info = takdecomp::Decoder::parse_streaminfo(gb);
             has_stream_info = true;
         } else if (type == MetaDataType::LastFrame) {
             if (buffer.size() >= 8) {
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
     write_wav_header(os, stream_info.sample_rate, stream_info.channels, stream_info.bps, stream_info.samples);
 
     Decoder decoder;
-    int total_samples_written = 0;
+    std::size_t total_samples_written = 0;
 
     // Read remaining file into memory
     size_t const current_pos = is.tellg();
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
                                                                   file_data.size() - next_sync);
                         BitStreamReader check_gb(check_span);
                         StreamInfo dummy_info;
-                        decoder.decode_frame_header(check_gb, dummy_info);
+                        takdecomp::Decoder::decode_frame_header(check_gb, dummy_info);
                         // If it succeeds without throwing, it's highly likely a valid sync word
                         break;
                     } catch (const std::exception &e) {
@@ -175,11 +175,11 @@ int main(int argc, char *argv[]) {
                 std::span<const uint8_t> const frame_span(padded_frame);
                 std::vector<std::vector<int32_t> > decoded_channels;
                 decoder.decode_frame(frame_span, stream_info, decoded_channels);
-                int const nb_samples = decoded_channels.empty() ? 0 : decoded_channels[0].size();
+                const std::size_t nb_samples = decoded_channels.empty() ? 0 : decoded_channels[0].size();
 
                 int const channels = stream_info.channels;
 
-                for (int s = 0; s < nb_samples; ++s) {
+                for (std::size_t s = 0; s < nb_samples; ++s) {
                     for (int c = 0; c < channels; ++c) {
                         int32_t sample = decoded_channels[c][s];
                         if (stream_info.bps == 8) {

@@ -71,15 +71,15 @@ namespace takdecomp {
         };
     } // namespace
 
-    int Decoder::get_unary(BitStreamReader &gb, int stop, int len) {
+    int Decoder::get_unary(BitStreamReader &gb, const int step, const int max) {
         int i;
-        for (i = 0; i < len && std::cmp_not_equal(gb.get_bits1(), stop); i++) {
+        for (i = 0; i < max && std::cmp_not_equal(gb.get_bits1(), step); i++) {
             ;
         }
         return i;
     }
 
-    void Decoder::decode_segment(int8_t mode, int32_t *decoded, int len, BitStreamReader &gb) {
+    void Decoder::decode_segment(const int8_t mode, int32_t *decoded, const int len, BitStreamReader &gb) {
         if (mode == 0) {
             for (int i = 0; i < len; ++i) {
                 decoded[i] = 0;
@@ -124,7 +124,7 @@ namespace takdecomp {
         if (decoded == nullptr) return; // just to trick
     }
 
-    void Decoder::decode_lpc(int32_t *coeffs, int mode, int length) {
+    void Decoder::decode_lpc(int32_t *coeffs, const int mode, const int length) {
         if (length < 2) {
             return;
         }
@@ -180,7 +180,7 @@ namespace takdecomp {
         }
     }
 
-    void Decoder::decode_residues(int32_t *decoded, int length, BitStreamReader &gb) {
+    void Decoder::decode_residues(int32_t *decoded, const int length, BitStreamReader &gb) {
         if (length > nb_samples_) {
             throw std::runtime_error("Residue length > nb_samples");
         }
@@ -203,9 +203,7 @@ namespace takdecomp {
             coding_mode_[0] = mode;
 
             for (int i = 1; i < wlength; i++) {
-                int const c = get_unary(gb, 1, 6);
-
-                switch (c) {
+                switch (const int c = get_unary(gb, 1, 6)) {
                     case 6:
                         mode = gb.get_bits(6);
                         break;

@@ -6,7 +6,7 @@ namespace takenc {
         items[key] = value;
     }
 
-    static void write_le32(std::vector<uint8_t> &out, uint32_t val) {
+    static void write_le32(std::vector<uint8_t> &out, const uint32_t val) {
         out.push_back(val & 0xFF);
         out.push_back((val >> 8) & 0xFF);
         out.push_back((val >> 16) & 0xFF);
@@ -20,25 +20,26 @@ namespace takenc {
         std::vector<uint8_t> items_data;
 
         for (const auto &pair: items) {
-            uint32_t val_size = pair.second.size();
-            uint32_t flags = 0; // UTF-8 string, Read-Write
+            const uint32_t val_size = pair.second.size();
+            constexpr uint32_t flags = 0; // UTF-8 string, Read-Write
 
             // Write Value Size
             write_le32(items_data, val_size);
             // Write Flags
             write_le32(items_data, flags);
             // Write Key (ASCII + \0)
-            for (char c: pair.first) items_data.push_back(c);
+            for (const char c: pair.first) items_data.push_back(c);
             items_data.push_back(0);
             // Write Value
-            for (char c: pair.second) items_data.push_back(c);
+            for (const char c: pair.second) items_data.push_back(c);
         }
 
-        uint32_t tag_size = items_data.size() + 32; // size of items + footer
-        uint32_t item_count = items.size();
+        const uint32_t tag_size = items_data.size() + 32; // size of items + footer
+        const uint32_t item_count = items.size();
 
         // Header
-        const char *magic = "APETAGEX";
+        constexpr auto magic = "APETAGEX";
+        out.reserve(8);
         for (int i = 0; i < 8; i++) out.push_back(magic[i]);
         write_le32(out, 2000); // Version
         write_le32(out, tag_size);
