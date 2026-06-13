@@ -13,19 +13,19 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # --- Core Library ---
-add_library(takdecomp_core STATIC
+add_library(takdec_core STATIC
             src/core/tak_decoder.cpp
             src/core/tak_decoder_entropy.cpp
             src/core/tak_decoder_subframe.cpp
             src/core/tak_decoder_decorrelate.cpp
             src/core/tak_crc.cpp)
 
-target_include_directories(takdecomp_core PUBLIC src/core/include)
+target_include_directories(takdec_core PUBLIC src/core/include)
 
 # --- CLI Executable (Decoder) ---
-add_executable(takdecomp src/cli/takdecomp.cpp)
-target_link_libraries(takdecomp PRIVATE takdecomp_core)
-target_include_directories(takdecomp PRIVATE src/cli)
+add_executable(takdec src/cli/takdec.cpp)
+target_link_libraries(takdec PRIVATE takdec_core)
+target_include_directories(takdec PRIVATE src/cli)
 
 # --- Encoder Core Library ---
 add_library(takenc_core STATIC
