@@ -158,12 +158,12 @@ CMakeFiles/takdecomp.dir/clean:
 CMakeFiles/takenc_core.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles --progress-num=11,12,13,14,15,16,17,18,19,20 "Built target takenc_core"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles --progress-num=11,12,13,14,15,16,17,18,19,20,21 "Built target takenc_core"
 .PHONY : CMakeFiles/takenc_core.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/takenc_core.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles 10
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles 11
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/takenc_core.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles 0
 .PHONY : CMakeFiles/takenc_core.dir/rule
@@ -175,7 +175,7 @@ takenc_core: CMakeFiles/takenc_core.dir/rule
 # codegen rule for target.
 CMakeFiles/takenc_core.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles --progress-num=11,12,13,14,15,16,17,18,19,20 "Finished codegen for target takenc_core"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles --progress-num=11,12,13,14,15,16,17,18,19,20,21 "Finished codegen for target takenc_core"
 .PHONY : CMakeFiles/takenc_core.dir/codegen
 
 # clean rule for target.
@@ -195,7 +195,7 @@ CMakeFiles/takenc.dir/all: CMakeFiles/takenc_core.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/takenc.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles 12
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles 13
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/takenc.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles 0
 .PHONY : CMakeFiles/takenc.dir/rule

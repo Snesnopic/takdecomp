@@ -216,6 +216,30 @@ src/cli/takenc.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc.dir/build.make CMakeFiles/takenc.dir/src/cli/takenc.cpp.s
 .PHONY : src/cli/takenc.cpp.s
 
+src/core/ape_tag.o: src/core/ape_tag.cpp.o
+.PHONY : src/core/ape_tag.o
+
+# target to build an object file
+src/core/ape_tag.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o
+.PHONY : src/core/ape_tag.cpp.o
+
+src/core/ape_tag.i: src/core/ape_tag.cpp.i
+.PHONY : src/core/ape_tag.i
+
+# target to preprocess a source file
+src/core/ape_tag.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.i
+.PHONY : src/core/ape_tag.cpp.i
+
+src/core/ape_tag.s: src/core/ape_tag.cpp.s
+.PHONY : src/core/ape_tag.s
+
+# target to generate assembly for a file
+src/core/ape_tag.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/takenc_core.dir/build.make CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.s
+.PHONY : src/core/ape_tag.cpp.s
+
 src/core/tak_crc.o: src/core/tak_crc.cpp.o
 .PHONY : src/core/tak_crc.o
 
@@ -549,6 +573,9 @@ help:
 	@echo "... src/cli/takenc.o"
 	@echo "... src/cli/takenc.i"
 	@echo "... src/cli/takenc.s"
+	@echo "... src/core/ape_tag.o"
+	@echo "... src/core/ape_tag.i"
+	@echo "... src/core/ape_tag.s"
 	@echo "... src/core/tak_crc.o"
 	@echo "... src/core/tak_crc.i"
 	@echo "... src/core/tak_crc.s"

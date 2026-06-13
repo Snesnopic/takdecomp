@@ -47,6 +47,14 @@ public:
     static void encode_segment(int mode, const int32_t* data, int len, BitStreamWriter& bw);
     static int calc_bits_needed(int mode, const int32_t* data, int len);
 
+    struct ResiduesPartition {
+        int cost;
+        int n;
+        std::vector<int> vs;
+        std::vector<int> modes;
+    };
+    static ResiduesPartition plan_residues_partition(const int32_t* data, int length);
+
     static EncodeResult encode_file(const char* wav_path, const char* tak_path, const EncoderConfig& cfg, ProgressCallback progress = nullptr);
     static EncodeResult encode_stream(std::istream& is, std::ostream& os, const EncoderConfig& cfg, ProgressCallback progress = nullptr);
 };

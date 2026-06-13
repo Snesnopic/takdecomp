@@ -184,10 +184,24 @@ CMakeFiles/takenc_core.dir/src/core/tak_encoder_md5.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/takenc_core.dir/src/core/tak_encoder_md5.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp -o CMakeFiles/takenc_core.dir/src/core/tak_encoder_md5.cpp.s
 
+CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o: CMakeFiles/takenc_core.dir/flags.make
+CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o: /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp
+CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o: CMakeFiles/takenc_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o -MF CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o.d -o CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp
+
+CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp > CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.i
+
+CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp -o CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.s
+
 CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o: CMakeFiles/takenc_core.dir/flags.make
 CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o: /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp
 CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o: CMakeFiles/takenc_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o -MF CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o.d -o CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp
 
 CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.i: cmake_force
@@ -208,6 +222,7 @@ takenc_core_OBJECTS = \
 "CMakeFiles/takenc_core.dir/src/core/tak_encoder_entropy.cpp.o" \
 "CMakeFiles/takenc_core.dir/src/core/tak_encoder_decorrelate.cpp.o" \
 "CMakeFiles/takenc_core.dir/src/core/tak_encoder_md5.cpp.o" \
+"CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o" \
 "CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o"
 
 # External object files for target takenc_core
@@ -221,10 +236,11 @@ lib/libtakenc_core.a: CMakeFiles/takenc_core.dir/src/core/tak_encoder_bitstream.
 lib/libtakenc_core.a: CMakeFiles/takenc_core.dir/src/core/tak_encoder_entropy.cpp.o
 lib/libtakenc_core.a: CMakeFiles/takenc_core.dir/src/core/tak_encoder_decorrelate.cpp.o
 lib/libtakenc_core.a: CMakeFiles/takenc_core.dir/src/core/tak_encoder_md5.cpp.o
+lib/libtakenc_core.a: CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o
 lib/libtakenc_core.a: CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o
 lib/libtakenc_core.a: CMakeFiles/takenc_core.dir/build.make
 lib/libtakenc_core.a: CMakeFiles/takenc_core.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX static library lib/libtakenc_core.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/giuseppefrancione/CLionProjects/takdecomp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX static library lib/libtakenc_core.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/takenc_core.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/takenc_core.dir/link.txt --verbose=$(VERBOSE)
 

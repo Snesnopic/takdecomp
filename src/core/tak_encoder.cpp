@@ -242,11 +242,9 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
         if (channels == 2) inverse_lpc(c2.data(), lpc_mode_c2, current_frame_samples);
 
         // Apply inverse decorrelation
-        int best_dmode = 0;
-        int32_t pre_c1 = c1[0], pre_c2 = (channels == 2) ? c2[0] : 0;
+        Decorrelator::DecorrelationResult dmode_res = {0, 0, 0};
         if (channels == 2) {
-            best_dmode = decorr.apply_decorrelation(c1.data(), c2.data(), current_frame_samples);
-            c1[0] = pre_c1; c2[0] = pre_c2;
+            dmode_res = decorr.apply_decorrelation(c1.data(), c2.data(), current_frame_samples);
         }
 
         // Encode channels
@@ -258,8 +256,17 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
 
         // Stereo decorrelation info
         if (channels == 2) {
-            fw.write_bit(0);
-            fw.write_bits(best_dmode, 3);
+            fw.write_bit(0); // nb_subframes - 1
+            fw.write_bits(dmode_res.mode, 3);
+            if (dmode_res.mode >= 4) {
+                if (dmode_res.shift > 0) {
+                    fw.write_bit(1);
+                    fw.write_bits(dmode_res.shift - 1, 4);
+                } else {
+                    fw.write_bit(0);
+                }
+                fw.write_bits(dmode_res.factor & 0x3FF, 10);
+            }
         }
 
         // Final sample_shift

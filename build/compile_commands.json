@@ -85,6 +85,12 @@
 },
 {
   "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
+  "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp",
+  "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp",
+  "output": "CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o"
+},
+{
+  "directory": "/Users/giuseppefrancione/CLionProjects/takdecomp/build",
   "command": "/usr/bin/c++  -I/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include  -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -arch arm64 -o CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o -c /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp",
   "file": "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp",
   "output": "CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o"

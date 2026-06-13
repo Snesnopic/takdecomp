@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o"
+  "CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o.d"
   "CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o"
   "CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o.d"
   "CMakeFiles/takenc_core.dir/src/core/tak_encoder.cpp.o"

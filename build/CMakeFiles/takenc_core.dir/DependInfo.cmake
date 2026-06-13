@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp" "CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o" "gcc" "CMakeFiles/takenc_core.dir/src/core/ape_tag.cpp.o.d"
   "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp" "CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o" "gcc" "CMakeFiles/takenc_core.dir/src/core/tak_crc.cpp.o.d"
   "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp" "CMakeFiles/takenc_core.dir/src/core/tak_encoder.cpp.o" "gcc" "CMakeFiles/takenc_core.dir/src/core/tak_encoder.cpp.o.d"
   "/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_bitstream.cpp" "CMakeFiles/takenc_core.dir/src/core/tak_encoder_bitstream.cpp.o" "gcc" "CMakeFiles/takenc_core.dir/src/core/tak_encoder_bitstream.cpp.o.d"

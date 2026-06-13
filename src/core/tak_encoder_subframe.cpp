@@ -49,16 +49,18 @@ SubframeChoice evaluate_subframe(const int32_t* subframe_data, int subframe_size
     return choice;
 }
 
+
+
 static void encode_residues(const int32_t* data, int length, BitStreamWriter& fw) {
-    int best_mode = 1;
-    int best_cost = Encoder::calc_bits_needed(1, data, length);
+    int best_m = 1;
+    int best_c = Encoder::calc_bits_needed(1, data, length);
     for (int m = 2; m <= 34; m++) {
         int c = Encoder::calc_bits_needed(m, data, length);
-        if (c < best_cost) { best_cost = c; best_mode = m; }
+        if (c < best_c) { best_c = c; best_m = m; }
     }
     fw.write_bit(0);
-    fw.write_bits(best_mode, 6); printf("encode_residues mode=%d length=%d\n", best_mode, length);
-    Encoder::encode_segment(best_mode, data, length, fw);
+    fw.write_bits(best_m, 6);
+    Encoder::encode_segment(best_m, data, length, fw);
 }
 
 void write_subframe(const SubframeChoice& choice, const int32_t* subframe_data,
