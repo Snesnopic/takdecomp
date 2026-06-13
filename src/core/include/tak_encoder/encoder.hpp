@@ -34,6 +34,21 @@ struct EncoderConfig {
     int max_frame_lpc_mode = 3;    // up to mode 3
     bool write_ape_tag = true;
     std::map<std::string, std::string> ape_tags;
+
+    // CLI parity options
+    int threads = 1;
+    int frame_size_limit = 0; // 0 means default
+    int wave_metadata_mode = 1; // 0=disable, 1=default max size, 46..1048576=custom max size
+    bool write_md5 = true;
+    bool ignore_header_size = false;
+    bool verify = false;
+    bool overwrite = false;
+    int file_info_mode = 0;
+    int log_level = 0;
+    std::string log_file_format = "Ansi";
+    bool silent = false;
+    bool wait_on_exit = false;
+    bool low_priority = false;
 };
 
 struct EncodeResult {

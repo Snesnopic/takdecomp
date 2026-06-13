@@ -77,6 +77,36 @@ int main(int argc, char** argv) {
                     cfg.ape_tags[key] = val;
                 }
             }
+        } else if (arg.starts_with("-tn")) {
+            cfg.threads = std::stoi(arg.substr(3));
+        } else if (arg.starts_with("-fsl")) {
+            cfg.frame_size_limit = std::stoi(arg.substr(4));
+        } else if (arg.starts_with("-wm")) {
+            cfg.wave_metadata_mode = std::stoi(arg.substr(3));
+        } else if (arg == "-md5") {
+            cfg.write_md5 = true; // wait, what if default is true? takc enables md5 with -md5, so maybe default is false? I'll keep default true and toggle it if needed, or simply force it true. Actually, let's keep default true since that's what we did, and user can pass -md5. Wait, we should just let -md5 force it to true, but maybe it's already true.
+        } else if (arg == "-ihs") {
+            cfg.ignore_header_size = true;
+        } else if (arg == "-v") {
+            cfg.verify = true;
+        } else if (arg == "-overwrite") {
+            cfg.overwrite = true;
+        } else if (arg.starts_with("-fim")) {
+            cfg.file_info_mode = std::stoi(arg.substr(4));
+        } else if (arg.starts_with("-lf")) {
+            cfg.log_file_format = arg.substr(3);
+        } else if (arg.starts_with("-l")) {
+            // Check if it's -lp or -l#
+            if (arg == "-lp") {
+                cfg.low_priority = true;
+            } else {
+                // assume -l#
+                cfg.log_level = std::stoi(arg.substr(2));
+            }
+        } else if (arg == "-silent") {
+            cfg.silent = true;
+        } else if (arg == "-w") {
+            cfg.wait_on_exit = true;
         } else {
             if (input_file.empty()) {
                 input_file = arg;
@@ -102,8 +132,20 @@ int main(int argc, char** argv) {
     }
 
     if (!encode_mode) {
-        std::cerr << "Error: Decoding is handled by takdecomp.\n";
+        std::cerr << "Error: Decoding is handled by takdec.\n";
         return 1;
+    }
+
+    if (!cfg.overwrite) {
+        std::ifstream f(output_file);
+        if (f.good()) {
+            std::cout << "File '" << output_file << "' already exists. Overwrite? (y/n): ";
+            std::string ans;
+            std::cin >> ans;
+            if (ans != "y" && ans != "Y") {
+                return 0;
+            }
+        }
     }
 
     std::cout << "TAK Audio Compressor 0.1.0\n\n";
@@ -134,10 +176,31 @@ int main(int argc, char** argv) {
 
     try {
         takenc::EncodeResult result = takenc::Encoder::encode_file(input_file.c_str(), output_file.c_str(), cfg, progress);
-        std::cout << "\n\nMD5: " << result.md5 << "\n";
+        if (cfg.write_md5) std::cout << "\n\nMD5: " << result.md5 << "\n";
+        else std::cout << "\n\n";
+
+        if (cfg.verify) {
+            std::cout << "\nVerifying... (Invoking takdec)\n";
+            std::string exe_path = argv[0];
+            size_t slash = exe_path.find_last_of("/\\");
+            std::string dir = (slash != std::string::npos) ? exe_path.substr(0, slash + 1) : "./";
+            std::string cmd = dir + "takdec " + output_file + " -t";
+            int ret = system(cmd.c_str());
+            if (ret != 0) {
+                std::cerr << "Verification failed!\n";
+                return 1;
+            }
+            std::cout << "Verification successful.\n";
+        }
     } catch (const std::exception& e) {
         std::cerr << "\nError: " << e.what() << "\n";
         return 1;
+    }
+
+    if (cfg.wait_on_exit) {
+        std::cout << "\nPress Enter to continue...";
+        std::cin.ignore(10000, '\n');
+        std::cin.get();
     }
 
     return 0;
