@@ -28,7 +28,7 @@ static void write_metadata_block(std::ostream& os, uint8_t type_byte,
         static_cast<uint8_t>((block_size >> 8) & 0xff),
         static_cast<uint8_t>((block_size >> 16) & 0xff)
     };
-    os.write(reinterpret_cast<char*>(size_le), 3);
+    os.write(reinterpret_cast<const char*>(size_le), 3);
     os.write(reinterpret_cast<const char*>(payload), payload_len);
     uint32_t crc = takdecomp::compute_crc24(payload, payload_len);
     const uint8_t crc_be[3] = {
@@ -36,7 +36,7 @@ static void write_metadata_block(std::ostream& os, uint8_t type_byte,
         static_cast<uint8_t>((crc >> 8) & 0xff),
         static_cast<uint8_t>(crc & 0xff)
     };
-    os.write(reinterpret_cast<char*>(crc_be), 3);
+    os.write(reinterpret_cast<const char*>(crc_be), 3);
 }
 
 EncodeResult Encoder::encode_file(const char* wav_path, const char* tak_path, const EncoderConfig& cfg, ProgressCallback progress) {
@@ -138,6 +138,7 @@ EncodeResult Encoder::encode_stream(std::istream& is, std::ostream& os, const En
     os.write("\x00\x00\x00\x00", 4); // type=0, size=0
 
     size_t audio_start_offset = os.tellp();
+    size_t last_frame_start = 0;
     
 
     // Encode frames
