@@ -1,66 +1,66 @@
 # takdecomp
 
-`takdecomp` è una suite open source in C++20 per la decodifica e codifica del formato audio lossless **TAK** (Tom's lossless Audio Kompressor). 
-Progettato per offrire piena compatibilità cross-platform con gli eseguibili originali `takc.exe` e `takd.exe`, offre una base di codice pulita, facilmente integrabile, multithread e completamente indipendente da Windows.
+`takdecomp` is an open-source C++20 suite for decoding and encoding the **TAK** (Tom's lossless Audio Kompressor) audio format.
+Designed to offer full cross-platform compatibility with the original `takc.exe` and `takd.exe` executables, it provides a clean, easily integrable, multithreaded codebase that is completely independent of Windows.
 
-## Funzionalità
+## Features
 
-- **Decodifica completa (`takdec`)**: Riproduzione 1:1 del bitstream in WAV, estrazione MD5, decodifica APEv2.
-- **Codifica ad alte prestazioni (`takenc`)**: Compressione audio in frame, supporto multithread (`-tn#`), APEv2 Tagging, wave metadata extraction e bitstream verify.
-- **Supporto multi-piattaforma**: Testato e nativamente compilabile su Windows (x64, x86, ARM64), Linux e macOS.
-- **Costruito come libreria**: Struttura C++ modulare per integrare encoder o decoder nel proprio ecosistema software (player, converter, DAWs).
+- **Full Decoding (`takdec`)**: 1:1 bitstream reproduction to WAV, MD5 extraction, APEv2 decoding.
+- **High-Performance Encoding (`takenc`)**: Audio compression into frames, multithreading support (`-tn#`), APEv2 tagging, wave metadata extraction, and bitstream verification.
+- **Cross-Platform Support**: Tested and natively compilable on Windows (x64, x86, ARM64), Linux, and macOS.
+- **Built as a Library**: Modular C++ structure to easily integrate the encoder or decoder into your own software ecosystem (players, converters, DAWs).
 
-## Compilazione
+## Building
 
-Il progetto usa CMake. Puoi compilare facilmente da riga di comando:
+The project uses CMake. You can easily build it from the command line:
 
 ```bash
-git clone https://github.com/tuo-utente/takdecomp.git
+git clone https://github.com/your-username/takdecomp.git
 cd takdecomp
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
 ```
 
-Questo produrrà gli eseguibili `takenc` e `takdec` all'interno della cartella `bin/`.
+This will produce the `takenc` and `takdec` executables inside the `bin/` directory.
 
-## Utilizzo degli eseguibili (CLI)
+## CLI Usage
 
-La sintassi e i flag replicano fedelmente gli eseguibili TAK originali.
+The syntax and flags faithfully replicate the original TAK executables.
 
-### Decodifica (takdec)
-
-```bash
-./takdec input.tak [output.wav] [opzioni]
-```
-- `-t`: Esegue solo il test di integrità del file (non scrive l'output audio).
-- `-md5`: Calcola e verifica l'MD5 del bitstream rispetto a quello contenuto nell'header.
-- Se l'output non è specificato, il file `.wav` verrà salvato nella stessa cartella con lo stesso nome.
-
-### Codifica (takenc)
+### Decoding (takdec)
 
 ```bash
-./takenc input.wav [output.tak] [opzioni]
+./takdec input.tak [output.wav] [options]
 ```
-- `-p#`: Preset di compressione (da 0 a 5). P5 = massima compressione, P0 = massima velocità. Extra: -p#m, -p#e per massimo effort.
-- `-tn#`: Specifica il numero di thread da usare (default: 1).
-- `-tt "Key=Value"`: Scrive tag APEv2 nel file in output.
-- `-wm#`: Scrive i metadata raw del file wave (0 = ignora, 1 = copia i foreign chunks, default: 1).
-- `-ihs`: Ignora la dimensione dell'header (utile in pipe con stream di lunghezza non definita a priori).
-- `-overwrite`: Sovrascrive il file di destinazione in modo silente.
-- `-v`: Verifica l'integrità dei frame richiamando automaticamente la decodifica post-encode.
+- `-t`: Performs only a file integrity test (does not write the audio output).
+- `-md5`: Calculates and verifies the MD5 of the bitstream against the one contained in the header.
+- If the output is not specified, the `.wav` file will be saved in the same folder with the same name.
 
-## Utilizzo come libreria
+### Encoding (takenc)
 
-Entrambi gli engine sono racchiusi nei target statici `takdec_core` e `takenc_core`.
-Aggiungendolo al tuo progetto tramite CMake:
+```bash
+./takenc input.wav [output.tak] [options]
+```
+- `-p#`: Compression preset (from 0 to 5). P5 = maximum compression, P0 = maximum speed. Extra: `-p#m`, `-p#e` for maximum effort.
+- `-tn#`: Specifies the number of threads to use (default: 1).
+- `-tt "Key=Value"`: Writes APEv2 tags to the output file.
+- `-wm#`: Writes raw wave file metadata (0 = ignore, 1 = copy foreign chunks, default: 1).
+- `-ihs`: Ignores the header size (useful when piping streams of unknown length).
+- `-overwrite`: Silently overwrites the destination file.
+- `-v`: Verifies frame integrity by automatically invoking post-encode decoding.
+
+## Using as a Library
+
+Both engines are wrapped in the static targets `takdec_core` e `takenc_core`.
+By adding it to your project via CMake:
 
 ```cmake
 add_subdirectory(takdecomp)
-target_link_libraries(tuo_eseguibile PRIVATE takdec_core takenc_core)
+target_link_libraries(your_executable PRIVATE takdec_core takenc_core)
 ```
 
-Esempio base di decodifica:
+Basic decoding example:
 ```cpp
 #include "tak_decoder/decoder.hpp"
 #include <iostream>
@@ -70,25 +70,25 @@ int main() {
         takdecomp::DecodeResult res = takdecomp::Decoder::decode_file("audio.tak", "audio.wav");
         std::cout << "Decoded " << res.samples_decoded << " samples!\n";
     } catch (const std::exception& e) {
-        std::cerr << "Errore: " << e.what() << "\n";
+        std::cerr << "Error: " << e.what() << "\n";
     }
 }
 ```
 
-Esempio base di codifica:
+Basic encoding example:
 ```cpp
 #include "tak_encoder/encoder.hpp"
 
 int main() {
     takenc::EncoderConfig cfg;
-    cfg.preset = 2; // preset normale
-    cfg.threads = 4; // usa 4 threads
+    cfg.preset = 2; // normal preset
+    cfg.threads = 4; // use 4 threads
 
     takenc::EncodeResult res = takenc::Encoder::encode_file("audio.wav", "audio.tak", cfg, nullptr);
     return 0;
 }
 ```
 
-## Licenza
+## License
 
-Questo progetto è rilasciato nei termini della licenza specificata nel repository. L'implementazione dell'algoritmo di compressione / decompressione si basa sulle specifiche del formato aperto Tom's lossless Audio Kompressor.
+This project is released under the terms of the license specified in the repository. The implementation of the compression/decompression algorithm is based on the specifications of the open format Tom's lossless Audio Kompressor.

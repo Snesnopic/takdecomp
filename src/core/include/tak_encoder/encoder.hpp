@@ -25,6 +25,12 @@ struct CParam {
 
 extern const CParam xcodes[50];
 
+/**
+ * @brief Configuration object for the TAK encoder.
+ * 
+ * Contains all the parameters affecting compression ratio, processing speed, 
+ * multithreading, and CLI parity behaviors.
+ */
 struct EncoderConfig {
     int max_lpc_mode = 50;         // max LPC evaluation order (2..50)
     int max_filter_order_idx = 14; // max filter order index to test (0..14)
@@ -51,12 +57,21 @@ struct EncoderConfig {
     bool low_priority = false;
 };
 
+/**
+ * @brief Result object returned by the encoding functions.
+ */
 struct EncodeResult {
     std::string md5;
 };
 
 using ProgressCallback = std::function<void(int64_t processed, int64_t total)>;
 
+/**
+ * @brief Main encoder class for TAK audio files.
+ * 
+ * This class handles the compression of PCM audio samples into TAK bitstreams.
+ * It provides both stream-based and file-based API endpoints.
+ */
 class Encoder {
 public:
     Encoder() = default;
@@ -73,6 +88,15 @@ public:
     static ResiduesPartition plan_residues_partition(const int32_t* data, int length);
 
     static EncodeResult encode_file(const char* wav_path, const char* tak_path, const EncoderConfig& cfg, ProgressCallback progress = nullptr);
+    /**
+     * @brief Encodes an input stream containing WAV PCM data into a TAK output stream.
+     * 
+     * @param is The input stream containing the raw WAV file.
+     * @param os The output stream where the TAK bitstream will be written.
+     * @param cfg The encoder configuration parameters.
+     * @param progress Optional callback function for reporting progress.
+     * @return EncodeResult Struct containing the final MD5 hash.
+     */
     static EncodeResult encode_stream(std::istream& is, std::ostream& os, const EncoderConfig& cfg, ProgressCallback progress = nullptr);
 };
 

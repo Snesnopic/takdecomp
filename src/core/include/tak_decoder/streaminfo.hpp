@@ -6,6 +6,12 @@
 
 namespace takdecomp {
 
+/**
+ * @brief Structure containing the metadata of a TAK bitstream.
+ * 
+ * This object holds global stream properties such as sample rate, 
+ * bit depth, channel count, and the total number of audio samples.
+ */
 struct StreamInfo {
     int flags = 0;
     CodecType codec = CodecType::MonoStereo;

@@ -10,19 +10,42 @@ namespace takdecomp {
 
 class BitStreamReader;
 
+/**
+ * @brief Main decoder class for TAK audio files.
+ * 
+ * This class handles the parsing and decoding of TAK bitstreams, 
+ * expanding the compressed frames back into raw PCM audio samples.
+ */
 class Decoder {
 public:
     Decoder() = default;
 
-    // Parse the stream info block from the bitstream.
-    // Throws std::runtime_error on invalid data.
+    /**
+     * @brief Parses the stream info block from the bitstream.
+     * 
+     * @param gb The BitStreamReader initialized with the stream info data.
+     * @return StreamInfo The parsed stream metadata.
+     * @throws std::runtime_error if the data is invalid.
+     */
     StreamInfo parse_streaminfo(BitStreamReader& gb);
 
 
-    // Decode a frame header
+    /**
+     * @brief Decodes the header of an audio frame.
+     * 
+     * @param gb The BitStreamReader pointing to the start of the frame.
+     * @param info Stream information to update or use during parsing.
+     */
     void decode_frame_header(BitStreamReader& gb, StreamInfo& info);
 
-    // Decodes the current frame from the bitstream. Returns consumed bytes.
+    /**
+     * @brief Decodes the current audio frame from the bitstream into PCM samples.
+     * 
+     * @param data The raw bitstream data of the frame.
+     * @param info Stream information context.
+     * @param output The multi-channel output buffer to store decoded samples.
+     * @return size_t The number of bytes consumed from the data span.
+     */
     size_t decode_frame(std::span<const uint8_t> data, StreamInfo& info, std::vector<std::vector<int32_t>>& output);
 
 private:
