@@ -2,6 +2,9 @@
 #include "tak_encoder/encoder.hpp"
 #include <cmath>
 #include <algorithm>
+#include <vector>
+#include <cstring>
+#include <array>
 
 namespace takenc {
 
