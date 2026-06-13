@@ -23,7 +23,7 @@ add_library(takdecomp_core STATIC
 target_include_directories(takdecomp_core PUBLIC src/core/include)
 
 # --- CLI Executable (Decoder) ---
-add_executable(takdecomp src/cli/main.cpp)
+add_executable(takdecomp src/cli/takdecomp.cpp)
 target_link_libraries(takdecomp PRIVATE takdecomp_core)
 target_include_directories(takdecomp PRIVATE src/cli)
 
