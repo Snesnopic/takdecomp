@@ -43,8 +43,8 @@ namespace takenc {
         os.write(reinterpret_cast<const char *>(crc_be), 3);
     }
 
-    EncodeResult Encoder::encode_file(const char *wav_path, const char *tak_path, const EncoderConfig &cfg,
-                                      const ProgressCallback& progress) {
+    auto Encoder::encode_file(const char *wav_path, const char *tak_path, const EncoderConfig &cfg,
+                                      const ProgressCallback& progress) -> EncodeResult {
         std::ifstream is(wav_path, std::ios::binary);
         if (!is) throw std::runtime_error("Could not open WAV file");
         std::ofstream os(tak_path, std::ios::binary);
@@ -52,8 +52,8 @@ namespace takenc {
         return encode_stream(is, os, cfg, progress);
     }
 
-    EncodeResult Encoder::encode_stream(std::istream &is, std::ostream &os, const EncoderConfig &cfg,
-                                        const ProgressCallback& progress) {
+    auto Encoder::encode_stream(std::istream &is, std::ostream &os, const EncoderConfig &cfg,
+                                        const ProgressCallback& progress) -> EncodeResult {
         WavInfo wav = read_wav_header(is);
         int channels = wav.channels;
         int bps = wav.bps;
@@ -67,7 +67,7 @@ namespace takenc {
         os.write("tBaK", 4);
         size_t si_md_offset = os.tellp();
 
-        auto write_si = [&](int64_t ts) {
+        auto write_si = [&](int64_t ts) -> BitStreamWriter {
             BitStreamWriter si_gb;
             takdecomp::CodecType codec = (channels > 2)
                                              ? takdecomp::CodecType::MultiChannel

@@ -77,7 +77,7 @@ namespace takenc {
 
         static void encode_segment(int mode, const int32_t *data, int len, BitStreamWriter &bw);
 
-        static int calc_bits_needed(int mode, const int32_t *data, int len);
+        static auto calc_bits_needed(int mode, const int32_t *data, int len) -> int;
 
         struct ResiduesPartition {
             int cost;
@@ -86,10 +86,10 @@ namespace takenc {
             std::vector<int> modes;
         };
 
-        static ResiduesPartition plan_residues_partition(const int32_t *data, int length);
+        static auto plan_residues_partition(const int32_t *data, int length) -> ResiduesPartition;
 
-        static EncodeResult encode_file(const char *wav_path, const char *tak_path, const EncoderConfig &cfg,
-                                 const ProgressCallback& progress = nullptr);
+        static auto encode_file(const char *wav_path, const char *tak_path, const EncoderConfig &cfg,
+                                 const ProgressCallback& progress = nullptr) -> EncodeResult;
 
         /**
          * @brief Encodes an input stream containing WAV PCM data into a TAK output stream.
@@ -100,8 +100,8 @@ namespace takenc {
          * @param progress Optional callback function for reporting progress.
          * @return EncodeResult Struct containing the final MD5 hash.
          */
-        static EncodeResult encode_stream(std::istream &is, std::ostream &os, const EncoderConfig &cfg,
-                                   const ProgressCallback& progress = nullptr);
+        static auto encode_stream(std::istream &is, std::ostream &os, const EncoderConfig &cfg,
+                                   const ProgressCallback& progress = nullptr) -> EncodeResult;
     };
 } // namespace takenc
 

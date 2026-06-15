@@ -24,7 +24,7 @@ namespace takenc {
     }
 
     // Levinson-Durbin: compute PARCOR (reflection) coefficients from autocorrelation
-    static bool levinson_durbin(const double *r, int order, double *parcor) {
+    static auto levinson_durbin(const double *r, int order, double *parcor) -> bool {
         if (r[0] <= 0.0) return false;
 
         std::vector<double> a(order), a_prev(order);
@@ -129,7 +129,7 @@ namespace takenc {
         }
     }
 
-    int estimate_lpc_cost(const int32_t *samples, int length, int lpc_mode) {
+    auto estimate_lpc_cost(const int32_t *samples, int length, int lpc_mode) -> int {
         std::vector<int32_t> tmp(samples, samples + length);
         inverse_lpc(tmp.data(), lpc_mode, length);
         int best = Encoder::calc_bits_needed(1, tmp.data() + 1, length - 1);
@@ -141,7 +141,7 @@ namespace takenc {
     }
 
 
-    static int evaluate_filter_cost(FilterConfig &cfg, const int32_t *samples, int subframe_size, int filter_order) {
+    static auto evaluate_filter_cost(FilterConfig &cfg, const int32_t *samples, int subframe_size, int filter_order) -> int {
         int overhead = 1 + 4 + 1 + 2 + 1 + 1 + 1 + 20 + 2 * cfg.size;
         if (filter_order > 4) {
             overhead += 1;
@@ -174,8 +174,8 @@ namespace takenc {
         return overhead + warmup_cost + resid_cost;
     }
 
-    bool try_filter_encode(const int32_t *samples, int subframe_size,
-                           int order_idx, FilterConfig &cfg, bool max_compression) {
+    auto try_filter_encode(const int32_t *samples, int subframe_size,
+                           int order_idx, FilterConfig &cfg, bool max_compression) -> bool {
         int filter_order = predictor_sizes[order_idx];
         if (subframe_size <= filter_order) return false;
 
@@ -206,7 +206,7 @@ namespace takenc {
 
         cfg.predictors.resize(std::max(4, filter_order));
 
-        auto init_predictors = [&](int size_val) {
+        auto init_predictors = [&](int size_val) -> void {
             for (int i = 0; i < filter_order; i++) {
                 double k = parcor[i];
                 int q;

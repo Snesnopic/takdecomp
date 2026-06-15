@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 namespace takenc {
-    WavInfo read_wav_header(std::istream &is) {
+    auto read_wav_header(std::istream &is) -> WavInfo {
         char chunk_id[4];
         uint32_t chunk_size;
         WavInfo info{};

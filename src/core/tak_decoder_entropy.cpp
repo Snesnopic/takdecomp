@@ -71,7 +71,7 @@ namespace takdecomp {
         };
     } // namespace
 
-    int Decoder::get_unary(BitStreamReader &gb, const int step, const int max) {
+    auto Decoder::get_unary(BitStreamReader &gb, const int step, const int max) -> int {
         int i;
         for (i = 0; i < max && std::cmp_not_equal(gb.get_bits1(), step); i++) {
             ;

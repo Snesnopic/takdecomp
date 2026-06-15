@@ -19,9 +19,9 @@ namespace takenc {
 
         void align_write_bits();
 
-        std::vector<uint8_t> &get_data() { return buffer_; }
-        [[nodiscard]] const std::vector<uint8_t> &get_data() const { return buffer_; }
-        [[nodiscard]] int get_position_bytes() const { return static_cast<int>(buffer_.size()); }
+        auto get_data() -> std::vector<uint8_t> & { return buffer_; }
+        [[nodiscard]] auto get_data() const -> const std::vector<uint8_t> & { return buffer_; }
+        [[nodiscard]] auto get_position_bytes() const -> int { return static_cast<int>(buffer_.size()); }
 
         void write_bit(uint32_t val);
 

@@ -43,7 +43,7 @@ namespace takdecomp {
         };
     } // namespace
 
-    int Decoder::get_nb_samples(const int sample_rate, FrameSizeType type) {
+    auto Decoder::get_nb_samples(const int sample_rate, FrameSizeType type) -> int {
         int nb_samples = 0;
         int max_nb_samples = 0;
         auto const type_val = static_cast<uint8_t>(type);
@@ -66,7 +66,7 @@ namespace takdecomp {
         return nb_samples;
     }
 
-    StreamInfo Decoder::parse_streaminfo(BitStreamReader &gb) {
+    auto Decoder::parse_streaminfo(BitStreamReader &gb) -> StreamInfo {
         StreamInfo s;
 
         s.codec = static_cast<CodecType>(gb.get_bits(constants::ENCODER_CODEC_BITS));
@@ -284,7 +284,7 @@ namespace takdecomp {
     }
 } // namespace takdecomp
 
-bool takdecomp::Decoder::check_crc24(const std::span<const uint8_t> data) {
+auto takdecomp::Decoder::check_crc24(const std::span<const uint8_t> data) -> bool {
     if (data.size() < 3) {
         return false;
     }

@@ -100,7 +100,7 @@ namespace takdecomp {
         [[nodiscard]] std::span<const uint8_t> get_data() const { return data_; }
 
         [[nodiscard]] size_t get_position_bytes() const { return byte_idx_; }
-        [[nodiscard]] int get_bit_idx() const { return bit_idx_; }
+        [[nodiscard]] auto get_bit_idx() const -> int { return bit_idx_; }
 
     private:
         std::span<const uint8_t> data_;

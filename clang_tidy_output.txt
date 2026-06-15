@@ -1,0 +1,670 @@
+[1/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_decorrelate.cpp.
+16 warnings and 1 error generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_decorrelate.cpp.
+[2/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp.
+41 warnings and 2 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp.
+[3/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder.cpp.
+62 warnings and 3 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder.cpp.
+[4/14] (1/2) Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp.
+64 warnings and 4 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp.
+[4/14] (2/2) Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp.
+66 warnings and 5 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp.
+[5/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_entropy.cpp.
+80 warnings and 6 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_entropy.cpp.
+[6/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp.
+97 warnings and 7 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp.
+[7/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp.
+117 warnings and 8 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp.
+[8/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp.
+158 warnings and 9 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp.
+[9/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_bitstream.cpp.
+165 warnings and 10 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_bitstream.cpp.
+[10/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_subframe.cpp.
+184 warnings and 11 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_subframe.cpp.
+[11/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_wav.cpp.
+188 warnings and 12 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_wav.cpp.
+[12/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_subframe.cpp.
+206 warnings and 13 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_subframe.cpp.
+[13/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp.
+209 warnings and 14 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp.
+[14/14] Processing file /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp.
+234 warnings and 15 errors generated.
+Error while processing /Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp.
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp:5:33: warning: 2 adjacent parameters of 'add_item' of similar type ('const int &') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+    5 |     void ApeTagWriter::add_item(const std::string &key, const std::string &value) {
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp:5:52: note: the first parameter in the range is 'key'
+    5 |     void ApeTagWriter::add_item(const std::string &key, const std::string &value) {
+      |                                                    ^~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp:5:76: note: the last parameter in the range is 'value'
+    5 |     void ApeTagWriter::add_item(const std::string &key, const std::string &value) {
+      |                                                                            ^~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/ape_tag.cpp:16:40: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   16 |     std::vector<uint8_t> ApeTagWriter::generate() const {
+      |                                        ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/bitstream.hpp:16:18: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   16 |         uint32_t get_bits(const int n) {
+      |                  ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/bitstream.hpp:31:18: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   31 |         uint64_t get_bits64(const int n) {
+      |                  ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/bitstream.hpp:46:17: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   46 |         int32_t get_sbits(const int n) {
+      |                 ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/bitstream.hpp:58:17: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   58 |         uint8_t get_bits1() {
+      |                 ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/bitstream.hpp:93:30: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   93 |         [[nodiscard]] size_t get_bits_left() const {
+      |                              ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/bitstream.hpp:100:48: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  100 |         [[nodiscard]] std::span<const uint8_t> get_data() const { return data_; }
+      |                                                ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/bitstream.hpp:102:30: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  102 |         [[nodiscard]] size_t get_position_bytes() const { return byte_idx_; }
+      |                              ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/bitstream.hpp:103:27: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  103 |         [[nodiscard]] int get_bit_idx() const { return bit_idx_; }
+      |                       ~~~ ^
+      |                       auto                    -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/constants.hpp:4:10: error: 'array' file not found [clang-diagnostic-error]
+    4 | #include <array>
+      |          ^~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/constants.hpp:44:16: warning: enum 'CodecType' uses a larger base type ('int', size: 4 bytes) than necessary for its value set, consider using 'std::uint8_t' (1 byte) as the base type to reduce its size [performance-enum-size]
+   44 |     enum class CodecType : uint8_t {
+      |                ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/constants.hpp:49:16: warning: enum 'MetaDataType' uses a larger base type ('int', size: 4 bytes) than necessary for its value set, consider using 'std::uint8_t' (1 byte) as the base type to reduce its size [performance-enum-size]
+   49 |     enum class MetaDataType : uint8_t {
+      |                ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/constants.hpp:60:16: warning: enum 'FrameSizeType' uses a larger base type ('int', size: 4 bytes) than necessary for its value set, consider using 'std::uint8_t' (1 byte) as the base type to reduce its size [performance-enum-size]
+   60 |     enum class FrameSizeType : uint8_t {
+      |                ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/decoder.hpp:29:27: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   29 |         static StreamInfo parse_streaminfo(BitStreamReader &gb);
+      |                ~~~~~~~~~~ ^                                    
+      |                auto                                             -> StreamInfo
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/decoder.hpp:48:16: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   48 |         size_t decode_frame(std::span<const uint8_t> data, StreamInfo &info,
+      |                ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/decoder.hpp:58:20: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   58 |         static int get_unary(BitStreamReader &gb, int step, int max);
+      |                ~~~ ^                                                
+      |                auto                                                  -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/decoder.hpp:66:20: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   66 |         static int get_nb_samples(int sample_rate, FrameSizeType type);
+      |                ~~~ ^                                                  
+      |                auto                                                    -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/decoder.hpp:68:21: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   68 |         static bool check_crc24(std::span<const uint8_t> data);
+      |                ~~~~ ^                                         
+      |                auto                                            -> bool
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/tak_crc.hpp:4:10: error: 'cstdint' file not found [clang-diagnostic-error]
+    4 | #include <cstdint>
+      |          ^~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_decoder/tak_crc.hpp:8:14: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+    8 |     uint32_t compute_crc24(const uint8_t *data, size_t len);
+      |              ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/ape_tag.hpp:3:10: error: 'string' file not found [clang-diagnostic-error]
+    3 | #include <string>
+      |          ^~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/ape_tag.hpp:14:44: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   14 |         [[nodiscard]] std::vector<uint8_t> generate() const;
+      |                                            ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/bitstream_writer.hpp:4:10: error: 'cstdint' file not found [clang-diagnostic-error]
+    4 | #include <cstdint>
+      |          ^~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/bitstream_writer.hpp:22:31: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   22 |         std::vector<uint8_t> &get_data() { return buffer_; }
+      |                              ~^
+      |                              auto        -> &
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/bitstream_writer.hpp:23:51: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   23 |         [[nodiscard]] const std::vector<uint8_t> &get_data() const { return buffer_; }
+      |                                                  ~^
+      |                                                  auto              -> &
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/bitstream_writer.hpp:24:27: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   24 |         [[nodiscard]] int get_position_bytes() const { return static_cast<int>(buffer_.size()); }
+      |                       ~~~ ^
+      |                       auto                           -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/bitstream_writer.hpp:30:30: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   30 |         [[nodiscard]] size_t get_pos() const;
+      |                              ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/decorrelate.hpp:4:10: error: 'cstdint' file not found [clang-diagnostic-error]
+    4 | #include <cstdint>
+      |          ^~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/decorrelate.hpp:24:36: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   24 |         static DecorrelationResult apply_decorrelation(int32_t *data_c1, int32_t *data_c2, int len);
+      |                ~~~~~~~~~~~~~~~~~~~ ^                                                               
+      |                auto                                                                                 -> DecorrelationResult
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/encoder.hpp:4:10: error: 'iostream' file not found [clang-diagnostic-error]
+    4 | #include <iostream>
+      |          ^~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/encoder.hpp:25:18: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+   25 |     extern const CParam xcodes[50];
+      |                  ^~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/encoder.hpp:80:20: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   80 |         static int calc_bits_needed(int mode, const int32_t *data, int len);
+      |                ~~~ ^                                                       
+      |                auto                                                         -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/encoder.hpp:89:34: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   89 |         static ResiduesPartition plan_residues_partition(const int32_t *data, int length);
+      |                ~~~~~~~~~~~~~~~~~ ^                                                       
+      |                auto                                                                       -> ResiduesPartition
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/encoder.hpp:91:29: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   91 |         static EncodeResult encode_file(const char *wav_path, const char *tak_path, const EncoderConfig &cfg,
+      |                ~~~~~~~~~~~~ ^
+      |                auto
+   92 |                                  const ProgressCallback& progress = nullptr);
+      |                                                                             
+      |                                                                              -> EncodeResult
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/encoder.hpp:103:29: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  103 |         static EncodeResult encode_stream(std::istream &is, std::ostream &os, const EncoderConfig &cfg,
+      |                ~~~~~~~~~~~~ ^
+      |                auto
+  104 |                                    const ProgressCallback& progress = nullptr);
+      |                                                                               
+      |                                                                                -> EncodeResult
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/filter.hpp:4:10: error: 'vector' file not found [clang-diagnostic-error]
+    4 | #include <vector>
+      |          ^~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/filter.hpp:28:10: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   28 |     bool try_filter_encode(const int32_t *samples, int subframe_size,
+      |     ~~~~ ^
+      |     auto
+   29 |                            int order_idx, FilterConfig &cfg, bool max_compression = false);
+      |                                                                                           
+      |                                                                                            -> bool
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/filter.hpp:33:9: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   33 |     int estimate_lpc_cost(const int32_t *samples, int length, int lpc_mode);
+      |     ~~~ ^                                                                  
+      |     auto                                                                    -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/md5.hpp:4:10: error: 'cstdint' file not found [clang-diagnostic-error]
+    4 | #include <cstdint>
+      |          ^~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/md5.hpp:17:9: warning: function 'to_string' should be marked [[nodiscard]] [modernize-use-nodiscard]
+   17 |         std::string to_string() const;
+      |         ^
+      |         [[nodiscard]] 
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/md5.hpp:17:21: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   17 |         std::string to_string() const;
+      |                     ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/md5.hpp:19:9: warning: function 'digest' should be marked [[nodiscard]] [modernize-use-nodiscard]
+   19 |         std::array<uint8_t, 16> digest() const;
+      |         ^
+      |         [[nodiscard]] 
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/md5.hpp:19:33: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   19 |         std::array<uint8_t, 16> digest() const;
+      |                                 ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/md5.hpp:22:43: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+   22 |         void transform(const uint8_t block[64]);
+      |                                           ^~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/md5.hpp:24:23: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+   24 |         uint32_t state[4];
+      |                       ^~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/md5.hpp:25:23: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+   25 |         uint32_t count[2];
+      |                       ^~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/md5.hpp:26:23: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+   26 |         uint8_t buffer[64];
+      |                       ^~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/subframe.hpp:18:20: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   18 |     SubframeChoice evaluate_subframe(const int32_t *subframe_data, int subframe_size);
+      |     ~~~~~~~~~~~~~~ ^                                                                 
+      |     auto                                                                              -> SubframeChoice
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/wav_reader.hpp:4:10: error: 'iostream' file not found [clang-diagnostic-error]
+    4 | #include <iostream>
+      |          ^~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/wav_reader.hpp:17:13: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+   17 |             char id[4];
+      |             ^~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/include/tak_encoder/wav_reader.hpp:24:13: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   24 |     WavInfo read_wav_header(std::istream &is);
+      |     ~~~~~~~ ^                                
+      |     auto                                      -> WavInfo
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_crc.cpp:42:14: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   42 |     uint32_t compute_crc24(const uint8_t *data, const size_t len) {
+      |              ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder.cpp:1:10: error: 'iostream' file not found [clang-diagnostic-error]
+    1 | #include <iostream>
+      |          ^~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder.cpp:46:18: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   46 |     int Decoder::get_nb_samples(const int sample_rate, FrameSizeType type) {
+      |     ~~~          ^
+      |     auto                                                                   -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder.cpp:69:25: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   69 |     StreamInfo Decoder::parse_streaminfo(BitStreamReader &gb) {
+      |     ~~~~~~~~~~          ^
+      |     auto                                                      -> StreamInfo
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder.cpp:149:21: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  149 |     size_t Decoder::decode_frame(const std::span<const uint8_t> data, StreamInfo &info,
+      |                     ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder.cpp:287:26: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  287 | bool takdecomp::Decoder::check_crc24(const std::span<const uint8_t> data) {
+      | ~~~~                     ^
+      | auto                                                                      -> bool
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp:1:10: error: 'cstdint' file not found [clang-diagnostic-error]
+    1 | #include <cstdint>
+      |          ^~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp:74:18: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   74 |     int Decoder::get_unary(BitStreamReader &gb, const int step, const int max) {
+      |     ~~~          ^
+      |     auto                                                                       -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp:74:49: warning: 2 adjacent parameters of 'get_unary' of similar type ('const int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   74 |     int Decoder::get_unary(BitStreamReader &gb, const int step, const int max) {
+      |                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp:74:59: note: the first parameter in the range is 'step'
+   74 |     int Decoder::get_unary(BitStreamReader &gb, const int step, const int max) {
+      |                                                           ^~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp:74:75: note: the last parameter in the range is 'max'
+   74 |     int Decoder::get_unary(BitStreamReader &gb, const int step, const int max) {
+      |                                                                           ^~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp:127:47: warning: 2 adjacent parameters of 'decode_lpc' of similar type ('const int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  127 |     void Decoder::decode_lpc(int32_t *coeffs, const int mode, const int length) {
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp:127:57: note: the first parameter in the range is 'mode'
+  127 |     void Decoder::decode_lpc(int32_t *coeffs, const int mode, const int length) {
+      |                                                         ^~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp:127:73: note: the last parameter in the range is 'length'
+  127 |     void Decoder::decode_lpc(int32_t *coeffs, const int mode, const int length) {
+      |                                                                         ^~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_entropy.cpp:206:17: warning: switching on non-enum value without default case may not cover all cases [bugprone-switch-missing-default-case]
+  206 |                 switch (const int c = get_unary(gb, 1, 6)) {
+      |                 ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_subframe.cpp:1:10: error: 'iostream' file not found [clang-diagnostic-error]
+    1 | #include <iostream>
+      |          ^~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_subframe.cpp:17:17: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   17 |         int32_t clip_intp2(int32_t a, int p) {
+      |                 ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_subframe.cpp:17:28: warning: 2 adjacent parameters of 'clip_intp2' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   17 |         int32_t clip_intp2(int32_t a, int p) {
+      |                            ^~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_subframe.cpp:17:36: note: the first parameter in the range is 'a'
+   17 |         int32_t clip_intp2(int32_t a, int p) {
+      |                                    ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_subframe.cpp:17:43: note: the last parameter in the range is 'p'
+   17 |         int32_t clip_intp2(int32_t a, int p) {
+      |                                           ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_subframe.cpp:25:53: warning: 2 adjacent parameters of 'decode_subframe' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   25 |     void Decoder::decode_subframe(int32_t *decoded, int subframe_size, int prev_subframe_size, BitStreamReader &gb) {
+      |                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_subframe.cpp:25:57: note: the first parameter in the range is 'subframe_size'
+   25 |     void Decoder::decode_subframe(int32_t *decoded, int subframe_size, int prev_subframe_size, BitStreamReader &gb) {
+      |                                                         ^~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_decoder_subframe.cpp:25:76: note: the last parameter in the range is 'prev_subframe_size'
+   25 |     void Decoder::decode_subframe(int32_t *decoded, int subframe_size, int prev_subframe_size, BitStreamReader &gb) {
+      |                                                                            ^~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:30:30: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+   30 |         const uint8_t size_le[3] = {
+      |                              ^~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:38:29: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+   38 |         const uint8_t crc_be[3] = {
+      |                             ^~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:46:27: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   46 |     EncodeResult Encoder::encode_file(const char *wav_path, const char *tak_path, const EncoderConfig &cfg,
+      |     ~~~~~~~~~~~~          ^
+      |     auto
+   47 |                                       const ProgressCallback& progress) {
+      |                                                                         -> EncodeResult
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:46:39: warning: 2 adjacent parameters of 'encode_file' of similar type ('const char *') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   46 |     EncodeResult Encoder::encode_file(const char *wav_path, const char *tak_path, const EncoderConfig &cfg,
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:46:51: note: the first parameter in the range is 'wav_path'
+   46 |     EncodeResult Encoder::encode_file(const char *wav_path, const char *tak_path, const EncoderConfig &cfg,
+      |                                                   ^~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:46:73: note: the last parameter in the range is 'tak_path'
+   46 |     EncodeResult Encoder::encode_file(const char *wav_path, const char *tak_path, const EncoderConfig &cfg,
+      |                                                                         ^~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:55:27: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   55 |     EncodeResult Encoder::encode_stream(std::istream &is, std::ostream &os, const EncoderConfig &cfg,
+      |     ~~~~~~~~~~~~          ^
+      |     auto
+   56 |                                         const ProgressCallback& progress) {
+      |                                                                           -> EncodeResult
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:70:25: warning: use a trailing return type for this lambda [modernize-use-trailing-return-type]
+   70 |         auto write_si = [&](int64_t ts) {
+      |                         ^
+      |                                         -> BitStreamWriter
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:112:25: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+  112 |         uint8_t enc_info[4] = {0x03, 0x03, 0x02, 0x00};
+      |                         ^~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:159:36: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+  159 |             uint8_t md5_placeholder[23] = {0};
+      |                                    ^~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:201:117: warning: 3 adjacent parameters of 'operator()' of similar type are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  201 |         auto process_frame = [channels, bps, sample_rate, cfg, channel_mask, header_total_samples, frame_size_type](const std::vector<uint8_t> &raw_bytes,
+      |                                                                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  202 |                                                                int current_frame_samples, int f_num,
+      |                                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:201:145: note: the first parameter in the range is 'raw_bytes'
+  201 |         auto process_frame = [channels, bps, sample_rate, cfg, channel_mask, header_total_samples, frame_size_type](const std::vector<uint8_t> &raw_bytes,
+      |                                                                                                                                                 ^~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:202:95: note: the last parameter in the range is 'f_num'
+  202 |                                                                int current_frame_samples, int f_num,
+      |                                                                                               ^~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:202:64: note: 'const int &' and 'int' parameters accept and bind the same kind of values
+  202 |                                                                int current_frame_samples, int f_num,
+      |                                                                ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:268:17: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+  268 |                 int costs[4];
+      |                 ^~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:362:68: warning: repeated branch body in conditional chain [bugprone-branch-clone]
+  362 |             if (!cfg.ignore_header_size && remaining_samples <= 0) is_last = true;
+      |                                                                    ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:362:82: note: end of the original
+  362 |             if (!cfg.ignore_header_size && remaining_samples <= 0) is_last = true;
+      |                                                                                  ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:363:90: note: clone 1 starts here
+  363 |             else if (cfg.ignore_header_size && bytes_read < frame_samples * block_align) is_last = true;
+      |                                                                                          ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:408:28: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+  408 |             uint8_t lf_data[11];
+      |                            ^~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder.cpp:445:37: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+  445 |                 const uint8_t crc_be[3] = {
+      |                                     ^~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_bitstream.cpp:39:40: warning: 2 adjacent parameters of 'write_bits64' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   39 |     void BitStreamWriter::write_bits64(uint64_t val, int n) {
+      |                                        ^~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_bitstream.cpp:39:49: note: the first parameter in the range is 'val'
+   39 |     void BitStreamWriter::write_bits64(uint64_t val, int n) {
+      |                                                 ^~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_bitstream.cpp:39:58: note: the last parameter in the range is 'n'
+   39 |     void BitStreamWriter::write_bits64(uint64_t val, int n) {
+      |                                                          ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_bitstream.cpp:40:9: warning: if with identical then and else branches [bugprone-branch-clone]
+   40 |         if (n > 32) {
+      |         ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_bitstream.cpp:43:11: note: else branch starts here
+   43 |         } else {
+      |           ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_bitstream.cpp:60:29: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   60 |     size_t BitStreamWriter::get_pos() const {
+      |                             ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:7:35: warning: 2 adjacent parameters of 'apply_mode' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+    7 |     void Decorrelator::apply_mode(int mode, int shift, int factor, const std::vector<int> &filter, const int32_t *src1,
+      |                                   ^~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:7:39: note: the first parameter in the range is 'mode'
+    7 |     void Decorrelator::apply_mode(int mode, int shift, int factor, const std::vector<int> &filter, const int32_t *src1,
+      |                                       ^~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:7:49: note: the last parameter in the range is 'shift'
+    7 |     void Decorrelator::apply_mode(int mode, int shift, int factor, const std::vector<int> &filter, const int32_t *src1,
+      |                                                 ^~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:7:56: warning: 2 adjacent parameters of 'apply_mode' of similar type are easily swapped by mistake [bugprone-easily-swappable-parameters]
+    7 |     void Decorrelator::apply_mode(int mode, int shift, int factor, const std::vector<int> &filter, const int32_t *src1,
+      |                                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:7:60: note: the first parameter in the range is 'factor'
+    7 |     void Decorrelator::apply_mode(int mode, int shift, int factor, const std::vector<int> &filter, const int32_t *src1,
+      |                                                            ^~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:7:92: note: the last parameter in the range is 'filter'
+    7 |     void Decorrelator::apply_mode(int mode, int shift, int factor, const std::vector<int> &filter, const int32_t *src1,
+      |                                                                                            ^~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:7:68: note: 'int' and 'const int &' parameters accept and bind the same kind of values
+    7 |     void Decorrelator::apply_mode(int mode, int shift, int factor, const std::vector<int> &filter, const int32_t *src1,
+      |                                                                    ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:118:16: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  118 |     static int estimate_entropy_fast(const int32_t *data, int len) {
+      |            ~~~ ^
+      |            auto                                                    -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:127:16: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  127 |     static int compute_optimal_factor(const int32_t *pred_source, const int32_t *target, int len, int shift) {
+      |            ~~~ ^
+      |            auto                                                                                              -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:127:39: warning: 2 adjacent parameters of 'compute_optimal_factor' of similar type ('const int *') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  127 |     static int compute_optimal_factor(const int32_t *pred_source, const int32_t *target, int len, int shift) {
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:127:54: note: the first parameter in the range is 'pred_source'
+  127 |     static int compute_optimal_factor(const int32_t *pred_source, const int32_t *target, int len, int shift) {
+      |                                                      ^~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:127:82: note: the last parameter in the range is 'target'
+  127 |     static int compute_optimal_factor(const int32_t *pred_source, const int32_t *target, int len, int shift) {
+      |                                                                                  ^~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:127:90: warning: 2 adjacent parameters of 'compute_optimal_factor' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  127 |     static int compute_optimal_factor(const int32_t *pred_source, const int32_t *target, int len, int shift) {
+      |                                                                                          ^~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:127:94: note: the first parameter in the range is 'len'
+  127 |     static int compute_optimal_factor(const int32_t *pred_source, const int32_t *target, int len, int shift) {
+      |                                                                                              ^~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:127:103: note: the last parameter in the range is 'shift'
+  127 |     static int compute_optimal_factor(const int32_t *pred_source, const int32_t *target, int len, int shift) {
+      |                                                                                                       ^~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:131:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  131 |             double p = static_cast<double>(pred_source[i] >> shift);
+      |             ^~~~~~
+      |             auto
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:132:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  132 |             double t = static_cast<double>(target[i]);
+      |             ^~~~~~
+      |             auto
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:144:17: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  144 |     static bool solve_linear_system(int n, std::vector<double> &A, std::vector<double> &b, std::vector<double> &x) {
+      |            ~~~~ ^
+      |            auto                                                                                                    -> bool
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:144:44: warning: 2 adjacent parameters of 'solve_linear_system' of similar type ('int &') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  144 |     static bool solve_linear_system(int n, std::vector<double> &A, std::vector<double> &b, std::vector<double> &x) {
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:144:65: note: the first parameter in the range is 'A'
+  144 |     static bool solve_linear_system(int n, std::vector<double> &A, std::vector<double> &b, std::vector<double> &x) {
+      |                                                                 ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:144:89: note: the last parameter in the range is 'b'
+  144 |     static bool solve_linear_system(int n, std::vector<double> &A, std::vector<double> &b, std::vector<double> &x) {
+      |                                                                                         ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:179:17: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  179 |     static bool compute_cross_fir_filter(const int32_t *target, const int32_t *source, int len, int K, int shift,
+      |            ~~~~ ^
+      |            auto
+  180 |                                          std::vector<int> &filter_out) {
+      |                                                                        -> bool
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:179:42: warning: 2 adjacent parameters of 'compute_cross_fir_filter' of similar type ('const int *') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  179 |     static bool compute_cross_fir_filter(const int32_t *target, const int32_t *source, int len, int K, int shift,
+      |                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:179:57: note: the first parameter in the range is 'target'
+  179 |     static bool compute_cross_fir_filter(const int32_t *target, const int32_t *source, int len, int K, int shift,
+      |                                                         ^~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:179:80: note: the last parameter in the range is 'source'
+  179 |     static bool compute_cross_fir_filter(const int32_t *target, const int32_t *source, int len, int K, int shift,
+      |                                                                                ^~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:220:53: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  220 |     Decorrelator::DecorrelationResult Decorrelator::apply_decorrelation(int32_t *data_c1, int32_t *data_c2, int len) {
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~               ^
+      |     auto                                                                                                             -> Decorrelator::DecorrelationResult
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:230:25: warning: use a trailing return type for this lambda [modernize-use-trailing-return-type]
+  230 |         auto evaluate = [&](int mode, int shift, int factor, const std::vector<int> &filter) {
+      |                         ^
+      |                                                                                              -> void
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:230:29: warning: 4 adjacent parameters of 'operator()' of similar type are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  230 |         auto evaluate = [&](int mode, int shift, int factor, const std::vector<int> &filter) {
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:230:33: note: the first parameter in the range is 'mode'
+  230 |         auto evaluate = [&](int mode, int shift, int factor, const std::vector<int> &filter) {
+      |                                 ^~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:230:86: note: the last parameter in the range is 'filter'
+  230 |         auto evaluate = [&](int mode, int shift, int factor, const std::vector<int> &filter) {
+      |                                                                                      ^~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_decorrelate.cpp:230:62: note: 'int' and 'const int &' parameters accept and bind the same kind of values
+  230 |         auto evaluate = [&](int mode, int shift, int factor, const std::vector<int> &filter) {
+      |                                                              ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_entropy.cpp:7:11: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+    7 |     const CParam xcodes[50] = {
+      |           ^~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_entropy.cpp:60:50: warning: 2 adjacent parameters of 'write_unary' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   60 |     static void write_unary(BitStreamWriter &bw, int val, int stop) {
+      |                                                  ^~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_entropy.cpp:60:54: note: the first parameter in the range is 'val'
+   60 |     static void write_unary(BitStreamWriter &bw, int val, int stop) {
+      |                                                      ^~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_entropy.cpp:60:63: note: the last parameter in the range is 'stop'
+   60 |     static void write_unary(BitStreamWriter &bw, int val, int stop) {
+      |                                                               ^~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_entropy.cpp:132:18: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  132 |     int Encoder::calc_bits_needed(int mode, const int32_t *data, int len) {
+      |     ~~~          ^
+      |     auto                                                                  -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_entropy.cpp:187:41: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  187 |     Encoder::ResiduesPartition Encoder::plan_residues_partition(const int32_t *data, int length) {
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~          ^
+      |     auto                                                                                         -> Encoder::ResiduesPartition
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_entropy.cpp:238:48: warning: use designated initializer list to initialize 'SC' [modernize-use-designated-initializers]
+  238 |                 get_best_seg(start_v, end_v) = {best_c, best_m};
+      |                                                ^~~~~~~~~~~~~~~~
+      |                                                 .cost=  .mode=
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_entropy.cpp:215:9: note: aggregate type is defined here
+  215 |         struct SC {
+      |         ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:10:20: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   10 |     static int32_t clip_intp2(int32_t a, int p) {
+      |                    ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:10:31: warning: 2 adjacent parameters of 'clip_intp2' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   10 |     static int32_t clip_intp2(int32_t a, int p) {
+      |                               ^~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:10:39: note: the first parameter in the range is 'a'
+   10 |     static int32_t clip_intp2(int32_t a, int p) {
+      |                                       ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:10:46: note: the last parameter in the range is 'p'
+   10 |     static int32_t clip_intp2(int32_t a, int p) {
+      |                                              ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:21:24: warning: C-style casts are discouraged; use static_cast/const_cast/reinterpret_cast [modernize-avoid-c-style-cast]
+   21 |                 sum += (double) data[i] * data[i - k];
+      |                        ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:27:17: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+   27 |     static bool levinson_durbin(const double *r, int order, double *parcor) {
+      |            ~~~~ ^
+      |            auto                                                             -> bool
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:54:53: warning: 2 adjacent parameters of 'build_filter' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   54 |     static void build_filter(const int *predictors, int filter_order, int filter_quant,
+      |                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:54:57: note: the first parameter in the range is 'filter_order'
+   54 |     static void build_filter(const int *predictors, int filter_order, int filter_quant,
+      |                                                         ^~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:54:75: note: the last parameter in the range is 'filter_quant'
+   54 |     static void build_filter(const int *predictors, int filter_order, int filter_quant,
+      |                                                                           ^~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:83:65: warning: 3 adjacent parameters of 'compute_filter_residuals' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   83 |                                          const int16_t *filter, int filter_order,
+      |                                                                 ^~~~~~~~~~~~~~~~~
+   84 |                                          int filter_quant, int dshift,
+      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:83:69: note: the first parameter in the range is 'filter_order'
+   83 |                                          const int16_t *filter, int filter_order,
+      |                                                                     ^~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:84:64: note: the last parameter in the range is 'dshift'
+   84 |                                          int filter_quant, int dshift,
+      |                                                                ^~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:116:24: warning: repeated branch body in conditional chain [bugprone-branch-clone]
+  116 |         if (mode == 1) {
+      |                        ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:119:10: note: end of the original
+  119 |         } else if (mode == 2) {
+      |          ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:119:31: note: clone 1 starts here
+  119 |         } else if (mode == 2) {
+      |                               ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:123:31: note: clone 2 starts here
+  123 |         } else if (mode == 3) {
+      |                               ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:132:9: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  132 |     int estimate_lpc_cost(const int32_t *samples, int length, int lpc_mode) {
+      |     ~~~ ^
+      |     auto                                                                    -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:144:16: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  144 |     static int evaluate_filter_cost(FilterConfig &cfg, const int32_t *samples, int subframe_size, int filter_order) {
+      |            ~~~ ^
+      |            auto                                                                                                     -> int
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:177:10: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  177 |     bool try_filter_encode(const int32_t *samples, int subframe_size,
+      |     ~~~~ ^
+      |     auto
+  178 |                            int order_idx, FilterConfig &cfg, bool max_compression) {
+      |                                                                                    -> bool
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:177:52: warning: 2 adjacent parameters of 'try_filter_encode' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  177 |     bool try_filter_encode(const int32_t *samples, int subframe_size,
+      |                                                    ^~~~~~~~~~~~~~~~~~
+  178 |                            int order_idx, FilterConfig &cfg, bool max_compression) {
+      |                            ~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:177:56: note: the first parameter in the range is 'subframe_size'
+  177 |     bool try_filter_encode(const int32_t *samples, int subframe_size,
+      |                                                        ^~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:178:32: note: the last parameter in the range is 'order_idx'
+  178 |                            int order_idx, FilterConfig &cfg, bool max_compression) {
+      |                                ^~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:192:9: warning: this loop is infinite; none of its condition variables (max_abs) are updated in the loop body [bugprone-infinite-loop]
+  192 |         while (max_abs > 32767) {
+      |         ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:209:32: warning: use a trailing return type for this lambda [modernize-use-trailing-return-type]
+  209 |         auto init_predictors = [&](int size_val) {
+      |                                ^
+      |                                                  -> void
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_filter.cpp:230:27: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+  230 |             int16_t filter[256];
+      |                           ^~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp:26:39: warning: do not declare C-style arrays, use 'std::span' instead [modernize-avoid-c-arrays]
+   26 |     static void decode(uint32_t output[], const uint8_t input[], uint32_t len) {
+      |                                       ^~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp:26:62: warning: do not declare C-style arrays, use 'std::span' instead [modernize-avoid-c-arrays]
+   26 |     static void decode(uint32_t output[], const uint8_t input[], uint32_t len) {
+      |                                                              ^~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp:32:38: warning: do not declare C-style arrays, use 'std::span' instead [modernize-avoid-c-arrays]
+   32 |     static void encode(uint8_t output[], const uint32_t input[], uint32_t len) {
+      |                                      ^~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp:32:62: warning: do not declare C-style arrays, use 'std::span' instead [modernize-avoid-c-arrays]
+   32 |     static void encode(uint8_t output[], const uint32_t input[], uint32_t len) {
+      |                                                              ^~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp:41:44: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+   41 |     void MD5::transform(const uint8_t block[64]) {
+      |                                            ^~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp:140:31: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+  140 |         static uint8_t padding[64] = {
+      |                               ^~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp:146:21: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+  146 |         uint8_t bits[8];
+      |                     ^~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp:159:34: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  159 |     std::array<uint8_t, 16> MD5::digest() const {
+      |                                  ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_md5.cpp:163:22: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+  163 |     std::string MD5::to_string() const {
+      |                      ^
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_subframe.cpp:9:20: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+    9 |     SubframeChoice evaluate_subframe(const int32_t *subframe_data, int subframe_size, const EncoderConfig &cfg) {
+      |     ~~~~~~~~~~~~~~ ^
+      |     auto                                                                                                        -> SubframeChoice
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_subframe.cpp:66:25: warning: 2 adjacent parameters of 'write_subframe' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   66 |                         int subframe_size, int prev_subframe_size, BitStreamWriter &fw) {
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_subframe.cpp:66:29: note: the first parameter in the range is 'subframe_size'
+   66 |                         int subframe_size, int prev_subframe_size, BitStreamWriter &fw) {
+      |                             ^~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_subframe.cpp:66:48: note: the last parameter in the range is 'prev_subframe_size'
+   66 |                         int subframe_size, int prev_subframe_size, BitStreamWriter &fw) {
+      |                                                ^~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_subframe.cpp:126:49: warning: 4 adjacent parameters of 'encode_channel' of similar type ('int') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+  126 |     void encode_channel(const int32_t *samples, int nb_samples, int bps,
+      |                                                 ^~~~~~~~~~~~~~~~~~~~~~~~
+  127 |                         int lpc_mode, int sample_rate, const EncoderConfig &cfg, BitStreamWriter &fw) {
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_subframe.cpp:126:53: note: the first parameter in the range is 'nb_samples'
+  126 |     void encode_channel(const int32_t *samples, int nb_samples, int bps,
+      |                                                     ^~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_subframe.cpp:127:43: note: the last parameter in the range is 'sample_rate'
+  127 |                         int lpc_mode, int sample_rate, const EncoderConfig &cfg, BitStreamWriter &fw) {
+      |                                           ^~~~~~~~~~~
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_wav.cpp:6:13: warning: use a trailing return type for this function [modernize-use-trailing-return-type]
+    6 |     WavInfo read_wav_header(std::istream &is) {
+      |     ~~~~~~~ ^
+      |     auto                                      -> WavInfo
+/Users/giuseppefrancione/CLionProjects/takdecomp/src/core/tak_encoder_wav.cpp:7:9: warning: do not declare C-style arrays, use 'std::array' instead [modernize-avoid-c-arrays]
+    7 |         char chunk_id[4];
+      |         ^~~~~~~~~~~~~~~~
+Found compiler error(s).

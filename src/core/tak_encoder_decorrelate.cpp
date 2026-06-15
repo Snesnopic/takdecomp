@@ -115,7 +115,7 @@ namespace takenc {
         }
     }
 
-    static int estimate_entropy_fast(const int32_t *data, int len) {
+    static auto estimate_entropy_fast(const int32_t *data, int len) -> int {
         int best = Encoder::calc_bits_needed(1, data, len);
         for (int m = 2; m <= 34; m++) {
             int c = Encoder::calc_bits_needed(m, data, len);
@@ -124,12 +124,12 @@ namespace takenc {
         return best;
     }
 
-    static int compute_optimal_factor(const int32_t *pred_source, const int32_t *target, int len, int shift) {
+    static auto compute_optimal_factor(const int32_t *pred_source, const int32_t *target, int len, int shift) -> int {
         double sum_p2 = 0;
         double sum_pt = 0;
         for (int i = 0; i < len; i++) {
-            double p = static_cast<double>(pred_source[i] >> shift);
-            double t = static_cast<double>(target[i]);
+            auto p = static_cast<double>(pred_source[i] >> shift);
+            auto t = static_cast<double>(target[i]);
             sum_p2 += p * p;
             sum_pt += p * t;
         }
@@ -141,7 +141,7 @@ namespace takenc {
         return factor;
     }
 
-    static bool solve_linear_system(int n, std::vector<double> &A, std::vector<double> &b, std::vector<double> &x) {
+    static auto solve_linear_system(int n, std::vector<double> &A, std::vector<double> &b, std::vector<double> &x) -> bool {
         for (int i = 0; i < n; i++) {
             int pivot = i;
             for (int j = i + 1; j < n; j++) {
@@ -176,8 +176,8 @@ namespace takenc {
         return true;
     }
 
-    static bool compute_cross_fir_filter(const int32_t *target, const int32_t *source, int len, int K, int shift,
-                                         std::vector<int> &filter_out) {
+    static auto compute_cross_fir_filter(const int32_t *target, const int32_t *source, int len, int K, int shift,
+                                         std::vector<int> &filter_out) -> bool {
         std::vector<double> R(K * K, 0.0);
         std::vector<double> C(K, 0.0);
 
@@ -217,7 +217,7 @@ namespace takenc {
         return true;
     }
 
-    Decorrelator::DecorrelationResult Decorrelator::apply_decorrelation(int32_t *data_c1, int32_t *data_c2, int len) {
+    auto Decorrelator::apply_decorrelation(int32_t *data_c1, int32_t *data_c2, int len) -> Decorrelator::DecorrelationResult {
         std::vector<int32_t> buf1(len);
         std::vector<int32_t> buf2(len);
 
@@ -227,7 +227,7 @@ namespace takenc {
         std::vector<int> best_filter;
         int best_cost = 2147483647; // INT_MAX
 
-        auto evaluate = [&](int mode, int shift, int factor, const std::vector<int> &filter) {
+        auto evaluate = [&](int mode, int shift, int factor, const std::vector<int> &filter) -> void {
             apply_mode(mode, shift, factor, filter, data_c1, data_c2, buf1.data(), buf2.data(), len);
             int cost1 = estimate_entropy_fast(buf1.data(), len);
             int cost2 = estimate_entropy_fast(buf2.data(), len);

@@ -129,7 +129,7 @@ namespace takenc {
         }
     }
 
-    int Encoder::calc_bits_needed(int mode, const int32_t *data, int len) {
+    auto Encoder::calc_bits_needed(int mode, const int32_t *data, int len) -> int {
         if (mode == 0) return 0;
         const auto &code = xcodes[mode - 1];
         int bits = 0;
@@ -184,7 +184,7 @@ namespace takenc {
         return bits;
     }
 
-    Encoder::ResiduesPartition Encoder::plan_residues_partition(const int32_t *data, int length) {
+    auto Encoder::plan_residues_partition(const int32_t *data, int length) -> Encoder::ResiduesPartition {
         int max_v = std::min(63, (length - 1) / 16);
         if (max_v <= 0) {
             int best_m = 1;
@@ -235,7 +235,7 @@ namespace takenc {
                         best_m = m;
                     }
                 }
-                get_best_seg(start_v, end_v) = {best_c, best_m};
+                get_best_seg(start_v, end_v) = {.cost=best_c, .mode=best_m};
             }
         }
 

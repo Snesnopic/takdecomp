@@ -14,9 +14,9 @@ namespace takenc {
 
         void finalize();
 
-        std::string to_string() const;
+        [[nodiscard]] std::string to_string() const;
 
-        std::array<uint8_t, 16> digest() const;
+        [[nodiscard]] std::array<uint8_t, 16> digest() const;
 
     private:
         void transform(const uint8_t block[64]);
