@@ -89,7 +89,7 @@ namespace takenc {
         static ResiduesPartition plan_residues_partition(const int32_t *data, int length);
 
         static EncodeResult encode_file(const char *wav_path, const char *tak_path, const EncoderConfig &cfg,
-                                        const ProgressCallback &progress = nullptr);
+                                 const ProgressCallback& progress = nullptr);
 
         /**
          * @brief Encodes an input stream containing WAV PCM data into a TAK output stream.
@@ -101,7 +101,7 @@ namespace takenc {
          * @return EncodeResult Struct containing the final MD5 hash.
          */
         static EncodeResult encode_stream(std::istream &is, std::ostream &os, const EncoderConfig &cfg,
-                                          const ProgressCallback &progress = nullptr);
+                                   const ProgressCallback& progress = nullptr);
     };
 } // namespace takenc
 

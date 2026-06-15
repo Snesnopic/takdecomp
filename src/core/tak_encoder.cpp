@@ -22,10 +22,10 @@
 
 namespace takenc {
     // Helper: write a metadata block (type byte, 3-byte LE size, payload, 3-byte BE CRC)
-    static void write_metadata_block(std::ostream &os, const uint8_t type_byte,
-                                     const uint8_t *payload, const int payload_len) {
+    static void write_metadata_block(std::ostream &os, uint8_t type_byte,
+                                     const uint8_t *payload, int payload_len) {
         os.write(reinterpret_cast<const char *>(&type_byte), 1);
-        const int block_size = payload_len + 3; // payload + CRC
+        int block_size = payload_len + 3; // payload + CRC
         const uint8_t size_le[3] = {
             static_cast<uint8_t>(block_size & 0xff),
             static_cast<uint8_t>((block_size >> 8) & 0xff),
@@ -33,7 +33,7 @@ namespace takenc {
         };
         os.write(reinterpret_cast<const char *>(size_le), 3);
         os.write(reinterpret_cast<const char *>(payload), payload_len);
-        const uint32_t crc = takdecomp::compute_crc24(payload, payload_len);
+        uint32_t crc = takdecomp::compute_crc24(payload, payload_len);
         const uint8_t crc_be[3] = {
             static_cast<uint8_t>((crc >> 16) & 0xff),
             static_cast<uint8_t>((crc >> 8) & 0xff),
@@ -66,7 +66,7 @@ namespace takenc {
         os.write("tBaK", 4);
         size_t si_md_offset = os.tellp();
 
-        auto write_si = [&](const int64_t ts) {
+        auto write_si = [&](int64_t ts) {
             BitStreamWriter si_gb;
             takdecomp::CodecType codec = (channels > 2)
                                              ? takdecomp::CodecType::MultiChannel
@@ -74,7 +74,7 @@ namespace takenc {
             si_gb.write_bits(static_cast<int>(codec), takdecomp::constants::ENCODER_CODEC_BITS);
             si_gb.write_bits(0, takdecomp::constants::ENCODER_PROFILE_BITS);
 
-            const int fsl = cfg.frame_size_limit;
+            int fsl = cfg.frame_size_limit;
             int frame_size_type = static_cast<int>(takdecomp::FrameSizeType::Fs250ms);
             if (fsl == 512) frame_size_type = 0;
             else if (fsl == 1024) frame_size_type = 1;
@@ -99,13 +99,14 @@ namespace takenc {
         int si_len = si_gb.get_position_bytes();
         write_metadata_block(os, 0x01, si_gb.get_data().data(), si_len);
 
-        os.write("\x07", 1);
-        uint8_t lf_size_le[3] = {11, 0, 0};
-        os.write(reinterpret_cast<char *>(lf_size_le), 3);
-        size_t last_frame_md_offset = os.tellp();
-        uint8_t lf_placeholder[8] = {0};
-        os.write(reinterpret_cast<const char *>(lf_placeholder), 8);
-        os.write("\x00\x00\x00", 3);
+//        os.write("\x07", 1);
+//        uint8_t lf_size_le[3] = {11, 0, 0};
+//        os.write(reinterpret_cast<char *>(lf_size_le), 3);
+//        size_t last_frame_md_offset = os.tellp();
+//        uint8_t lf_placeholder[8] = {0};
+//        os.write(reinterpret_cast<const char *>(lf_placeholder), 8);
+//        os.write("\x00\x00\x00", 3);
+        size_t last_frame_md_offset = 0;
 
         uint8_t enc_info[4] = {0x03, 0x03, 0x02, 0x00};
         write_metadata_block(os, 0x04, enc_info, 4); {
@@ -150,19 +151,14 @@ namespace takenc {
             write_metadata_block(os, 0x03, swd_payload.data(), static_cast<int>(swd_payload.size()));
         }
 
-        if (cfg.wave_metadata_mode > 0 && !wav.foreign_chunks.empty()) {
-            std::vector<uint8_t> wm_payload;
-            for (const auto &fc: wav.foreign_chunks) {
-                wm_payload.insert(wm_payload.end(), fc.id, fc.id + 4);
-                uint32_t size = fc.data.size();
-                wm_payload.push_back(size & 0xFF);
-                wm_payload.push_back((size >> 8) & 0xFF);
-                wm_payload.push_back((size >> 16) & 0xFF);
-                wm_payload.push_back((size >> 24) & 0xFF);
-                wm_payload.insert(wm_payload.end(), fc.data.begin(), fc.data.end());
-                if (size % 2 != 0) wm_payload.push_back(0);
-            }
-            write_metadata_block(os, 0x06, wm_payload.data(), static_cast<int>(wm_payload.size()));
+        // 0x06 in TAK is MD5, which causes ffmpeg to fail if size != 19
+        size_t md5_md_offset = 0;
+        if (cfg.write_md5) {
+            md5_md_offset = os.tellp();
+            uint8_t md5_placeholder[23] = {0};
+            md5_placeholder[0] = 0x06; // Type MD5
+            md5_placeholder[1] = 19;   // Size LE (16 + 3)
+            os.write(reinterpret_cast<const char *>(md5_placeholder), 23);
         }
 
         os.write("\x00\x00\x00\x00", 4);
@@ -171,8 +167,15 @@ namespace takenc {
         size_t last_frame_start = 0;
 
         int frame_samples = (sample_rate * 250) / 1000;
+        int frame_size_type = static_cast<int>(takdecomp::FrameSizeType::Fs250ms);
         if (cfg.frame_size_limit != 0 && cfg.frame_size_limit != 11025) {
             frame_samples = cfg.frame_size_limit;
+            if (frame_samples == 512) frame_size_type = 0;
+            else if (frame_samples == 1024) frame_size_type = 1;
+            else if (frame_samples == 2048) frame_size_type = 2;
+            else if (frame_samples == 4096) frame_size_type = 3;
+            else if (frame_samples == 8192) frame_size_type = 4;
+            else if (frame_samples == 16384) frame_size_type = 5;
         }
 
         int64_t remaining_samples = total_samples;
@@ -184,17 +187,29 @@ namespace takenc {
             bool is_last = false;
         };
 
-        auto process_frame = [channels, bps, sample_rate, cfg](const std::vector<uint8_t> &raw_bytes,
-                                                               const int current_frame_samples, const int f_num,
-                                                               const bool is_last) -> FrameRes {
+        int channel_mask = 0;
+        if (wav.fmt_chunk.size() >= 40 && wav.fmt_chunk[20] == 0xFE && wav.fmt_chunk[21] == 0xFF) {
+            // Extensible format
+            channel_mask = wav.fmt_chunk[24] | (wav.fmt_chunk[25] << 8) | (wav.fmt_chunk[26] << 16) | (wav.fmt_chunk[27] << 24);
+        }
+        uint32_t header_total_samples = 0;
+        if (wav.data_size > 0 && bps > 0 && channels > 0) {
+            header_total_samples = wav.data_size / (channels * (bps / 8));
+        }
+
+        auto process_frame = [channels, bps, sample_rate, cfg, channel_mask, header_total_samples, frame_size_type](const std::vector<uint8_t> &raw_bytes,
+                                                               int current_frame_samples, int f_num,
+                                                               bool is_last) -> FrameRes {
+            Decorrelator decorr;
             std::vector<std::vector<int32_t> > c(channels, std::vector<int32_t>(current_frame_samples));
             int byte_idx = 0;
             int const bytes_per_sample = bps / 8;
             for (int i = 0; i < current_frame_samples; i++) {
                 for (int ch = 0; ch < channels; ch++) {
                     if (bps == 16) {
-                        const int16_t val = raw_bytes[byte_idx] | (raw_bytes[byte_idx + 1] << 8);
+                        int16_t val = raw_bytes[byte_idx] | (raw_bytes[byte_idx + 1] << 8);
                         c[ch][i] = val;
+                        if (i == 0 && f_num == 0) printf("Sample ch %d: %d\n", ch, val);
                     } else if (bps == 24) {
                         int32_t val = raw_bytes[byte_idx] | (raw_bytes[byte_idx + 1] << 8) | (
                                           raw_bytes[byte_idx + 2] << 16);
@@ -209,22 +224,46 @@ namespace takenc {
             fw.write_bits(takdecomp::constants::FRAME_HEADER_SYNC_ID, takdecomp::constants::FRAME_HEADER_SYNC_ID_BITS);
             int flags = 0;
             if (is_last) flags |= takdecomp::constants::FRAME_FLAG_IS_LAST;
+            if (f_num == 0) flags |= takdecomp::constants::FRAME_FLAG_HAS_INFO;
             fw.write_bits(flags, takdecomp::constants::FRAME_HEADER_FLAGS_BITS);
             fw.write_bits(f_num, takdecomp::constants::FRAME_HEADER_NO_BITS);
             if (is_last) {
                 fw.write_bits(current_frame_samples - 1, takdecomp::constants::FRAME_HEADER_SAMPLE_COUNT_BITS);
                 fw.write_bits(0, 2);
             }
+            if (f_num == 0) {
+                fw.write_bits(static_cast<int>(channels > 2 ? takdecomp::CodecType::MultiChannel : takdecomp::CodecType::MonoStereo), takdecomp::constants::ENCODER_CODEC_BITS);
+                fw.write_bits(0, takdecomp::constants::ENCODER_PROFILE_BITS);
+                fw.write_bits(frame_size_type, takdecomp::constants::SIZE_FRAME_DURATION_BITS);
+                fw.write_bits64(header_total_samples, 35);
+                fw.write_bits(0, takdecomp::constants::FORMAT_DATA_TYPE_BITS); // PCM
+                fw.write_bits(sample_rate - takdecomp::constants::SAMPLE_RATE_MIN, takdecomp::constants::FORMAT_SAMPLE_RATE_BITS);
+                fw.write_bits(bps - takdecomp::constants::BPS_MIN, takdecomp::constants::FORMAT_BPS_BITS);
+                fw.write_bits(channels - takdecomp::constants::CHANNELS_MIN, takdecomp::constants::FORMAT_CHANNEL_BITS);
+                if (channels > 2) {
+                    fw.write_bits(1, 1);
+                    fw.write_bits(bps, takdecomp::constants::FORMAT_VALID_BITS);
+                    if (channel_mask != 0) {
+                        fw.write_bits(1, 1);
+                        fw.write_bits(channel_mask, takdecomp::constants::FORMAT_CH_LAYOUT_BITS);
+                    } else {
+                        fw.write_bits(0, 1);
+                    }
+                } else {
+                    fw.write_bits(0, 1);
+                }
+                fw.write_bits(0, 6);
+            }
             fw.align_write_bits();
-            const int header_bytes = fw.get_position_bytes();
-            const uint32_t header_crc = takdecomp::compute_crc24(fw.get_data().data(), header_bytes);
+            int header_bytes = fw.get_position_bytes();
+            uint32_t header_crc = takdecomp::compute_crc24(fw.get_data().data(), header_bytes);
             fw.write_bits((header_crc >> 16) & 0xff, 8);
             fw.write_bits((header_crc >> 8) & 0xff, 8);
             fw.write_bits(header_crc & 0xff, 8);
 
             std::vector<int> lpc_mode(channels, 0);
             if (current_frame_samples >= 16) {
-                const int max_lpc = cfg.max_frame_lpc_mode;
+                int max_lpc = cfg.max_frame_lpc_mode;
                 int costs[4];
                 for (int ch = 0; ch < channels; ch++) {
                     for (int m = 0; m <= max_lpc; m++) costs[m] = estimate_lpc_cost(
@@ -239,13 +278,14 @@ namespace takenc {
 
             Decorrelator::DecorrelationResult dmode_res = {0, 0, 0, 0, {}};
             if (channels == 2) {
-                Decorrelator decorr;
                 dmode_res = decorr.apply_decorrelation(c[0].data(), c[1].data(), current_frame_samples);
             }
 
             if (channels > 2) fw.write_bit(0);
 
             for (int ch = 0; ch < channels; ch++) {
+if (ch == 0) { printf("dmode=%d\n", dmode_res.mode); for(int i=0; i<8; i++) printf("c[0][%d]=%d ", i, c[0][i]); printf("\n"); }
+if (ch == 1) { for(int i=0; i<8; i++) printf("c[1][%d]=%d ", i, c[1][i]); printf("\n"); }
                 encode_channel(c[ch].data(), current_frame_samples, bps, lpc_mode[ch], sample_rate, cfg, fw);
             }
 
@@ -264,8 +304,8 @@ namespace takenc {
                         fw.write_bits(dmode_res.shift - 1, 4);
                     } else { fw.write_bit(0); }
                     fw.write_bit(dmode_res.filter_order == 16 ? 1 : 0);
-                    fw.write_bit(1);
-                    fw.write_bit(0);
+                    fw.write_bit(1); // dval1
+                    fw.write_bit(1); // dval2
                     for (int i = 0; i < dmode_res.filter_order; i += 4) {
                         int max_val = 0;
                         for (int j = 0; j < 4; j++) max_val = std::max(max_val, std::abs(dmode_res.filter[i + j]));
@@ -282,9 +322,9 @@ namespace takenc {
             }
 
             fw.align_write_bits();
-            const int frame_size = fw.get_position_bytes();
-            const int payload_size = frame_size - (header_bytes + 3);
-            const uint32_t frame_crc = takdecomp::compute_crc24(fw.get_data().data() + header_bytes + 3, payload_size);
+            int frame_size = fw.get_position_bytes();
+            int payload_size = frame_size - (header_bytes + 3);
+            uint32_t frame_crc = takdecomp::compute_crc24(fw.get_data().data() + header_bytes + 3, payload_size);
             fw.write_bits((frame_crc >> 16) & 0xff, 8);
             fw.write_bits((frame_crc >> 8) & 0xff, 8);
             fw.write_bits(frame_crc & 0xff, 8);
@@ -363,24 +403,24 @@ namespace takenc {
         }
 
         // Patch LastFrame metadata
-        os.seekp(last_frame_md_offset);
-        uint64_t lf_pos = last_frame_start - audio_start_offset;
-        uint8_t lf_payload[8];
-        lf_payload[0] = lf_pos & 0xFF;
-        lf_payload[1] = (lf_pos >> 8) & 0xFF;
-        lf_payload[2] = (lf_pos >> 16) & 0xFF;
-        lf_payload[3] = (lf_pos >> 24) & 0xFF;
-        lf_payload[4] = (lf_pos >> 32) & 0xFF;
-        lf_payload[5] = last_frame_size & 0xFF;
-        lf_payload[6] = (last_frame_size >> 8) & 0xFF;
-        lf_payload[7] = (last_frame_size >> 16) & 0xFF;
-        os.write(reinterpret_cast<const char *>(lf_payload), 8);
-        uint32_t lf_crc = takdecomp::compute_crc24(lf_payload, 8);
-        uint8_t crc_bytes[3];
-        crc_bytes[0] = (lf_crc >> 16) & 0xFF;
-        crc_bytes[1] = (lf_crc >> 8) & 0xFF;
-        crc_bytes[2] = lf_crc & 0xFF;
-        os.write(reinterpret_cast<const char *>(crc_bytes), 3);
+        if (last_frame_md_offset > 0) {
+            os.seekp(last_frame_md_offset);
+            uint8_t lf_data[11];
+            lf_data[0] = last_frame_start & 0xFF;
+            lf_data[1] = (last_frame_start >> 8) & 0xFF;
+            lf_data[2] = (last_frame_start >> 16) & 0xFF;
+            lf_data[3] = (last_frame_start >> 24) & 0xFF;
+            lf_data[4] = (last_frame_start >> 32) & 0xFF;
+            lf_data[5] = (remaining_samples) & 0xFF;
+            lf_data[6] = ((remaining_samples) >> 8) & 0xFF;
+            lf_data[7] = ((remaining_samples) >> 16) & 0xFF;
+            
+            uint32_t lf_crc = takdecomp::compute_crc24(lf_data, 8);
+            lf_data[8] = (lf_crc >> 16) & 0xFF;
+            lf_data[9] = (lf_crc >> 8) & 0xFF;
+            lf_data[10] = lf_crc & 0xFF;
+            os.write(reinterpret_cast<const char *>(lf_data), 11);
+        }
 
         // Patch StreamInfo if we didn't know total_samples
         if (cfg.ignore_header_size) {
@@ -395,7 +435,22 @@ namespace takenc {
             progress(real_total_samples, real_total_samples);
         }
 
-        if (cfg.write_md5) md5.finalize();
+        if (cfg.write_md5) {
+            md5.finalize();
+            if (md5_md_offset > 0) {
+                os.seekp(md5_md_offset + 4);
+                auto digest = md5.digest();
+                os.write(reinterpret_cast<const char *>(digest.data()), 16);
+                uint32_t md5_crc = takdecomp::compute_crc24(digest.data(), 16);
+                const uint8_t crc_be[3] = {
+                    static_cast<uint8_t>((md5_crc >> 16) & 0xff),
+                    static_cast<uint8_t>((md5_crc >> 8) & 0xff),
+                    static_cast<uint8_t>(md5_crc & 0xff)
+                };
+                os.write(reinterpret_cast<const char *>(crc_be), 3);
+                os.seekp(0, std::ios::end);
+            }
+        }
 
         if (cfg.write_ape_tag && !cfg.ape_tags.empty()) {
             ApeTagWriter ape;

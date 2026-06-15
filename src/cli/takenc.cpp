@@ -24,10 +24,10 @@ void print_help(const char *prog_name) {
             << "\n";
 }
 
-int main(int argc, char * const*argv) {
+int main(int argc, char **argv) {
     if (argc < 2) {
         print_help(argv[0]);
-        return 1;
+        return EXIT_FAILURE;
     }
 
     takenc::EncoderConfig cfg;
@@ -43,7 +43,7 @@ int main(int argc, char * const*argv) {
             encode_mode = false;
         } else if (arg == "-h" || arg == "--help") {
             print_help(argv[0]);
-            return 0;
+            return EXIT_SUCCESS;
         } else if (arg.starts_with("-p")) {
             std::string p = arg.substr(2);
             if (p == "0") {
@@ -173,17 +173,17 @@ int main(int argc, char * const*argv) {
 
     auto start_time = std::chrono::steady_clock::now();
 
-    takenc::ProgressCallback progress = [&](const int64_t processed, const int64_t total) {
+    takenc::ProgressCallback progress = [&](int64_t processed, int64_t total) {
         if (total == 0) return;
-        const double pct = (double) processed * 100.0 / total;
+        double pct = (double) processed * 100.0 / total;
 
-        const auto now = std::chrono::steady_clock::now();
-        const std::chrono::duration<double> elapsed = now - start_time;
+        auto now = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed = now - start_time;
         double speed = 0.0;
         if (elapsed.count() > 0) {
             // Speed = amount of audio processed / wall clock time
             // We assume 44100 Hz for speed calculation approximation
-            const double audio_time = (double) processed / 44100.0;
+            double audio_time = (double) processed / 44100.0;
             speed = audio_time / elapsed.count();
         }
 

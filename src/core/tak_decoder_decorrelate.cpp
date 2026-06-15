@@ -146,7 +146,7 @@ namespace takdecomp {
                 if (dmode_ == 6) std::swap(p1, p2);
 
                 if (dval2 != 0) {
-                    for (int i = length - order_half; i < length; i++) {
+                    for (int i = length - order_half + 1; i < length; i++) {
                         int32_t const a = p1[i];
                         int32_t const b = p2[i];
                         p1[i] = a + b;

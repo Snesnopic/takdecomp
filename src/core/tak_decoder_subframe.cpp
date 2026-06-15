@@ -14,7 +14,7 @@ namespace takdecomp {
         };
 
 
-        int32_t clip_intp2(const int32_t a, const int p) {
+        int32_t clip_intp2(int32_t a, int p) {
             if (((static_cast<unsigned>(a) + (1 << p)) & ~((2U << p) - 1)) != 0u) {
                 return (a < 0 ? -1 : 0) ^ ((1 << p) - 1);
             }
@@ -22,7 +22,7 @@ namespace takdecomp {
         }
     } // namespace
 
-    void Decoder::decode_subframe(int32_t *decoded, int subframe_size, const int prev_subframe_size, BitStreamReader &gb) {
+    void Decoder::decode_subframe(int32_t *decoded, int subframe_size, int prev_subframe_size, BitStreamReader &gb) {
         if (gb.get_bits1() == 0u) {
             decode_residues(decoded, subframe_size, gb);
             return;
@@ -143,7 +143,7 @@ namespace takdecomp {
         }
     }
 
-    void Decoder::decode_channel(const int chan, BitStreamReader &gb) {
+    void Decoder::decode_channel(int chan, BitStreamReader &gb) {
         int32_t *decoded = decoded_[chan].data();
         int left = nb_samples_ - 1;
         int prev = 0;
