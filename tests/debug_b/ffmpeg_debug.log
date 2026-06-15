@@ -1,0 +1,122 @@
+ffmpeg version 8.1.1 Copyright (c) 2000-2026 the FFmpeg developers
+  built with Apple clang version 21.0.0 (clang-2100.0.123.102)
+  configuration: --prefix=/opt/homebrew/Cellar/ffmpeg/8.1.1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox --enable-neon
+  libavutil      60. 26.101 / 60. 26.101
+  libavcodec     62. 28.101 / 62. 28.101
+  libavformat    62. 12.101 / 62. 12.101
+  libavdevice    62.  3.101 / 62.  3.101
+  libavfilter    11. 14.101 / 11. 14.101
+  libswscale      9.  5.101 /  9.  5.101
+  libswresample   6.  3.101 /  6.  3.101
+Splitting the commandline.
+Reading option '-v' ... matched as option 'v' (set logging level) with argument 'debug'.
+Reading option '-y' ... matched as option 'y' (overwrite output files) with argument '1'.
+Reading option '-i' ... matched as input url with argument 'our.tak'.
+Reading option 'ffmpeg_out.wav' ... matched as output url.
+Finished splitting the commandline.
+Parsing a group of options: global .
+Applying option v (set logging level) with argument debug.
+Applying option y (overwrite output files) with argument 1.
+Successfully parsed a group of options.
+Parsing a group of options: input url our.tak.
+Successfully parsed a group of options.
+Opening an input file: our.tak.
+[in#0 @ 0x786c20000] Opening 'our.tak' for reading
+[file @ 0x787008150] Setting default whitelist 'file,crypto,data'
+[in#0 @ 0x786c20000] Format tak probed with size=2048 and score=50
+[in#0 @ 0x786c20000] encoder version: 20303
+[in#0/tak @ 0x786c20000] Before avformat_find_stream_info() pos: 356 bytes read:32800 seeks:2 nb_streams:1
+[tak @ 0x786c4c380] overread
+[in#0/tak @ 0x786c20000] After avformat_find_stream_info() pos: 98637 bytes read:131081 seeks:2 frames:4
+[aist#0:0/tak @ 0x787004180] Guessed Channel Layout: stereo
+Input #0, tak, from 'our.tak':
+  Duration: 00:00:01.00, start: 0.000000, bitrate: 789 kb/s
+  Stream #0:0, 4, 1/44100: Audio: tak, 44100 Hz, stereo, s16p
+Successfully opened the file.
+Parsing a group of options: output url ffmpeg_out.wav.
+Successfully parsed a group of options.
+Opening an output file: ffmpeg_out.wav.
+[out#0/wav @ 0x78702c180] No explicit maps, mapping streams automatically...
+[aost#0:0/pcm_s16le @ 0x786d1c000] Created audio stream from input stream 0:0
+detected 10 logical cores
+[file @ 0x7870097a0] Setting default whitelist 'file,crypto,data'
+Successfully opened the file.
+Stream mapping:
+  Stream #0:0 -> #0:0 (tak (native) -> pcm_s16le (native))
+[aost#0:0/pcm_s16le @ 0x786d1c000] Starting thread...
+[af#0:0 @ 0x787034000] Starting thread...
+[aist#0:0/tak @ 0x787004180] [dec:tak @ 0x786c1c280] Starting thread...
+[in#0/tak @ 0x786c1c000] Starting thread...
+Press [q] to stop, [?] for help
+[in#0/tak @ 0x786c1c000] EOF while reading input
+[in#0/tak @ 0x786c1c000] Terminating thread with return code 0 (success)
+[tak @ 0x786c4d180] overread
+[tak @ 0x786c4d500] overread
+[graph_-1_in_0:0 @ 0x78702c9c0] Setting 'time_base' to value '1/44100'
+[graph_-1_in_0:0 @ 0x78702c9c0] Setting 'sample_rate' to value '44100'
+[graph_-1_in_0:0 @ 0x78702c9c0] Setting 'sample_fmt' to value 's16p'
+[graph_-1_in_0:0 @ 0x78702c9c0] Setting 'channels' to value '2'
+[graph_-1_in_0:0 @ 0x78702c9c0] tb:1/44100 samplefmt:s16p samplerate:44100 chlayout:2 channels
+[format_out_#0:0 @ 0x78702cc00] Setting 'sample_fmts' to value 's16'
+Filter 'Parsed_anull_0' formats:
+  in[0] 'default':
+    Channel layouts: 
+    Sample rates: 
+    Sample formats: u8 s16 s32 flt dbl u8p s16p s32p fltp dblp s64 s64p
+  out[0] 'default':
+    Channel layouts: 
+    Sample rates: 
+    Sample formats: u8 s16 s32 flt dbl u8p s16p s32p fltp dblp s64 s64p
+Filter 'graph_-1_in_0:0' formats:
+  out[0] 'default':
+    Channel layouts: 2 channels
+    Sample rates: 44100
+    Sample formats: s16p
+Filter 'out_#0:0' formats:
+  in[0] 'default':
+    Channel layouts: 
+    Sample rates: 
+    Sample formats: u8 s16 s32 flt dbl u8p s16p s32p fltp dblp s64 s64p
+Filter 'format_out_#0:0' formats:
+  in[0] 'default':
+    Channel layouts: 
+    Sample rates: 
+    Sample formats: s16
+  out[0] 'default':
+    Channel layouts: 
+    Sample rates: 
+    Sample formats: s16
+[format_out_#0:0 @ 0x78702cc00] auto-inserting filter 'auto_aresample_0' between the filter 'Parsed_anull_0' and the filter 'format_out_#0:0'
+[AVFilterGraph @ 0x787098380] query_formats: 4 queried, 10 merged, 15 already done, 0 delayed
+[auto_aresample_0 @ 0x78702ccc0] [SWR @ 0x786858000] Using s16p internally between filters
+[auto_aresample_0 @ 0x78702ccc0] ch:2 chl:2 channels fmt:s16p r:44100Hz -> ch:2 chl:2 channels fmt:s16 r:44100Hz
+Output #0, wav, to 'ffmpeg_out.wav':
+  Metadata:
+    ISFT            : Lavf62.12.101
+  Stream #0:0, 0, 1/44100: Audio: pcm_s16le ([1][0][0][0] / 0x0001), 44100 Hz, 2 channels, s16, 1411 kb/s
+    Metadata:
+      encoder         : Lavc62.28.101 pcm_s16le
+[out#0/wav @ 0x78702c180] Starting thread...
+[aist#0:0/tak @ 0x787004180] [dec:tak @ 0x786c1c280] Decoder thread received EOF packet
+[aist#0:0/tak @ 0x787004180] [dec:tak @ 0x786c1c280] Decoder returned EOF, finishing
+[out_#0:0 @ 0x78702cb40] EOF on sink link out_#0:0:default.
+[af#0:0 @ 0x787034000] Filtergraph returned EOF, finishing
+[af#0:0 @ 0x787034000] All consumers returned EOF
+[aost#0:0/pcm_s16le @ 0x786d1c000] [enc:pcm_s16le @ 0x787008230] Encoder thread received EOF
+[aost#0:0/pcm_s16le @ 0x786d1c000] Terminating thread with return code 0 (success)
+[out#0/wav @ 0x78702c180] All streams finished
+[out#0/wav @ 0x78702c180] Terminating thread with return code 0 (success)
+[af#0:0 @ 0x787034000] Terminating thread with return code 0 (success)
+[aist#0:0/tak @ 0x787004180] [dec:tak @ 0x786c1c280] Terminating thread with return code 0 (success)
+[AVIOContext @ 0x786c1c3c0] Statistics: 176478 bytes written, 0 seeks, 1 writeouts
+[out#0/wav @ 0x78702c180] Output file #0 (ffmpeg_out.wav):
+[out#0/wav @ 0x78702c180]   Output stream #0:0 (audio): 4 frames encoded (44100 samples); 4 packets muxed (176400 bytes); 
+[out#0/wav @ 0x78702c180]   Total: 4 packets (176400 bytes) muxed
+[out#0/wav @ 0x78702c180] video:0KiB audio:172KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.044218%
+size=     172KiB time=00:00:01.00 bitrate=1411.8kbits/s speed= 307x elapsed=0:00:00.00    
+[in#0/tak @ 0x786c1c000] Input file #0 (our.tak):
+[in#0/tak @ 0x786c1c000]   Input stream #0:0 (audio): 4 packets read (98281 bytes); 4 frames decoded; 0 decode errors (44100 samples); 
+[in#0/tak @ 0x786c1c000]   Total: 4 packets (98281 bytes) demuxed
+[AVIOContext @ 0x786c1c140] Statistics: 131081 bytes read, 2 seeks
+
+Exiting with exit code 0

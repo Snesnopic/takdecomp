@@ -1,5 +1,7 @@
 #include "tak_encoder/encoder.hpp"
 #include <stdexcept>
+#include <bit>
+#include <algorithm>
 
 namespace takenc {
     const CParam xcodes[50] = {
@@ -102,10 +104,8 @@ namespace takenc {
                 bw.write_bits(0, 9);
 
                 if (scale > 0) {
-                    int scale_bits = 0;
-                    uint32_t s = scale - 1;
-                    while ((1U << scale_bits) <= s) scale_bits++;
-                    if (scale_bits == 0) scale_bits = 1;
+                    const uint32_t s = scale - 1;
+                    const int scale_bits = std::max(1, std::bit_width(s));
 
                     if (scale_bits >= 7) {
                         bw.write_bits(7, 3);
@@ -162,10 +162,8 @@ namespace takenc {
                 bits += 9; // unary 9 zeros
 
                 if (scale > 0) {
-                    int scale_bits = 0;
-                    uint32_t s = scale - 1;
-                    while ((1U << scale_bits) <= s) scale_bits++;
-                    if (scale_bits == 0) scale_bits = 1;
+                    const uint32_t s = scale - 1;
+                    const int scale_bits = std::max(1, std::bit_width(s));
 
                     if (scale_bits >= 7) {
                         bits += 3 + 5;

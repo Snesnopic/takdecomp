@@ -19,6 +19,7 @@
 #include <cmath>
 #include <array>
 #include <algorithm>
+#include <bit>
 
 namespace takenc {
     // Helper: write a metadata block (type byte, 3-byte LE size, payload, 3-byte BE CRC)
@@ -309,8 +310,7 @@ if (ch == 1) { for(int i=0; i<8; i++) printf("c[1][%d]=%d ", i, c[1][i]); printf
                     for (int i = 0; i < dmode_res.filter_order; i += 4) {
                         int max_val = 0;
                         for (int j = 0; j < 4; j++) max_val = std::max(max_val, std::abs(dmode_res.filter[i + j]));
-                        int code_size = 0;
-                        while ((1 << code_size) <= max_val && code_size < 14) code_size++;
+                        int code_size = std::min(14, std::bit_width(static_cast<uint32_t>(max_val)));
                         if (code_size > 0) code_size++;
                         if (code_size < 7) code_size = 7;
                         fw.write_bits(14 - code_size, 3);

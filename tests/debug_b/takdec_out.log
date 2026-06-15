@@ -1,0 +1,72 @@
+DEMUXED SR: 44100, SAMPLES: 44100\nACTUAL BUFFER: 02 0c 11 2b 00 00 40 4d 09 0a ea c6 80 \ndecode_segment branch=0 mode=5 length=8 left=196250
+decode_segment branch=0 mode=13 length=2632 left=196143
+decode_segment branch=0 mode=8 length=8 left=173318
+decode_segment branch=0 mode=10 length=2808 left=173197
+decode_segment branch=0 mode=12 length=8 left=153110
+decode_segment branch=0 mode=10 length=2632 left=152975
+decode_segment branch=0 mode=10 length=8 left=133675
+decode_segment branch=0 mode=14 length=2920 left=133546
+decode_segment branch=0 mode=8 length=8 left=106438
+decode_segment branch=0 mode=16 length=2632 left=106322
+decode_segment branch=0 mode=11 length=8 left=78682
+decode_segment branch=0 mode=12 length=2808 left=78554
+decode_segment branch=0 mode=15 length=8 left=54631
+decode_segment branch=0 mode=14 length=2632 left=54486
+decode_segment branch=0 mode=14 length=8 left=31115
+decode_segment branch=0 mode=16 length=2920 left=30971
+dmode=7
+decode_segment branch=0 mode=13 length=8 left=193962
+decode_segment branch=0 mode=12 length=2632 left=193823
+decode_segment branch=0 mode=13 length=8 left=172939
+decode_segment branch=0 mode=10 length=2808 left=172803
+decode_segment branch=0 mode=5 length=8 left=153246
+decode_segment branch=0 mode=18 length=2632 left=153136
+decode_segment branch=0 mode=16 length=8 left=124860
+decode_segment branch=0 mode=12 length=2920 left=124710
+decode_segment branch=0 mode=14 length=8 left=101232
+decode_segment branch=0 mode=14 length=2632 left=101090
+decode_segment branch=0 mode=15 length=8 left=76694
+decode_segment branch=0 mode=12 length=2808 left=76547
+decode_segment branch=0 mode=13 length=8 left=53852
+decode_segment branch=0 mode=16 length=2632 left=53716
+decode_segment branch=0 mode=12 length=8 left=26938
+decode_segment branch=0 mode=14 length=2920 left=26805
+dmode=6
+decode_segment branch=0 mode=15 length=8 left=208922
+decode_segment branch=0 mode=12 length=2632 left=208777
+decode_segment branch=0 mode=11 length=8 left=187877
+decode_segment branch=0 mode=16 length=2808 left=187746
+decode_segment branch=0 mode=17 length=8 left=159496
+decode_segment branch=0 mode=14 length=2632 left=159344
+decode_segment branch=0 mode=19 length=8 left=134419
+decode_segment branch=0 mode=16 length=2920 left=134258
+decode_segment branch=0 mode=17 length=8 left=105388
+decode_segment branch=0 mode=15 length=2632 left=105237
+decode_segment branch=0 mode=14 length=8 left=80379
+decode_segment branch=0 mode=15 length=2808 left=80239
+decode_segment branch=0 mode=18 length=8 left=53063
+decode_segment branch=0 mode=15 length=2632 left=52908
+decode_segment branch=0 mode=17 length=8 left=27706
+decode_segment branch=0 mode=14 length=2920 left=27550
+dmode=6
+decode_segment branch=0 mode=9 length=8 left=188586
+decode_segment branch=0 mode=14 length=2632 left=188468
+decode_segment branch=0 mode=14 length=8 left=165399
+decode_segment branch=0 mode=11 length=2808 left=165255
+decode_segment branch=0 mode=11 length=8 left=143549
+decode_segment branch=0 mode=10 length=2632 left=143418
+decode_segment branch=0 mode=10 length=8 left=124280
+decode_segment branch=0 mode=16 length=2920 left=124154
+decode_segment branch=0 mode=14 length=8 left=94805
+decode_segment branch=0 mode=14 length=2632 left=94660
+decode_segment branch=0 mode=13 length=8 left=70456
+decode_segment branch=0 mode=10 length=2808 left=70320
+decode_segment branch=0 mode=14 length=8 left=49786
+decode_segment branch=0 mode=12 length=2632 left=49645
+decode_segment branch=0 mode=13 length=8 left=28776
+decode_segment branch=0 mode=15 length=2920 left=28637
+dmode=6
+Successfully decoded TAK file to WAV.
+Codec config: 44100Hz, 2 channels, 16 bits per sample.
+Decoded 44100 samples.
+Output ready at ours_mod2_d.wav

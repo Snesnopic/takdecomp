@@ -1,0 +1,6 @@
+--- src/cli/takenc.cpp
++++ src/cli/takenc.cpp
+@@ -204,2 +204,3 @@
+                         c[ch][i] = val;
++                        if (i == 0 && f_num == 0) printf("Sample ch %d: %d\n", ch, val);
+                     } else if (bps == 24) {
