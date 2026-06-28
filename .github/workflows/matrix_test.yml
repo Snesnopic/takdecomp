@@ -17,8 +17,9 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y cmake g++ python3 ffmpeg wine64
+          sudo apt-get install -y cmake g++ python3 ffmpeg wine wine32
 
       - name: Download TAK 2.3.3
         run: |
