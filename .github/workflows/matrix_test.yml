@@ -1,0 +1,63 @@
+name: Matrix Tests
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+  workflow_dispatch:
+
+jobs:
+  matrix-test:
+    name: Audio Matrix Tests (Linux x64)
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ python3 ffmpeg wine64
+
+      - name: Download TAK 2.3.3
+        run: |
+          curl -fL http://thbeck.de/Download/TAK_2.3.3.zip -o TAK.zip
+          unzip TAK.zip -d tak_dist
+          # Locate Takc.exe wherever it lands inside the zip
+          TAKC_EXE=$(find tak_dist -iname "Takc.exe" | head -1)
+          if [ -z "$TAKC_EXE" ]; then
+            echo "ERROR: Takc.exe not found in archive"
+            find tak_dist
+            exit 1
+          fi
+          echo "Found Takc.exe at: $TAKC_EXE"
+          echo "TAKC_EXE=$TAKC_EXE" >> "$GITHUB_ENV"
+
+      - name: Initialise Wine prefix (suppresses first-run noise)
+        run: |
+          WINEDEBUG=-all WINEPREFIX="$HOME/.wine" wineboot --init
+        timeout-minutes: 2
+
+      - name: Configure CMake (Release, no sanitizers)
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Generate test WAV files
+        run: python3 tests/generate_test_wavs.py
+
+      - name: Encoder Matrix Test (our takc → Takc.exe)
+        run: python3 tests/test_encoder_matrix.py
+        env:
+          TAKC_BIN: ./build/bin/takc
+          TAKC_EXE: ${{ env.TAKC_EXE }}
+          WINEDEBUG: "-all"
+
+      - name: Decoder Matrix Test (Takc.exe → our takc)
+        run: python3 tests/test_decoder_matrix.py
+        env:
+          TAKC_BIN: ./build/bin/takc
+          TAKC_EXE: ${{ env.TAKC_EXE }}
+          WINEDEBUG: "-all"
