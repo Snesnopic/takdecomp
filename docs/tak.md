@@ -80,12 +80,6 @@ A central architectural feature is the static `xcodes` lookup table, which defin
 
 Data integrity is rigorously controlled via CRC. The stream header is protected by a CRC, and every single audio frame concludes with a 24-bit CRC (CRC-24). The decoder computes the CRC of the decompressed PCM samples for the frame and compares it against the stored CRC. This guarantees that any transmission error or bit flip is immediately detected, preventing corrupted audio output.
 
-## Future and history
+## Credits
 
-My first attempts in the field of lossy audio compression occurred in 1994, researching simple methods based on ADPCM for speech compression. Around 1996, I turned to lossless audio compression using linear prediction. In 1997, encountering the audio compressor Shorten showed me a faster method for calculating prediction coefficients: the Levinson-Durbin algorithm. 
-
-My initial euphoria about achieving better results than Shorten vanished when I encountered Monkey's Audio, which was superior in every respect. In the following years, my development work focused on catching up. By the end of March 2006, I had achieved my goals and saw no way to work out significant improvements. I asked the community on hydrogenaudio.org if the world needed another lossless audio compression method.
-
-This post brought momentum. To prove my unexpectedly good but unpublished results on April Fools' Day, I developed a working prototype (YALAC V0.01) within a few days. With extensive support from testers, I spent the following months improving compression performance and speed up to version V0.10. Then began the work on streaming support, finalization of the file format, and improving user-friendliness. The first final version 1.0 was published on January 26, 2007.
-
-The future of TAK now lies in the hands of the open-source community. With a complete, cross-platform C++ implementation available, potential expansions include support for Unicode character sets, porting to other platforms like ARM, optimizing vector instructions, and extending support for more than six audio channels.
+*Original project and format design by Thomas Becker. Visit the original website here: [http://www.thbeck.de/Tak/Tak.html](http://www.thbeck.de/Tak/Tak.html)*

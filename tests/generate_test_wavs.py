@@ -1,11 +1,11 @@
 """
-Genera i file WAV sintetici usati dalla matrix di test.
-Richiede ffmpeg nel PATH.
+generates synthetic wav files used by the test matrix.
+requires ffmpeg in path.
 
-Produce una cartella test_matrix/ con file nominati:
+produces a test_matrix/ directory with files named:
     {sr}_{ch}ch_{bits}b_{signal}.wav
 
-Uso:
+usage:
     python3 tests/generate_test_wavs.py
 """
 

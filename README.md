@@ -1,18 +1,16 @@
 # takdecomp
 
-`takdecomp` is an open-source C++20 suite for decoding and encoding the TAK (Tom's lossless Audio Kompressor) audio format. Designed to offer full cross-platform compatibility with the original closed-source executables, it provides a clean, easily integrable, multithreaded codebase that is completely independent of Windows architectures.
+`takdecomp` is an open-source C++20 suite for decoding and encoding the TAK (Tom's lossless Audio Kompressor) audio format. Designed to offer full compatibility with the original closed-source executables, it provides a clean, easily integrable, multithreaded codebase.
 
-For an in-depth understanding of how the TAK codec works under the hood, including its container layout, linear predictive coding math, and entropy segmentation logic, please refer to the [TAK format specification](docs/tak_format_specification.md).
+For an in-depth understanding of how the TAK codec works under the hood, including its container layout, linear predictive coding math, and entropy segmentation logic, please refer to the [TAK format specification](docs/tak.md).
 
 ## Features
 
-The project provides full 1:1 bitstream reproduction to WAV, MD5 checksum extraction, and APEv2 decoding. On the compression side, it handles audio framing, multi-threading support, tagging, wave metadata extraction, and bitstream verification.
+The project provides reproduction to WAV, MD5 checksum extraction, and APEv2 decoding. On the compression side, it handles audio framing, multi-threading support, tagging, wave metadata extraction, and bitstream verification.
 
-Everything is cross-platform, having been heavily tested and natively compiled on Windows (x64, x86, ARM64), Linux, and macOS. The modular C++ structure allows you to effortlessly integrate the encoder or decoder into your own software ecosystem, such as media players, converters, or digital audio workstations.
+Everything is cross-platform, having been heavily tested and natively compiled on Windows (x64, x86, ARM64), Linux, macOS and FreeBSD. Both the encoder and decoder have their own headers and targets.
 
 ## Building
-
-The project uses CMake for an easy build process. You can compile it from your command line by cloning the repository, creating a build directory, and invoking CMake with the Release configuration.
 
 ```bash
 git clone https://github.com/Snesnopic/takdecomp.git
@@ -22,28 +20,27 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
 ```
 
-This will produce a single unified `takc` executable inside the `bin/` directory.
+This will produce a `takc` executable inside the `bin/` directory.
 
 ## CLI usage
 
-The syntax and flags replicate the original TAK executables, but are now consolidated into a single unified binary (`takc`). The tool automatically detects whether you are trying to encode or decode based on the input file extension (`.wav` for encoding, `.tak` for decoding), or you can force the mode using `-e` or `-d`.
+The syntax and flags replicate the original TAK executables. The tool automatically detects whether you are trying to encode or decode based on the input file extension (`.wav` for encoding, `.tak` for decoding), or you can force the mode using `-e` or `-d`.
 
-When encoding, you can specify the compression preset using `-p#` (from 0 to 5, where 5 is maximum compression and 0 is maximum speed). You can allocate multiple threads using `-tn#`. Additional flags like `-tt` allow you to write APEv2 tags, `-wm` handles foreign wave chunks, and `-v` verifies frame integrity by automatically running a post-encode decoding check.
+When encoding, you can specify the compression preset using `-p#` (from 0 to 5, where 5 is maximum compression and 0 is maximum speed). You can allocate multiple threads using `-tn#`. Additional flags like `-tt` allow you to write APEv2 tags, `-wm` handles foreign wave chunks, and `-v` verifies frame integrity by running a post-encode decoding check.
 
 When decoding, passing `-t` performs only a file integrity test without writing audio output. The `-md5` flag calculates and verifies the MD5 checksum of the bitstream against the one stored in the header. If the output path is not specified, the `.wav` or `.tak` file will be generated in the same directory as the input.
 
 ```bash
-# Encoding
+# encoding
 ./takc input.wav [output.tak] [options]
 
-# Decoding
+# decoding
 ./takc input.tak [output.wav] [options]
 ```
 
 ## Using as a library
 
-Both the encoder and decoder engines are wrapped in the static targets `takdec_core` and `takenc_core`. You can add them to your own CMake project by including the subdirectory and linking your executable against these private targets.
-
+Both the encoder and decoder are wrapped in the targets `takdec_core` and `takenc_core`.
 ```cmake
 add_subdirectory(takdecomp)
 target_link_libraries(your_executable PRIVATE takdec_core takenc_core)

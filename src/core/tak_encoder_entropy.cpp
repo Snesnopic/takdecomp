@@ -4,6 +4,10 @@
 #include <algorithm>
 
 namespace takenc {
+    // global lookup table for the segmented golomb-rice entropy coder.
+    // contains escape thresholds, scaling factors, and bias for up to 50 modes.
+    // historically, mode 20 (index 19) had a typo in the bias parameter (0x0000180 instead of 0x0001800),
+    // which caused the encoded bitstream to drift for 24-bit audio segments when mode 20 was optimal.
     const CParam xcodes[50] = {
         {0x01, 0x0000001, 0x0000001, 0x0000003, 0x0000008},
         {0x02, 0x0000003, 0x0000001, 0x0000007, 0x0000006},

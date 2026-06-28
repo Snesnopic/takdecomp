@@ -1,13 +1,13 @@
 """
-Test round-trip: nostro encoder → nostro decoder → confronto PCM e header con l'originale.
+round-trip test: our encoder -> our decoder -> pcm and header comparison.
 
-Non richiede wine né Takc.exe. Portabile su tutti i platform.
-Testa anche vari preset di encoding.
+does not require wine or the original takc.exe. fully portable.
+tests various encoding presets.
 
-Variabili d'ambiente:
-    TAKC_BIN   Path al nostro binario takc   (default: ./build/bin/takc)
+environment variables:
+    TAKC_BIN   path to our takc binary (default: ./build/bin/takc)
 
-Uso:
+usage:
     python3 tests/test_roundtrip.py
     TAKC_BIN=./build/bin/takc python3 tests/test_roundtrip.py
 """

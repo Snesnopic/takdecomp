@@ -25,10 +25,8 @@ namespace takenc {
     extern const CParam xcodes[50];
 
     /**
-     * @brief Configuration object for the TAK encoder.
-     *
-     * Contains all the parameters affecting compression ratio, processing speed,
-     * multithreading, and CLI parity behaviors.
+     * @brief configuration object for the TAK encoder.
+     * contains parameters for compression ratio, speed, multithreading, and CLI behaviors.
      */
     struct EncoderConfig {
         int max_lpc_mode = 50; // max LPC evaluation order (2..50)
@@ -57,7 +55,7 @@ namespace takenc {
     };
 
     /**
-     * @brief Result object returned by the encoding functions.
+     * @brief result object returned by the encoding functions.
      */
     struct EncodeResult {
         std::string md5;
@@ -66,10 +64,8 @@ namespace takenc {
     using ProgressCallback = std::function<void(int64_t processed, int64_t total)>;
 
     /**
-     * @brief Main encoder class for TAK audio files.
-     *
-     * This class handles the compression of PCM audio samples into TAK bitstreams.
-     * It provides both stream-based and file-based API endpoints.
+     * @brief main encoder class for TAK audio files.
+     * compresses PCM audio samples into TAK bitstreams.
      */
     class Encoder {
     public:
@@ -92,13 +88,12 @@ namespace takenc {
                                  const ProgressCallback& progress = nullptr);
 
         /**
-         * @brief Encodes an input stream containing WAV PCM data into a TAK output stream.
-         *
-         * @param is The input stream containing the raw WAV file.
-         * @param os The output stream where the TAK bitstream will be written.
-         * @param cfg The encoder configuration parameters.
-         * @param progress Optional callback function for reporting progress.
-         * @return EncodeResult Struct containing the final MD5 hash.
+         * @brief encodes WAV PCM data from an input stream into a TAK output stream.
+         * @param is input stream containing the raw WAV file.
+         * @param os output stream where the TAK bitstream will be written.
+         * @param cfg encoder configuration parameters.
+         * @param progress optional callback function for reporting progress.
+         * @return struct containing the final MD5 hash.
          */
         static EncodeResult encode_stream(std::istream& is, std::ostream& os, const EncoderConfig& cfg,
                                    const ProgressCallback& progress = nullptr);

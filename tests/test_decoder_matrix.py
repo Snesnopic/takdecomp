@@ -1,12 +1,12 @@
 """
-Test matrice decoder: codifica con Takc.exe (originale), decodifica con il nostro
-takc, confronta PCM e header WAV con l'originale.
+decoder matrix test: encodes with the official takc.exe, decodes with our takc,
+and compares pcm and wav header with the original.
 
-Variabili d'ambiente:
-    TAKC_BIN   Path al nostro binario takc         (default: ./build/bin/takc)
-    TAKC_EXE   Path al Takc.exe ufficiale          (default: Takc.exe)
+environment variables:
+    TAKC_BIN   path to our takc binary       (default: ./build/bin/takc)
+    TAKC_EXE   path to the official takc.exe (default: Takc.exe)
 
-Uso:
+usage:
     TAKC_BIN=./build/bin/takc TAKC_EXE=./tak/Takc.exe python3 tests/test_decoder_matrix.py
 """
 

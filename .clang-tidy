@@ -1,1 +1,0 @@
-Checks: '-*,performance-*,bugprone-*,-bugprone-easily-swappable-parameters,modernize-*,-modernize-use-trailing-return-type,-modernize-avoid-c-arrays'
