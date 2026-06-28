@@ -44,7 +44,7 @@ namespace takenc {
         int threads = 1;
         int frame_size_limit = 0; // 0 means default
         int wave_metadata_mode = 1; // 0=disable, 1=default max size, 46..1048576=custom max size
-        bool write_md5 = true;
+        bool write_md5 = false;
         bool ignore_header_size = false;
         bool verify = false;
         bool overwrite = false;
@@ -77,7 +77,7 @@ namespace takenc {
 
         static void encode_segment(int mode, const int32_t *data, int len, BitStreamWriter &bw);
 
-        static auto calc_bits_needed(int mode, const int32_t *data, int len) -> int;
+        static int calc_bits_needed(int mode, const int32_t *data, int len);
 
         struct ResiduesPartition {
             int cost;
@@ -86,10 +86,10 @@ namespace takenc {
             std::vector<int> modes;
         };
 
-        static auto plan_residues_partition(const int32_t *data, int length) -> ResiduesPartition;
+        static ResiduesPartition plan_residues_partition(const int32_t *data, int length);
 
-        static auto encode_file(const char *wav_path, const char *tak_path, const EncoderConfig &cfg,
-                                 const ProgressCallback& progress = nullptr) -> EncodeResult;
+        static EncodeResult encode_file(const char* in_file, const char* out_file, const EncoderConfig& cfg,
+                                 const ProgressCallback& progress = nullptr);
 
         /**
          * @brief Encodes an input stream containing WAV PCM data into a TAK output stream.
@@ -100,8 +100,8 @@ namespace takenc {
          * @param progress Optional callback function for reporting progress.
          * @return EncodeResult Struct containing the final MD5 hash.
          */
-        static auto encode_stream(std::istream &is, std::ostream &os, const EncoderConfig &cfg,
-                                   const ProgressCallback& progress = nullptr) -> EncodeResult;
+        static EncodeResult encode_stream(std::istream& is, std::ostream& os, const EncoderConfig& cfg,
+                                   const ProgressCallback& progress = nullptr);
     };
 } // namespace takenc
 

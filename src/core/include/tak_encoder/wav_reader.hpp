@@ -19,9 +19,10 @@ namespace takenc {
         };
 
         std::vector<ForeignChunk> foreign_chunks;
+        std::vector<uint8_t> header_data;
     };
 
-    auto read_wav_header(std::istream &is) -> WavInfo;
+    WavInfo read_wav_header(std::istream &is);
 } // namespace takenc
 
 #endif // TAK_ENCODER_WAV_READER_HPP

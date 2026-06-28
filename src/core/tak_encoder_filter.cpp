@@ -1,4 +1,5 @@
 #include "tak_encoder/filter.hpp"
+#include <cmath>
 #include "tak_encoder/encoder.hpp"
 #include <cmath>
 #include <algorithm>
@@ -18,13 +19,13 @@ namespace takenc {
         for (int k = 0; k <= order; k++) {
             double sum = 0;
             for (int i = k; i < len; i++)
-                sum += (double) data[i] * data[i - k];
+                sum += static_cast<double>(data[i]) * data[i - k];
             r[k] = sum;
         }
     }
 
     // Levinson-Durbin: compute PARCOR (reflection) coefficients from autocorrelation
-    static auto levinson_durbin(const double *r, int order, double *parcor) -> bool {
+    static bool levinson_durbin(const double *r, int order, double *parcor) {
         if (r[0] <= 0.0) return false;
 
         std::vector<double> a(order), a_prev(order);
@@ -44,7 +45,7 @@ namespace takenc {
             a[i] = k;
 
             E *= (1.0 - k * k);
-            if (E <= 0.0) return false;
+            if (E <= 0.0 || std::isnan(E)) return false;
             std::copy(a.begin(), a.end(), a_prev.begin());
         }
         return true;
@@ -129,7 +130,7 @@ namespace takenc {
         }
     }
 
-    auto estimate_lpc_cost(const int32_t *samples, int length, int lpc_mode) -> int {
+    int estimate_lpc_cost(const int32_t *samples, int length, int lpc_mode) {
         std::vector<int32_t> tmp(samples, samples + length);
         inverse_lpc(tmp.data(), lpc_mode, length);
         int best = Encoder::calc_bits_needed(1, tmp.data() + 1, length - 1);
@@ -141,7 +142,7 @@ namespace takenc {
     }
 
 
-    static auto evaluate_filter_cost(FilterConfig &cfg, const int32_t *samples, int subframe_size, int filter_order) -> int {
+    static int evaluate_filter_cost(FilterConfig &cfg, const int32_t *samples, int subframe_size, int filter_order) {
         int overhead = 1 + 4 + 1 + 2 + 1 + 1 + 1 + 20 + 2 * cfg.size;
         if (filter_order > 4) {
             overhead += 1;
@@ -174,8 +175,8 @@ namespace takenc {
         return overhead + warmup_cost + resid_cost;
     }
 
-    auto try_filter_encode(const int32_t *samples, int subframe_size,
-                           int order_idx, FilterConfig &cfg, bool max_compression) -> bool {
+    bool try_filter_encode(const int32_t *samples, int subframe_size,
+                           int order_idx, FilterConfig &cfg, bool max_compression) {
         int filter_order = predictor_sizes[order_idx];
         if (subframe_size <= filter_order) return false;
 
@@ -183,9 +184,9 @@ namespace takenc {
         cfg.filter_order = filter_order;
         cfg.filter_quant = 10;
 
-        int32_t max_abs = 0;
+        uint32_t max_abs = 0;
         for (int i = 0; i < subframe_size; i++) {
-            int32_t a = std::abs(samples[i]);
+            uint32_t a = std::abs(samples[i]);
             if (a > max_abs) max_abs = a;
         }
         cfg.dshift = 0;
@@ -206,7 +207,7 @@ namespace takenc {
 
         cfg.predictors.resize(std::max(4, filter_order));
 
-        auto init_predictors = [&](int size_val) -> void {
+        auto init_predictors = [&](int size_val) {
             for (int i = 0; i < filter_order; i++) {
                 double k = parcor[i];
                 int q;
@@ -226,7 +227,7 @@ namespace takenc {
             for (int i = filter_order; i < 4; i++) cfg.predictors[i] = 0;
         };
 
-        auto evaluate_configuration = [&]() -> int {
+        auto evaluate_configuration = [&]() {
             int16_t filter[256];
             build_filter(cfg.predictors.data(), filter_order, cfg.filter_quant, filter);
             cfg.filter_residuals.resize(subframe_size - filter_order);

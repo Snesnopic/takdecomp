@@ -11,9 +11,12 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /Zc:__cplusplus /EHsc")
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-padded -Wno-sign-conversion -Wno-shorten-64-to-32")
+    endif()
     # Uncomment the following to enable sanitizers for debug builds:
-    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined -fno-omit-frame-pointer -O0")
-    # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address,undefined")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined -fno-omit-frame-pointer -O0")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address,undefined")
 endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -31,11 +34,6 @@ add_library(takdec_core STATIC
 target_include_directories(takdec_core PUBLIC src/core/include)
 target_link_libraries(takdec_core PRIVATE Threads::Threads)
 
-# --- CLI Executable (Decoder) ---
-add_executable(takdec src/cli/takdec.cpp)
-target_link_libraries(takdec PRIVATE takdec_core)
-target_include_directories(takdec PRIVATE src/cli)
-
 # --- Core Library (Encoder) ---
 add_library(takenc_core STATIC
             src/core/tak_encoder.cpp
@@ -52,10 +50,10 @@ add_library(takenc_core STATIC
 target_include_directories(takenc_core PUBLIC src/core/include)
 target_link_libraries(takenc_core PRIVATE Threads::Threads)
 
-# --- CLI Executable (Encoder) ---
-add_executable(takenc src/cli/takenc.cpp)
-target_link_libraries(takenc PRIVATE takenc_core)
-target_include_directories(takenc PRIVATE src/cli)
+# --- CLI Executable ---
+add_executable(takc src/cli/takc.cpp)
+target_link_libraries(takc PRIVATE takdec_core takenc_core)
+target_include_directories(takc PRIVATE src/cli)
 
 include(GNUInstallDirs)
-install(TARGETS takdec takenc DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS takc DESTINATION ${CMAKE_INSTALL_BINDIR})

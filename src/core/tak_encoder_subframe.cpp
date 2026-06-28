@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace takenc {
-    auto evaluate_subframe(const int32_t *subframe_data, int subframe_size, const EncoderConfig &cfg) -> SubframeChoice {
+    SubframeChoice evaluate_subframe(const int32_t *subframe_data, int subframe_size, const EncoderConfig &cfg) {
         SubframeChoice choice = {};
         choice.use_filter = false;
 

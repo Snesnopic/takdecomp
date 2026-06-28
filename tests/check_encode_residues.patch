@@ -1,7 +1,0 @@
---- src/core/tak_encoder_subframe.cpp
-+++ src/core/tak_encoder_subframe.cpp
-@@ -58,3 +58,3 @@
-         }
--        fw.write_bit(0);
-+        fw.write_bit(1);
-         fw.write_bits(best_m, 6);

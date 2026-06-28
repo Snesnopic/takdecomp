@@ -43,7 +43,7 @@ namespace takdecomp {
         };
     } // namespace
 
-    auto Decoder::get_nb_samples(const int sample_rate, FrameSizeType type) -> int {
+    int Decoder::get_nb_samples(const int sample_rate, FrameSizeType type) {
         int nb_samples = 0;
         int max_nb_samples = 0;
         auto const type_val = static_cast<uint8_t>(type);
@@ -66,7 +66,7 @@ namespace takdecomp {
         return nb_samples;
     }
 
-    auto Decoder::parse_streaminfo(BitStreamReader &gb) -> StreamInfo {
+    StreamInfo Decoder::parse_streaminfo(BitStreamReader &gb) {
         StreamInfo s;
 
         s.codec = static_cast<CodecType>(gb.get_bits(constants::ENCODER_CODEC_BITS));
@@ -99,6 +99,8 @@ namespace takdecomp {
         return s;
     }
 
+
+
     void Decoder::decode_frame_header(BitStreamReader &gb, StreamInfo &info) {
         if (gb.get_bits(constants::FRAME_HEADER_SYNC_ID_BITS) != constants::FRAME_HEADER_SYNC_ID) {
             throw std::runtime_error("Missing sync id");
@@ -113,6 +115,8 @@ namespace takdecomp {
         } else {
             info.last_frame_samples = 0;
         }
+
+        printf("Header parsed! frame_samples: %d\n", info.frame_samples);
 
         if ((info.flags & constants::FRAME_FLAG_HAS_INFO) != 0) {
             parse_streaminfo(gb);
@@ -284,7 +288,7 @@ namespace takdecomp {
     }
 } // namespace takdecomp
 
-auto takdecomp::Decoder::check_crc24(const std::span<const uint8_t> data) -> bool {
+bool takdecomp::Decoder::check_crc24(const std::span<const uint8_t> data) {
     if (data.size() < 3) {
         return false;
     }

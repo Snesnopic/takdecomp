@@ -26,7 +26,7 @@ namespace takdecomp {
          * @return StreamInfo The parsed stream metadata.
          * @throws std::runtime_error if the data is invalid.
          */
-        static auto parse_streaminfo(BitStreamReader &gb) -> StreamInfo;
+        static StreamInfo parse_streaminfo(BitStreamReader &gb);
 
 
         /**
@@ -55,7 +55,7 @@ namespace takdecomp {
 
         void decode_residues(int32_t *decoded, int length, BitStreamReader &gb);
 
-        static auto get_unary(BitStreamReader &gb, int step, int max) -> int;
+        static int get_unary(BitStreamReader &gb, int step, int max);
 
         void decode_subframe(int32_t *decoded, int subframe_size, int prev_subframe_size, BitStreamReader &gb);
 
@@ -63,9 +63,9 @@ namespace takdecomp {
 
         void decorrelate(int c1, int c2, int length, BitStreamReader &gb);
 
-        static auto get_nb_samples(int sample_rate, FrameSizeType type) -> int;
+        static int get_nb_samples(int sample_rate, FrameSizeType type);
 
-        static auto check_crc24(std::span<const uint8_t> data) -> bool;
+        static bool check_crc24(std::span<const uint8_t> data);
 
         int uval_ = 0;
         int subframe_scale_ = 0;

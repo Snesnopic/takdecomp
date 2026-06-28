@@ -15,7 +15,7 @@ namespace takenc {
         int total_bits;
     };
 
-    auto evaluate_subframe(const int32_t *subframe_data, int subframe_size) -> SubframeChoice;
+    SubframeChoice evaluate_subframe(const int32_t *subframe_data, int subframe_size);
 
     void write_subframe(const SubframeChoice &choice, const int32_t *subframe_data,
                         int subframe_size, int prev_subframe_size, BitStreamWriter &fw);

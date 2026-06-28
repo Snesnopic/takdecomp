@@ -25,12 +25,12 @@ namespace takenc {
     };
 
     // Evaluate and populate FilterConfig. Returns false if signal is degenerate or size is too small.
-    auto try_filter_encode(const int32_t *samples, int subframe_size,
-                           int order_idx, FilterConfig &cfg, bool max_compression = false) -> bool;
+    bool try_filter_encode(const int32_t *samples, int subframe_size,
+                           int order_idx, FilterConfig &cfg, bool max_compression = false);
 
     void inverse_lpc(int32_t *data, int mode, int length);
 
-    auto estimate_lpc_cost(const int32_t *samples, int length, int lpc_mode) -> int;
+    int estimate_lpc_cost(const int32_t *samples, int length, int lpc_mode);
 } // namespace takenc
 
 #endif // TAK_ENCODER_FILTER_HPP

@@ -115,7 +115,7 @@ namespace takenc {
         }
     }
 
-    static auto estimate_entropy_fast(const int32_t *data, int len) -> int {
+    static int estimate_entropy_fast(const int32_t *data, int len) {
         int best = Encoder::calc_bits_needed(1, data, len);
         for (int m = 2; m <= 34; m++) {
             int c = Encoder::calc_bits_needed(m, data, len);
@@ -124,7 +124,7 @@ namespace takenc {
         return best;
     }
 
-    static auto compute_optimal_factor(const int32_t *pred_source, const int32_t *target, int len, int shift) -> int {
+    static int compute_optimal_factor(const int32_t *pred_source, const int32_t *target, int len, int shift) {
         double sum_p2 = 0;
         double sum_pt = 0;
         for (int i = 0; i < len; i++) {
@@ -141,7 +141,7 @@ namespace takenc {
         return factor;
     }
 
-    static auto solve_linear_system(int n, std::vector<double> &A, std::vector<double> &b, std::vector<double> &x) -> bool {
+    static bool solve_linear_system(int n, std::vector<double> &A, std::vector<double> &b, std::vector<double> &x) {
         for (int i = 0; i < n; i++) {
             int pivot = i;
             for (int j = i + 1; j < n; j++) {
@@ -176,8 +176,8 @@ namespace takenc {
         return true;
     }
 
-    static auto compute_cross_fir_filter(const int32_t *target, const int32_t *source, int len, int K, int shift,
-                                         std::vector<int> &filter_out) -> bool {
+    static bool compute_cross_fir_filter(const int32_t *target, const int32_t *source, int len, int K, int shift,
+                                         std::vector<int> &filter_out) {
         std::vector<double> R(K * K, 0.0);
         std::vector<double> C(K, 0.0);
 
@@ -217,7 +217,7 @@ namespace takenc {
         return true;
     }
 
-    auto Decorrelator::apply_decorrelation(int32_t *data_c1, int32_t *data_c2, int len) -> Decorrelator::DecorrelationResult {
+    Decorrelator::DecorrelationResult Decorrelator::apply_decorrelation(int32_t *data_c1, int32_t *data_c2, int len) {
         std::vector<int32_t> buf1(len);
         std::vector<int32_t> buf2(len);
 
