@@ -64,7 +64,11 @@ int main(int argc, char** argv) {
     while (true) {
         TtakInt32 read_num = 0;
         TtakResult res = tak_SSD_ReadAudio(decoder, pcm_buf.data(), block_size, &read_num);
-        if (res != tak_res_Ok || read_num == 0) break;
+        if (res != tak_res_Ok) {
+            std::cerr << "ReadAudio error: " << res << "\n";
+            break;
+        }
+        if (read_num == 0) break;
 
         os.write(reinterpret_cast<char*>(pcm_buf.data()), read_num * bytes_per_sample);
         total_samples_written += read_num;

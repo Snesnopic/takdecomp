@@ -241,7 +241,6 @@ TAK_API TtakResult tak_SSD_ReadAudio(TtakSeekableStreamDecoder ADecoder,
     auto *out_buf = static_cast<uint8_t *>(ASamples);
     int bytes_per_sample = state->info.bps / 8;
     while (samples_read < ASampleNum) {
-        // If we need to decode a new frame
         if (state->pcm_buffer.empty() || static_cast<size_t>(state->pcm_buffer_pos) >= state->pcm_buffer[0].size()) {
             if (state->current_sample >= state->info.samples) {
                 break; // EOF
@@ -252,9 +251,9 @@ TAK_API TtakResult tak_SSD_ReadAudio(TtakSeekableStreamDecoder ADecoder,
             
             // We need to read a frame. We use a heuristic since we don't have bitstream size in streaminfo
             // Instead of full parsing, just try reading a max frame size chunk and decoding
-            state->frame_buffer.resize(32768); // Max possible frame size roughly
+            state->frame_buffer.resize(1048576); // Max possible frame size roughly (1MB)
             auto start_pos = state->file->tellg();
-            state->file->read(reinterpret_cast<char*>(state->frame_buffer.data()), 32768);
+            state->file->read(reinterpret_cast<char*>(state->frame_buffer.data()), 1048576);
             auto actually_read = state->file->gcount();
             if (actually_read < 2) break;
             
@@ -264,6 +263,7 @@ TAK_API TtakResult tak_SSD_ReadAudio(TtakSeekableStreamDecoder ADecoder,
                 takdecomp::StreamInfo frame_info = state->info; // copy context
                 size_t consumed = state->decoder.decode_frame(state->frame_buffer, frame_info, state->pcm_buffer);
                 state->last_frame_bytes = static_cast<int>(consumed);
+                state->file->clear(); // Clear EOF bit before seekg
                 state->file->seekg(start_pos + std::streamoff(consumed), std::ios::beg);
                 state->pcm_buffer_pos = 0;
             } catch (...) {
