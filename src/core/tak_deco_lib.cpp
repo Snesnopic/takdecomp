@@ -279,9 +279,14 @@ TAK_API TtakResult tak_SSD_ReadAudio(TtakSeekableStreamDecoder ADecoder,
         for (int i = 0; i < to_copy; ++i) {
             for (int c = 0; c < state->info.channels; ++c) {
                 int32_t sample = state->pcm_buffer[c][state->pcm_buffer_pos + i];
-                // little endian write
-                for (int b = 0; b < bytes_per_sample; ++b) {
-                    *out_buf++ = (sample >> (b * 8)) & 0xFF;
+                
+                if (state->info.bps == 8) {
+                    *out_buf++ = static_cast<uint8_t>(sample + 0x80);
+                } else {
+                    // little endian write
+                    for (int b = 0; b < bytes_per_sample; ++b) {
+                        *out_buf++ = (sample >> (b * 8)) & 0xFF;
+                    }
                 }
             }
         }
