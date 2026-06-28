@@ -97,12 +97,9 @@ jobs:
         with:
           name: ${{ matrix.asset_name }}
           path: |
-            build/bin/takenc
-            build/bin/takdec
-            build/bin/takenc.exe
-            build/bin/takdec.exe
-            build/bin/Release/takenc.exe
-            build/bin/Release/takdec.exe
+            build/bin/takc
+            build/bin/takc.exe
+            build/bin/Release/takc.exe
 
   build-freebsd:
     name: ${{ matrix.asset_name }}
@@ -137,9 +134,6 @@ jobs:
         with:
           name: ${{ matrix.asset_name }}
           path: |
-            build/bin/takenc
-            build/bin/takdec
-            build/bin/takenc.exe
-            build/bin/takdec.exe
-            build/bin/Release/takenc.exe
-            build/bin/Release/takdec.exe
+            build/bin/takc
+            build/bin/takc.exe
+            build/bin/Release/takc.exe
