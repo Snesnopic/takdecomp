@@ -109,3 +109,13 @@ jobs:
           TAKC_BIN: ./build/bin/takc
           TAKC_EXE: ${{ env.TAKC_EXE }}
           WINEDEBUG: "-all"
+
+      - name: Build C API test client
+        run: g++ -std=c++20 -I src/core/include -I src/core/include/tak_decoder src/core/tak_deco_lib.cpp tests/c_api_decoder.cpp build/lib/libtakdec_core.a build/lib/libtakenc_core.a -o build/c_api_decoder
+
+      - name: C API Decoder Matrix Test (Takc.exe → C API Client)
+        run: python3 tests/test_c_api_matrix.py
+        env:
+          C_API_DEC: ./build/c_api_decoder
+          TAKC_EXE: ${{ env.TAKC_EXE }}
+          WINEDEBUG: "-all"

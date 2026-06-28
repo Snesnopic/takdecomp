@@ -23,6 +23,7 @@ namespace takdecomp {
         int last_frame_samples = 0;
         uint64_t ch_layout = 0;
         int64_t samples = 0;
+        int preset = 0;
     };
 } // namespace takdecomp
 #endif // TAK_DECODER_STREAMINFO_HPP

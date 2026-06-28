@@ -38,6 +38,18 @@ When decoding, passing `-t` performs only a file integrity test without writing 
 ./takc input.tak [output.wav] [options]
 ```
 
+## C API Wrapper
+
+The library provides a compatible drop-in replacement for the original closed-source `tak_deco_lib.dll` decoder library. This allows retro-compatibility with older players (like Winamp plugins or foobar2000) that used the original SDK.
+
+To build the shared library wrapper, compile `src/core/tak_deco_lib.cpp` into a shared library. For example, using CMake:
+
+```cmake
+add_library(tak_deco_lib SHARED src/core/tak_deco_lib.cpp)
+target_link_libraries(tak_deco_lib PRIVATE takdec_core)
+target_compile_definitions(tak_deco_lib PRIVATE TAK_DECO_LIB_EXPORTS)
+```
+
 ## Using as a library
 
 Both the encoder and decoder are wrapped in the targets `takdec_core` and `takenc_core`.

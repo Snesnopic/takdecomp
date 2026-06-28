@@ -70,7 +70,7 @@ namespace takdecomp {
         StreamInfo s;
 
         s.codec = static_cast<CodecType>(gb.get_bits(constants::ENCODER_CODEC_BITS));
-        gb.skip_bits(constants::ENCODER_PROFILE_BITS);
+        s.preset = gb.get_bits(constants::ENCODER_PROFILE_BITS);
 
         const auto frame_type = static_cast<FrameSizeType>(gb.get_bits(constants::SIZE_FRAME_DURATION_BITS));
         s.samples = gb.get_bits64(constants::SIZE_SAMPLES_NUM_BITS);

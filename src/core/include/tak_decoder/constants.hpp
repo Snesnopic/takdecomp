@@ -69,5 +69,28 @@ namespace takdecomp {
         Fs1024 = 8,
         Fs2048 = 9,
     };
+
+    enum class SpeakerFlag : uint32_t {
+        None                  = 0x00000,
+        Front_Left            = 0x00001,
+        Front_Right           = 0x00002,
+        Front_Center          = 0x00004,
+        Low_Frequency         = 0x00008,
+        Back_Left             = 0x00010,
+        Back_Right            = 0x00020,
+        Front_Left_Of_Center  = 0x00040,
+        Front_Right_Of_Center = 0x00080,
+        Back_Center           = 0x00100,
+        Side_Left             = 0x00200,
+        Side_Right            = 0x00400,
+        Top_Center            = 0x00800,
+        Top_Front_Left        = 0x01000,
+        Top_Front_Center      = 0x02000,
+        Top_Front_Right       = 0x04000,
+        Top_Back_Left         = 0x08000,
+        Top_Back_Center       = 0x10000,
+        Top_Back_Right        = 0x20000,
+        Max_Supported         = 0x20000,
+    };
 } // namespace takdecomp
 #endif // TAK_DECODER_CONSTANTS_HPP
