@@ -19,13 +19,15 @@ CHANNELS = [1, 2, 6]
 BIT_DEPTHS = [8, 16, 24]
 
 # (ffmpeg lavfi source expression, duration in seconds)
+# NOTE: duration is passed via the -t flag, NOT appended to the source expression,
+# to avoid ffmpeg option-separator ambiguity with sources like anoisesrc.
 SIGNALS: dict[str, tuple[str, float]] = {
-    "sine":     ("sine=frequency=1000",        0.5),   # standard 1kHz tone
-    "silence":  ("aevalsrc=0",                 0.5),   # all-zeros — edge case for encoder
-    "noise":    ("anoisesrc",                  0.5),   # white noise — maximum entropy
-    "long":     ("sine=frequency=1000",        5.0),   # multi-frame stress test
-    "short":    ("sine=frequency=1000",        0.05),  # ~2205 samples @ 44.1kHz, partial frame
-    "impulse":  ("aevalsrc=if(eq(n,0),1,0)",  0.5),   # single peak then silence
+    "sine":     ("sine=frequency=1000",  0.5),   # standard 1kHz tone
+    "silence":  ("aevalsrc=0",           0.5),   # all-zeros — edge case for encoder
+    "noise":    ("anoisesrc",            0.5),   # white noise — maximum entropy
+    "long":     ("sine=frequency=1000",  5.0),   # multi-frame stress test
+    "short":    ("sine=frequency=1000",  0.05),  # ~2205 samples @ 44.1kHz, partial frame
+    "impulse":  ("aevalsrc=not(n)",      0.5),   # 1 at n=0, 0 elsewhere (no commas in expr)
 }
 
 OUTPUT_DIR = "test_matrix"
@@ -41,10 +43,14 @@ def codec_for_bits(bits: int) -> str:
 
 def generate_wav(filepath: str, sr: int, ch: int, bits: int,
                  source: str, duration: float) -> bool:
+    # Duration is passed via -t rather than embedded in the filter string so that
+    # sources like `anoisesrc` (no existing options) and complex expressions like
+    # `aevalsrc=not(n)` are not broken by lavfi option-separator rules.
     cmd = [
         "ffmpeg", "-y",
         "-f", "lavfi",
-        "-i", f"{source}:duration={duration}",
+        "-i", source,
+        "-t", str(duration),
         "-ac", str(ch),
         "-ar", str(sr),
         "-c:a", codec_for_bits(bits),
