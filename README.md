@@ -1,94 +1,58 @@
 # takdecomp
 
-`takdecomp` is an open-source C++20 suite for decoding and encoding the **TAK** (Tom's lossless Audio Kompressor) audio format.
-Designed to offer full cross-platform compatibility with the original `takc.exe` and `takd.exe` executables, it provides a clean, easily integrable, multithreaded codebase that is completely independent of Windows.
+`takdecomp` is an open-source C++20 suite for decoding and encoding the TAK (Tom's lossless Audio Kompressor) audio format. Designed to offer full cross-platform compatibility with the original closed-source executables, it provides a clean, easily integrable, multithreaded codebase that is completely independent of Windows architectures.
+
+For an in-depth understanding of how the TAK codec works under the hood, including its container layout, linear predictive coding math, and entropy segmentation logic, please refer to the [TAK format specification](docs/tak_format_specification.md).
 
 ## Features
 
-- **Full Decoding (`takdec`)**: 1:1 bitstream reproduction to WAV, MD5 extraction, APEv2 decoding.
-- **High-Performance Encoding (`takenc`)**: Audio compression into frames, multithreading support (`-tn#`), APEv2 tagging, wave metadata extraction, and bitstream verification.
-- **Cross-Platform Support**: Tested and natively compilable on Windows (x64, x86, ARM64), Linux, and macOS.
-- **Built as a Library**: Modular C++ structure to easily integrate the encoder or decoder into your own software ecosystem (players, converters, DAWs).
+The project provides full 1:1 bitstream reproduction to WAV, MD5 checksum extraction, and APEv2 decoding. On the compression side, it handles audio framing, multi-threading support, tagging, wave metadata extraction, and bitstream verification.
+
+Everything is cross-platform, having been heavily tested and natively compiled on Windows (x64, x86, ARM64), Linux, and macOS. The modular C++ structure allows you to effortlessly integrate the encoder or decoder into your own software ecosystem, such as media players, converters, or digital audio workstations.
 
 ## Building
 
-The project uses CMake. You can easily build it from the command line:
+The project uses CMake for an easy build process. You can compile it from your command line by cloning the repository, creating a build directory, and invoking CMake with the Release configuration.
 
 ```bash
-git clone https://github.com/your-username/takdecomp.git
+git clone https://github.com/Snesnopic/takdecomp.git
 cd takdecomp
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
 ```
 
-This will produce the `takenc` and `takdec` executables inside the `bin/` directory.
+This will produce a single unified `takc` executable inside the `bin/` directory.
 
-## CLI Usage
+## CLI usage
 
-The syntax and flags faithfully replicate the original TAK executables.
+The syntax and flags replicate the original TAK executables, but are now consolidated into a single unified binary (`takc`). The tool automatically detects whether you are trying to encode or decode based on the input file extension (`.wav` for encoding, `.tak` for decoding), or you can force the mode using `-e` or `-d`.
 
-### Decoding (takdec)
+When encoding, you can specify the compression preset using `-p#` (from 0 to 5, where 5 is maximum compression and 0 is maximum speed). You can allocate multiple threads using `-tn#`. Additional flags like `-tt` allow you to write APEv2 tags, `-wm` handles foreign wave chunks, and `-v` verifies frame integrity by automatically running a post-encode decoding check.
 
-```bash
-./takdec input.tak [output.wav] [options]
-```
-- `-t`: Performs only a file integrity test (does not write the audio output).
-- `-md5`: Calculates and verifies the MD5 of the bitstream against the one contained in the header.
-- If the output is not specified, the `.wav` file will be saved in the same folder with the same name.
-
-### Encoding (takenc)
+When decoding, passing `-t` performs only a file integrity test without writing audio output. The `-md5` flag calculates and verifies the MD5 checksum of the bitstream against the one stored in the header. If the output path is not specified, the `.wav` or `.tak` file will be generated in the same directory as the input.
 
 ```bash
-./takenc input.wav [output.tak] [options]
+# Encoding
+./takc input.wav [output.tak] [options]
+
+# Decoding
+./takc input.tak [output.wav] [options]
 ```
-- `-p#`: Compression preset (from 0 to 5). P5 = maximum compression, P0 = maximum speed. Extra: `-p#m`, `-p#e` for maximum effort.
-- `-tn#`: Specifies the number of threads to use (default: 1).
-- `-tt "Key=Value"`: Writes APEv2 tags to the output file.
-- `-wm#`: Writes raw wave file metadata (0 = ignore, 1 = copy foreign chunks, default: 1).
-- `-ihs`: Ignores the header size (useful when piping streams of unknown length).
-- `-overwrite`: Silently overwrites the destination file.
-- `-v`: Verifies frame integrity by automatically invoking post-encode decoding.
 
-## Using as a Library
+## Using as a library
 
-Both engines are wrapped in the static targets `takdec_core` e `takenc_core`.
-By adding it to your project via CMake:
+Both the encoder and decoder engines are wrapped in the static targets `takdec_core` and `takenc_core`. You can add them to your own CMake project by including the subdirectory and linking your executable against these private targets.
 
 ```cmake
 add_subdirectory(takdecomp)
 target_link_libraries(your_executable PRIVATE takdec_core takenc_core)
 ```
 
-Basic decoding example:
-```cpp
-#include "tak_decoder/decoder.hpp"
-#include <iostream>
+To perform a basic decode operation, include `tak_decoder/decoder.hpp` and call `takdecomp::Decoder::decode_file("audio.tak", "audio.wav")`. This returns a result struct containing the number of samples decoded, or throws an exception on failure.
 
-int main() {
-    try {
-        takdecomp::DecodeResult res = takdecomp::Decoder::decode_file("audio.tak", "audio.wav");
-        std::cout << "Decoded " << res.samples_decoded << " samples!\n";
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << "\n";
-    }
-}
-```
-
-Basic encoding example:
-```cpp
-#include "tak_encoder/encoder.hpp"
-
-int main() {
-    takenc::EncoderConfig cfg;
-    cfg.preset = 2; // normal preset
-    cfg.threads = 4; // use 4 threads
-
-    takenc::EncodeResult res = takenc::Encoder::encode_file("audio.wav", "audio.tak", cfg, nullptr);
-    return 0;
-}
-```
+To perform a basic encode operation, include `tak_encoder/encoder.hpp`, populate a `takenc::EncoderConfig` object with your desired preset and thread count, and call `takenc::Encoder::encode_file("audio.wav", "audio.tak", cfg, nullptr)`.
 
 ## License
 
-This project is released under the terms of the license specified in the repository. The implementation of the compression/decompression algorithm is based on the specifications of the open format Tom's lossless Audio Kompressor.
+This project is released under the terms of the license specified in the repository. The implementation of the compression and decompression algorithms is based on the specifications of the open format Tom's lossless Audio Kompressor.
