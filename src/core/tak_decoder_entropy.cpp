@@ -240,13 +240,11 @@ namespace takdecomp {
                     }
                 } while (coding_mode_[i] == mode);
 
-                printf("decode_segment branch=1 mode=%d length=%d left=%zu\\n", mode, len, gb.get_bits_left());
                 decode_segment(mode, decoded, len, gb);
                 decoded += len;
             }
         } else {
             int const mode = gb.get_bits(6);
-            printf("decode_segment branch=0 mode=%d length=%d left=%zu\n", mode, length, gb.get_bits_left());
             decode_segment(mode, decoded, length, gb);
         }
     }

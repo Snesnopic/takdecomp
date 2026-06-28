@@ -197,8 +197,23 @@ namespace takenc {
         cfg.size = 6;
         cfg.warmup_lpc_mode = 0;
 
+        // Compute autocorrelation on dshifted samples rather than raw samples.
+        // LPC coefficients are scale-invariant (the α² factor from scaling cancels in
+        // the -sum/E ratio of Levinson-Durbin), so the result is mathematically
+        // identical. However, using dshifted samples (max ~32767) instead of raw
+        // 24-bit samples (max ~8,388,607) keeps autocorrelation sums within
+        // ~N×10⁹ instead of ~N×10¹⁹, well within double precision (15.9 sig. digits).
+        // Without this, for 24-bit audio at certain sample rates the precision loss
+        // is large enough to shift a quantized PARCOR coefficient by ±1 step,
+        // producing wrong predictors and corrupted PCM. dshift=0 for 8/16-bit, so
+        // those are unaffected.
+        std::vector<int32_t> shifted(subframe_size);
+        for (int i = 0; i < subframe_size; i++)
+            shifted[i] = samples[i] >> cfg.dshift;
+
         std::vector<double> r(filter_order + 1);
-        compute_autocorrelation(samples, subframe_size, r.data(), filter_order);
+        compute_autocorrelation(shifted.data(), subframe_size, r.data(), filter_order);
+
 
         std::vector<double> parcor(filter_order);
         if (!levinson_durbin(r.data(), filter_order, parcor.data())) {
