@@ -10,10 +10,10 @@ on:
 jobs:
   matrix-test:
     name: Audio Matrix Tests (Linux x64)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install dependencies
         run: |
