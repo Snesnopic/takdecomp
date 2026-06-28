@@ -8,12 +8,61 @@ on:
   workflow_dispatch:
 
 jobs:
-  matrix-test:
-    name: Audio Matrix Tests (Linux x64)
-    runs-on: ubuntu-latest
+  # -----------------------------------------------------------------------
+  # Round-trip test (no wine required) — runs on all platforms
+  # -----------------------------------------------------------------------
+  roundtrip:
+    name: Round-trip (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            takc: ./build/bin/takc
+          - os: macos-14
+            takc: ./build/bin/takc
+          - os: windows-2022
+            takc: ./build/bin/Release/takc.exe
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
+
+      - name: Install ffmpeg (Ubuntu)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install ffmpeg (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ffmpeg
+
+      - name: Install ffmpeg (Windows)
+        if: runner.os == 'Windows'
+        run: choco install ffmpeg --no-progress -y
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Generate test WAV files
+        run: python3 tests/generate_test_wavs.py
+
+      - name: Round-trip test
+        run: python3 tests/test_roundtrip.py
+        env:
+          TAKC_BIN: ${{ matrix.takc }}
+
+  # -----------------------------------------------------------------------
+  # Encoder + Decoder matrix vs official Takc.exe — Linux only (wine)
+  # -----------------------------------------------------------------------
+  matrix-test:
+    name: Audio Matrix Tests (Linux x64)
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
@@ -25,7 +74,6 @@ jobs:
         run: |
           curl -fL http://thbeck.de/Download/TAK_2.3.3.zip -o TAK.zip
           unzip TAK.zip -d tak_dist
-          # Locate Takc.exe wherever it lands inside the zip
           TAKC_EXE=$(find tak_dist -iname "Takc.exe" | head -1)
           if [ -z "$TAKC_EXE" ]; then
             echo "ERROR: Takc.exe not found in archive"
@@ -35,12 +83,11 @@ jobs:
           echo "Found Takc.exe at: $TAKC_EXE"
           echo "TAKC_EXE=$TAKC_EXE" >> "$GITHUB_ENV"
 
-      - name: Initialise Wine prefix (suppresses first-run noise)
-        run: |
-          WINEDEBUG=-all WINEPREFIX="$HOME/.wine" wineboot --init
+      - name: Initialise Wine prefix
+        run: WINEDEBUG=-all WINEPREFIX="$HOME/.wine" wineboot --init
         timeout-minutes: 2
 
-      - name: Configure CMake (Release, no sanitizers)
+      - name: Configure CMake
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
