@@ -94,7 +94,8 @@ namespace takenc {
                 for (int i = 0; i < len - (K - 1); i++) {
                     int v = 1 << 9;
                     for (int j = 0; j < K; j++) {
-                        v += (p_src[i + j] >> shift) * filter[j];
+                        // decoders keep this history in int16, so it must truncate the same way
+                        v += static_cast<int16_t>(p_src[i + j] >> shift) * filter[j];
                     }
                     int32_t v_clip = (((v >> 10) + (1 << 13)) & ~((2U << 13) - 1))
                                          ? ((v < 0 ? -1 : 0) ^ ((1 << 13) - 1))
