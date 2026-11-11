@@ -54,6 +54,12 @@ jobs:
         env:
           TAKC_BIN: ${{ matrix.takc }}
 
+      - name: Loud stereo regression test
+        if: ${{ !cancelled() }}
+        run: python3 tests/test_loud_stereo.py
+        env:
+          TAKC_BIN: ${{ matrix.takc }}
+
   # -----------------------------------------------------------------------
   # Encoder + Decoder matrix vs official Takc.exe — Linux only (wine)
   # -----------------------------------------------------------------------
@@ -117,5 +123,13 @@ jobs:
         run: python3 tests/test_c_api_matrix.py
         env:
           C_API_DEC: ./build/c_api_decoder
+          TAKC_EXE: ${{ env.TAKC_EXE }}
+          WINEDEBUG: "-all"
+
+      - name: Loud stereo regression test (our takc → our takc and Takc.exe)
+        if: ${{ !cancelled() }}
+        run: python3 tests/test_loud_stereo.py
+        env:
+          TAKC_BIN: ./build/bin/takc
           TAKC_EXE: ${{ env.TAKC_EXE }}
           WINEDEBUG: "-all"
