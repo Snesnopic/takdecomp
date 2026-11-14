@@ -1,4 +1,4 @@
-# regression test: cross-FIR decorrelation (modes 6/7) on loud stereo must keep the decoder's int16 history
+# stereo decorrelation modes 4-7 on loud and cross-correlated signals, decoded by us and optionally by takc.exe
 # usage: TAKC_BIN=./build/bin/takc [TAKC_EXE=<path>/Takc.exe] python3 tests/test_loud_stereo.py
 
 import os
@@ -37,6 +37,19 @@ def loud_pair(bits: int, seed: int) -> tuple[list[int], list[int]]:
         avg = sum(loud[max(0, i - k)] for k in range(3)) / 3
         copy.append(clip(avg + rng.gauss(0, 300) * scale, bits))
     return loud, copy
+
+
+def scaled_pair(bits: int, seed: int) -> tuple[list[int], list[int]]:
+    # low-passed noise and a scaled noisy copy: modes 4/5, at 24 bit with shifts above 4
+    rng = random.Random(seed)
+    scale = 1 << (bits - 16)
+    y = 0.0
+    src = []
+    for _ in range(N_SAMPLES):
+        y = 0.95 * y + rng.gauss(0, 1)
+        src.append(clip(1500 * scale * y, bits))
+    copy = [clip(0.6 * v + rng.gauss(0, 20) * scale, bits) for v in src]
+    return src, copy
 
 
 def write_wav(path: str, ch1: list[int], ch2: list[int], bits: int) -> None:
@@ -118,50 +131,54 @@ def decoders(tak: str, src: str) -> list[tuple[str, str, list[str]]]:
 def run() -> int:
     os.makedirs(OUT_DIR, exist_ok=True)
     names = ["ours"] + (["takc.exe"] if TAKC_EXE else [])
-    header = f"{'SIGNAL':<16} {'ENCODER':<12} {'Enc':<7} " + " ".join(f"{d:<9}" for d in names)
+    header = f"{'SIGNAL':<18} {'ENCODER':<12} {'Enc':<7} " + " ".join(f"{d:<9}" for d in names)
     print(header)
     print("-" * len(header))
 
-    failures = 0
-    total = 0
+    cases = []
     for bits in (16, 24):
         loud, copy = loud_pair(bits, seed=1234)
-        # without jumps beyond int16 the old bug cannot show, so the test would pass for nothing
+        # without jumps beyond int16 the encoder never has to keep modes 4-7 inside int16
         jump = max(abs(loud[i] - loud[i - 1]) for i in range(1, N_SAMPLES))
         if jump <= INT16_MAX:
             print(f"signal too quiet for this test: largest jump {jump} at {bits} bit")
             return 1
+        scaled, scaled_copy = scaled_pair(bits, seed=7)
+        for kind, a, b in (("loud", loud, copy), ("scaled", scaled, scaled_copy)):
+            cases.append((f"{bits}b_{kind}_left", a, b, bits))
+            cases.append((f"{bits}b_{kind}_right", b, a, bits))
 
-        for side, (ch1, ch2) in (("left", (loud, copy)), ("right", (copy, loud))):
-            name = f"{bits}b_loud_{side}"
-            wav_path = f"{OUT_DIR}/{name}.wav"
-            write_wav(wav_path, ch1, ch2, bits)
+    failures = 0
+    total = 0
+    for name, ch1, ch2, bits in cases:
+        wav_path = f"{OUT_DIR}/{name}.wav"
+        write_wav(wav_path, ch1, ch2, bits)
 
-            encoders = [(f"ours -{p}", [TAKC_BIN, f"-{p}", "-e", "-overwrite", "-q"], f"{name}_{p}.tak", None)
-                        for p in PRESETS]
-            if TAKC_EXE:
-                encoders.append(("takc.exe", ["wine", TAKC_EXE, "-e", "-overwrite"], f"{name}_exe.tak", WINE_ENV))
+        encoders = [(f"ours -{p}", [TAKC_BIN, f"-{p}", "-e", "-overwrite", "-q"], f"{name}_{p}.tak", None)
+                    for p in PRESETS]
+        if TAKC_EXE:
+            encoders.append(("takc.exe", ["wine", TAKC_EXE, "-e", "-overwrite"], f"{name}_exe.tak", WINE_ENV))
 
-            for label, cmd, tak_name, env in encoders:
-                total += 1
-                tak_path = f"{OUT_DIR}/{tak_name}"
-                if os.path.exists(tak_path):
-                    os.remove(tak_path)
-                enc_ok, enc_out = run_cmd(cmd + [wav_path, tak_path], env)
-                if not enc_ok:
-                    print(f"{name:<16} {label:<12} {'FAIL':<7}")
-                    for line in enc_out.splitlines()[-3:]:
-                        print(f"    [enc] {line[:160]}")
-                    failures += 1
-                    continue
+        for label, cmd, tak_name, env in encoders:
+            total += 1
+            tak_path = f"{OUT_DIR}/{tak_name}"
+            if os.path.exists(tak_path):
+                os.remove(tak_path)
+            enc_ok, enc_out = run_cmd(cmd + [wav_path, tak_path], env)
+            if not enc_ok:
+                print(f"{name:<18} {label:<12} {'FAIL':<7}")
+                for line in enc_out.splitlines()[-3:]:
+                    print(f"    [enc] {line[:160]}")
+                failures += 1
+                continue
 
-                results = decoders(tak_path, wav_path)
-                if any(r != "PASS" for _, r, _ in results):
-                    failures += 1
-                print(f"{name:<16} {label:<12} {'OK':<7} " + " ".join(f"{r:<9}" for _, r, _ in results))
-                for dec_name, _, notes in results:
-                    for note in notes:
-                        print(f"    [{dec_name}] {note[:200]}")
+            results = decoders(tak_path, wav_path)
+            if any(r != "PASS" for _, r, _ in results):
+                failures += 1
+            print(f"{name:<18} {label:<12} {'OK':<7} " + " ".join(f"{r:<9}" for _, r, _ in results))
+            for dec_name, _, notes in results:
+                for note in notes:
+                    print(f"    [{dec_name}] {note[:200]}")
 
     print()
     print(f"Results: {total - failures}/{total} passed.")

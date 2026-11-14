@@ -60,6 +60,12 @@ jobs:
         env:
           TAKC_BIN: ${{ matrix.takc }}
 
+      - name: Decorrelation fixtures (decoder vs Takc.exe output)
+        if: ${{ !cancelled() }}
+        run: python3 tests/test_decorrelation_fixtures.py
+        env:
+          TAKC_BIN: ${{ matrix.takc }}
+
   # -----------------------------------------------------------------------
   # Encoder + Decoder matrix vs official Takc.exe — Linux only (wine)
   # -----------------------------------------------------------------------

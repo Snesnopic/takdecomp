@@ -8,6 +8,11 @@
 #include <iostream>
 
 namespace takdecomp {
+    // takc.exe saturates the modes 6/7 history to int16 (FFmpeg wraps it)
+    static int16_t saturate_int16(int32_t x) {
+        return static_cast<int16_t>(std::clamp(x, -32768, 32767));
+    }
+
     void Decoder::decorrelate(const int c1,const int c2, int length, BitStreamReader &gb) {
         int32_t *p1 = decoded_[c1].data() + (dmode_ > 5 ? 1 : 0);
         int32_t *p2 = decoded_[c2].data() + (dmode_ > 5 ? 1 : 0);
@@ -53,9 +58,9 @@ namespace takdecomp {
                 dfactor = gb.get_sbits(10);
                 for (int i = 0; i < length; i++) {
                     uint32_t const a = p1[i];
-                    int32_t b = p2[i];
-                    b = static_cast<unsigned>(static_cast<int>((dfactor * static_cast<unsigned>(b >> dshift)) + 128) >>
-                                              8) << dshift;
+                    // takc.exe wraps the source to int16 before scaling it (FFmpeg keeps 32 bits)
+                    int32_t const s = static_cast<int16_t>(p2[i] >> dshift);
+                    int32_t const b = static_cast<int32_t>(static_cast<uint32_t>((dfactor * s + 128) >> 8) << dshift);
                     p1[i] = b - a;
                 }
                 break;
@@ -96,7 +101,7 @@ namespace takdecomp {
                 }
 
                 for (int i = 0; i < filter_order; i++) {
-                    residues_[i] = *p2++ >> dshift;
+                    residues_[i] = saturate_int16(*p2++ >> dshift);
                 }
 
                 p1 += order_half;
@@ -106,7 +111,7 @@ namespace takdecomp {
                     tmp = std::min(length2, x);
 
                     for (int i = 0; i < tmp - (tmp == length2 ? 1 : 0); i++) {
-                        residues_[filter_order + i] = *p2++ >> dshift;
+                        residues_[filter_order + i] = saturate_int16(*p2++ >> dshift);
                     }
 
                     for (int i = 0; i < tmp; i++) {

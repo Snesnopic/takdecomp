@@ -4,6 +4,28 @@
 #include <stdexcept>
 
 namespace takenc {
+    // takc.exe wraps the modes 4/5 source to int16 before scaling it
+    static int32_t scale_source(int32_t x, int shift, int factor) {
+        int32_t const s = static_cast<int16_t>(x >> shift);
+        return static_cast<int32_t>(static_cast<uint32_t>((factor * s + 128) >> 8) << shift);
+    }
+
+    // takc.exe saturates the modes 6/7 history to int16
+    static int32_t saturate_int16(int32_t x) {
+        return std::clamp(x, -32768, 32767);
+    }
+
+    // smallest shift that brings every x >> shift inside int16, where all decoders agree on modes 4-7
+    static int min_int16_shift(const int32_t *x, int len) {
+        int32_t peak = 0;
+        for (int i = 0; i < len; i++) {
+            peak = std::max(peak, x[i] < 0 ? ~x[i] : x[i]);
+        }
+        int shift = 0;
+        while ((peak >> shift) > 32767) shift++;
+        return shift;
+    }
+
     void Decorrelator::apply_mode(int mode, int shift, int factor, const std::vector<int> &filter, const int32_t *src1,
                                   const int32_t *src2, int32_t *dst1, int32_t *dst2, int len) {
         switch (mode) {
@@ -37,10 +59,8 @@ namespace takenc {
                 for (int i = 0; i < len; i++) {
                     int32_t left = src1[i];
                     int32_t right = src2[i];
-                    int32_t left_scaled = static_cast<unsigned>(
-                                              static_cast<int>((factor * static_cast<unsigned>(left >> shift)) + 128) >> 8) << shift;
                     dst1[i] = left;
-                    dst2[i] = left_scaled - right;
+                    dst2[i] = scale_source(left, shift, factor) - right;
                 }
                 break;
             }
@@ -50,9 +70,7 @@ namespace takenc {
                 for (int i = 0; i < len; i++) {
                     int32_t left = src1[i];
                     int32_t right = src2[i];
-                    int32_t right_scaled = static_cast<unsigned>(
-                                               static_cast<int>((factor * static_cast<unsigned>(right >> shift)) + 128) >> 8) << shift;
-                    dst1[i] = right_scaled - left;
+                    dst1[i] = scale_source(right, shift, factor) - left;
                     dst2[i] = right;
                 }
                 break;
@@ -94,8 +112,7 @@ namespace takenc {
                 for (int i = 0; i < len - (K - 1); i++) {
                     int v = 1 << 9;
                     for (int j = 0; j < K; j++) {
-                        // decoders keep this history in int16, so it must truncate the same way
-                        v += static_cast<int16_t>(p_src[i + j] >> shift) * filter[j];
+                        v += saturate_int16(p_src[i + j] >> shift) * filter[j];
                     }
                     int32_t v_clip = (((v >> 10) + (1 << 13)) & ~((2U << 13) - 1))
                                          ? ((v < 0 ? -1 : 0) ^ ((1 << 13) - 1))
@@ -269,21 +286,34 @@ namespace takenc {
         evaluate(2, 0, 0, dummy_filter);
         evaluate(3, 0, 0, dummy_filter);
 
-        for (int shift = 0; shift <= 4; shift++) {
+        // modes 4/5 and 6/7 take their source from c1 (4, 6) or c2 (5, 7); dshift is coded as 1..16
+        int const min_shift1 = min_int16_shift(data_c1, len);
+        int const min_shift2 = min_int16_shift(data_c2, len);
+        int const max_shift1 = std::min(min_shift1 + 4, 16);
+        int const max_shift2 = std::min(min_shift2 + 4, 16);
+
+        // keeps the 32-bit FIR sum from overflowing with any int16 history
+        auto fir_sum_fits = [](const std::vector<int> &filter) {
+            int sum = 0;
+            for (int f: filter) sum += std::abs(f);
+            return sum <= 65535;
+        };
+
+        for (int shift = min_shift1; shift <= max_shift1; shift++) {
             int factor = compute_optimal_factor(data_c1, data_c2, len, shift);
             evaluate(4, shift, factor, dummy_filter);
         }
 
-        for (int shift = 0; shift <= 4; shift++) {
+        for (int shift = min_shift2; shift <= max_shift2; shift++) {
             int factor = compute_optimal_factor(data_c2, data_c1, len, shift);
             evaluate(5, shift, factor, dummy_filter);
         }
 
         // Mode 6: p1=Right, p2=Left (filter predicts Right from Left)
         for (int K: {8, 16}) {
-            for (int shift = 0; shift <= 4; shift++) {
+            for (int shift = min_shift1; shift <= max_shift1; shift++) {
                 std::vector<int> filter_out;
-                if (compute_cross_fir_filter(data_c2, data_c1, len, K, shift, filter_out)) {
+                if (compute_cross_fir_filter(data_c2, data_c1, len, K, shift, filter_out) && fir_sum_fits(filter_out)) {
                     evaluate(6, shift, 0, filter_out);
                 }
             }
@@ -291,9 +321,9 @@ namespace takenc {
 
         // Mode 7: p1=Left, p2=Right (filter predicts Left from Right)
         for (int K: {8, 16}) {
-            for (int shift = 0; shift <= 4; shift++) {
+            for (int shift = min_shift2; shift <= max_shift2; shift++) {
                 std::vector<int> filter_out;
-                if (compute_cross_fir_filter(data_c1, data_c2, len, K, shift, filter_out)) {
+                if (compute_cross_fir_filter(data_c1, data_c2, len, K, shift, filter_out) && fir_sum_fits(filter_out)) {
                     evaluate(7, shift, 0, filter_out);
                 }
             }
