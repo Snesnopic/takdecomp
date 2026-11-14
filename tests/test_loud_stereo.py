@@ -13,6 +13,7 @@ WINE_ENV = {**os.environ, "WINEDEBUG": "-all"}
 OUT_DIR = "test_matrix/loud"
 SAMPLE_RATE = 44100
 N_SAMPLES = SAMPLE_RATE * 2
+BLOCK = SAMPLE_RATE // 4
 PRESETS = ["p0", "p2", "p4"]
 INT16_MAX = 32767
 
@@ -51,36 +52,73 @@ def write_wav(path: str, ch1: list[int], ch2: list[int], bits: int) -> None:
         w.writeframes(bytes(data))
 
 
-def same_audio(path1: str, path2: str) -> bool:
+def compare(src: str, dec: str) -> tuple[bool, list[str]]:
+    if not os.path.exists(dec):
+        return False, ["output file missing"]
     try:
-        with wave.open(path1, "rb") as w1, wave.open(path2, "rb") as w2:
-            return (w1.getparams()[:4] == w2.getparams()[:4]
-                    and w1.readframes(w1.getnframes()) == w2.readframes(w2.getnframes()))
-    except Exception:
-        return False
+        with wave.open(src, "rb") as a, wave.open(dec, "rb") as b:
+            pa, pb = a.getparams()[:4], b.getparams()[:4]
+            if pa != pb:
+                return False, [f"format differs: source {pa}, decoded {pb}"]
+            raw_a, raw_b = a.readframes(pa[3]), b.readframes(pb[3])
+    except Exception as e:
+        return False, [f"unreadable: {e}"]
+    if raw_a == raw_b:
+        return True, []
+
+    channels, width = pa[0], pa[1]
+    count = len(raw_a) // width
+
+    def sample(raw: bytes, i: int) -> int:
+        return int.from_bytes(raw[i * width:(i + 1) * width], "little", signed=width > 1)
+
+    diffs = [i for i in range(count) if raw_a[i * width:(i + 1) * width] != raw_b[i * width:(i + 1) * width]]
+    first = diffs[0]
+    per_ch = [sum(1 for i in diffs if i % channels == c) for c in range(channels)]
+    blocks = sorted({i // channels // BLOCK for i in diffs})
+    near = [(sample(raw_a, i), sample(raw_b, i)) for i in range(first, min(first + 4 * channels, count), channels)]
+    return False, [
+        f"{len(diffs)} of {count} samples differ, per channel {per_ch}",
+        f"first at frame {first // channels} channel {first % channels} "
+        f"(250 ms block {first // channels // BLOCK}, offset {first // channels % BLOCK})",
+        f"250 ms blocks hit: {blocks}",
+        f"source/decoded on that channel from there: {near}",
+    ]
 
 
 def run_cmd(cmd: list[str], env: dict | None = None) -> tuple[bool, str]:
     try:
         res = subprocess.run(cmd, capture_output=True, text=True, timeout=120, env=env)
-        return res.returncode == 0, res.stderr.strip()
+        return res.returncode == 0, (res.stdout + res.stderr).strip()
     except subprocess.TimeoutExpired:
         return False, "TIMEOUT"
 
 
-def decode_check(cmd: list[str], src: str, dec: str, env: dict | None = None) -> str:
+def decode_check(cmd: list[str], src: str, dec: str, env: dict | None = None) -> tuple[str, list[str]]:
     if os.path.exists(dec):
         os.remove(dec)
-    ok, err = run_cmd(cmd, env)
+    ok, out = run_cmd(cmd, env)
+    tail = [f"output: {line}" for line in out.splitlines()[-3:]]
     if not ok:
-        return "TIMEOUT" if err == "TIMEOUT" else "FAIL"
-    return "PASS" if same_audio(src, dec) else "BAD"
+        return ("TIMEOUT" if out == "TIMEOUT" else "FAIL"), tail
+    same, notes = compare(src, dec)
+    return ("PASS", []) if same else ("BAD", notes + tail)
+
+
+def decoders(tak: str, src: str) -> list[tuple[str, str, list[str]]]:
+    base = tak[:-4]
+    out = [("ours", *decode_check([TAKC_BIN, "-d", "-overwrite", "-q", tak, f"{base}_by_ours.wav"],
+                                   src, f"{base}_by_ours.wav"))]
+    if TAKC_EXE:
+        out.append(("takc.exe", *decode_check(["wine", TAKC_EXE, "-d", "-overwrite", tak, f"{base}_by_exe.wav"],
+                                              src, f"{base}_by_exe.wav", WINE_ENV)))
+    return out
 
 
 def run() -> int:
     os.makedirs(OUT_DIR, exist_ok=True)
-    decoders = ["ours"] + (["takc.exe"] if TAKC_EXE else [])
-    header = f"{'SIGNAL':<16} {'PRESET':<7} {'Enc':<7} " + " ".join(f"{d:<9}" for d in decoders)
+    names = ["ours"] + (["takc.exe"] if TAKC_EXE else [])
+    header = f"{'SIGNAL':<16} {'ENCODER':<12} {'Enc':<7} " + " ".join(f"{d:<9}" for d in names)
     print(header)
     print("-" * len(header))
 
@@ -99,31 +137,31 @@ def run() -> int:
             wav_path = f"{OUT_DIR}/{name}.wav"
             write_wav(wav_path, ch1, ch2, bits)
 
-            for preset in PRESETS:
+            encoders = [(f"ours -{p}", [TAKC_BIN, f"-{p}", "-e", "-overwrite", "-q"], f"{name}_{p}.tak", None)
+                        for p in PRESETS]
+            if TAKC_EXE:
+                encoders.append(("takc.exe", ["wine", TAKC_EXE, "-e", "-overwrite"], f"{name}_exe.tak", WINE_ENV))
+
+            for label, cmd, tak_name, env in encoders:
                 total += 1
-                tak_path = f"{OUT_DIR}/{name}_{preset}.tak"
+                tak_path = f"{OUT_DIR}/{tak_name}"
                 if os.path.exists(tak_path):
                     os.remove(tak_path)
-                enc_ok, enc_err = run_cmd([TAKC_BIN, f"-{preset}", "-e", "-overwrite", "-q", wav_path, tak_path])
+                enc_ok, enc_out = run_cmd(cmd + [wav_path, tak_path], env)
                 if not enc_ok:
-                    print(f"{name:<16} {preset:<7} {'FAIL':<7}")
-                    if enc_err and enc_err != "TIMEOUT":
-                        print(f"  [enc] {enc_err[:120]}")
+                    print(f"{name:<16} {label:<12} {'FAIL':<7}")
+                    for line in enc_out.splitlines()[-3:]:
+                        print(f"    [enc] {line[:160]}")
                     failures += 1
                     continue
 
-                results = []
-                ours_dec = f"{OUT_DIR}/{name}_{preset}_dec.wav"
-                results.append(decode_check([TAKC_BIN, "-d", "-overwrite", "-q", tak_path, ours_dec],
-                                            wav_path, ours_dec))
-                if TAKC_EXE:
-                    exe_dec = f"{OUT_DIR}/{name}_{preset}_exe.wav"
-                    results.append(decode_check(["wine", TAKC_EXE, "-d", "-overwrite", tak_path, exe_dec],
-                                                wav_path, exe_dec, WINE_ENV))
-
-                if any(r != "PASS" for r in results):
+                results = decoders(tak_path, wav_path)
+                if any(r != "PASS" for _, r, _ in results):
                     failures += 1
-                print(f"{name:<16} {preset:<7} {'OK':<7} " + " ".join(f"{r:<9}" for r in results))
+                print(f"{name:<16} {label:<12} {'OK':<7} " + " ".join(f"{r:<9}" for _, r, _ in results))
+                for dec_name, _, notes in results:
+                    for note in notes:
+                        print(f"    [{dec_name}] {note[:200]}")
 
     print()
     print(f"Results: {total - failures}/{total} passed.")

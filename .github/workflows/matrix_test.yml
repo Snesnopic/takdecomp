@@ -126,10 +126,64 @@ jobs:
           TAKC_EXE: ${{ env.TAKC_EXE }}
           WINEDEBUG: "-all"
 
-      - name: Loud stereo regression test (our takc → our takc and Takc.exe)
-        if: ${{ !cancelled() }}
+  # -----------------------------------------------------------------------
+  # Loud stereo vs official Takc.exe, both directions — Linux only (wine)
+  # -----------------------------------------------------------------------
+  loud-stereo-takc:
+    name: Loud stereo vs Takc.exe (Linux x64)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install dependencies
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ python3 wine wine32
+
+      - name: Download TAK 2.3.3
+        run: |
+          curl -fL http://thbeck.de/Download/TAK_2.3.3.zip -o TAK.zip
+          unzip TAK.zip -d tak_dist
+          TAKC_EXE=$(find tak_dist -iname "Takc.exe" | head -1)
+          if [ -z "$TAKC_EXE" ]; then
+            echo "ERROR: Takc.exe not found in archive"
+            find tak_dist
+            exit 1
+          fi
+          echo "TAKC_EXE=$TAKC_EXE" >> "$GITHUB_ENV"
+
+      - name: Initialise Wine prefix
+        run: WINEDEBUG=-all WINEPREFIX="$HOME/.wine" wineboot --init
+        timeout-minutes: 2
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Loud stereo test (our takc ↔ Takc.exe)
         run: python3 tests/test_loud_stereo.py
         env:
           TAKC_BIN: ./build/bin/takc
           TAKC_EXE: ${{ env.TAKC_EXE }}
           WINEDEBUG: "-all"
+
+      - name: Takc.exe file information
+        if: ${{ !cancelled() }}
+        run: |
+          for f in test_matrix/loud/16b_loud_left_p2.tak test_matrix/loud/16b_loud_left_exe.tak; do
+            echo "== $f"
+            wine "$TAKC_EXE" -fi "$f" || true
+          done
+        env:
+          WINEDEBUG: "-all"
+
+      - name: Upload loud stereo files
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: loud-stereo
+          path: test_matrix/loud/
