@@ -23,6 +23,9 @@ namespace takenc {
         // Returns the selected mode (0 to 7).
         static DecorrelationResult apply_decorrelation(int32_t *data_c1, int32_t *data_c2, int len);
 
+        // bits per coefficient for a group of four cross-FIR coefficients as coded in the stream (7..14)
+        static int filter_code_size(const int *group);
+
     private:
         static void apply_mode(int mode, int shift, int factor, const std::vector<int> &filter, const int32_t *src1,
                                const int32_t *src2, int32_t *dst1, int32_t *dst2, int len);

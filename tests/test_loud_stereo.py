@@ -1,4 +1,4 @@
-# stereo decorrelation modes 4-7 on loud and cross-correlated signals, decoded by us and optionally by takc.exe
+# stereo decorrelation modes 4-7 on loud, cross-correlated and amplified signals, decoded by us and optionally by takc.exe
 # usage: TAKC_BIN=./build/bin/takc [TAKC_EXE=<path>/Takc.exe] python3 tests/test_loud_stereo.py
 
 import os
@@ -50,6 +50,19 @@ def scaled_pair(bits: int, seed: int) -> tuple[list[int], list[int]]:
         src.append(clip(1500 * scale * y, bits))
     copy = [clip(0.6 * v + rng.gauss(0, 20) * scale, bits) for v in src]
     return src, copy
+
+
+def clamp_pair(bits: int, seed: int) -> tuple[list[int], list[int]]:
+    # quiet white noise and a copy amplified past 8x: the best cross-FIR coefficient is the limit -8192
+    rng = random.Random(seed)
+    scale = 1 << (bits - 16)
+    quiet, amplified = [], []
+    for i in range(N_SAMPLES):
+        block = i // BLOCK
+        x = rng.gauss(0, 2 + block % 4 * 2) * scale
+        quiet.append(clip(x, bits))
+        amplified.append(clip(-(8.3 + block // 4 * 0.4) * x, bits))
+    return quiet, amplified
 
 
 def write_wav(path: str, ch1: list[int], ch2: list[int], bits: int) -> None:
@@ -144,7 +157,8 @@ def run() -> int:
             print(f"signal too quiet for this test: largest jump {jump} at {bits} bit")
             return 1
         scaled, scaled_copy = scaled_pair(bits, seed=7)
-        for kind, a, b in (("loud", loud, copy), ("scaled", scaled, scaled_copy)):
+        quiet, amplified = clamp_pair(bits, seed=5)
+        for kind, a, b in (("loud", loud, copy), ("scaled", scaled, scaled_copy), ("clamp", quiet, amplified)):
             cases.append((f"{bits}b_{kind}_left", a, b, bits))
             cases.append((f"{bits}b_{kind}_right", b, a, bits))
 

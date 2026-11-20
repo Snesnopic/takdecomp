@@ -1,6 +1,7 @@
 #include "tak_encoder/decorrelate.hpp"
 #include "tak_encoder/encoder.hpp"
 #include <algorithm>
+#include <bit>
 #include <stdexcept>
 
 namespace takenc {
@@ -24,6 +25,16 @@ namespace takenc {
         int shift = 0;
         while ((peak >> shift) > 32767) shift++;
         return shift;
+    }
+
+    int Decorrelator::filter_code_size(const int *group) {
+        int size = 7;
+        for (int j = 0; j < 4; j++) {
+            // signed width, so -8192 takes 14 bits like 8191
+            int const f = group[j];
+            size = std::max(size, static_cast<int>(std::bit_width(static_cast<uint32_t>(f < 0 ? ~f : f))) + 1);
+        }
+        return size;
     }
 
     void Decorrelator::apply_mode(int mode, int shift, int factor, const std::vector<int> &filter, const int32_t *src1,
@@ -261,13 +272,7 @@ namespace takenc {
                 total_cost += num_groups * 3; // code_size headers
 
                 for (int i = 0; i < K; i += 4) {
-                    int max_val = 0;
-                    for (int j = 0; j < 4; j++) max_val = std::max(max_val, std::abs(filter[i + j]));
-                    int code_size = 0;
-                    while ((1 << code_size) <= max_val && code_size < 14) code_size++;
-                    if (code_size > 0) code_size++; // sign bit
-                    if (code_size < 7) code_size = 7;
-                    total_cost += 4 * code_size;
+                    total_cost += 4 * filter_code_size(&filter[i]);
                 }
             }
 
