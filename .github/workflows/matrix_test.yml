@@ -1,0 +1,185 @@
+name: Matrix Tests
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+  workflow_dispatch:
+
+jobs:
+  # -----------------------------------------------------------------------
+  # Round-trip test (no wine required) — runs on all platforms
+  # -----------------------------------------------------------------------
+  roundtrip:
+    name: Round-trip (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            takc: ./build/bin/takc
+          - os: macos-latest
+            takc: ./build/bin/takc
+          - os: windows-latest
+            takc: ./build/bin/Release/takc.exe
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install ffmpeg (Ubuntu)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install ffmpeg (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ffmpeg
+
+      - name: Install ffmpeg (Windows)
+        if: runner.os == 'Windows'
+        run: choco install ffmpeg --no-progress -y
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Generate test WAV files
+        run: python3 tests/generate_test_wavs.py
+
+      - name: Round-trip test
+        run: python3 tests/test_roundtrip.py
+        env:
+          TAKC_BIN: ${{ matrix.takc }}
+
+      - name: Loud stereo regression test
+        if: ${{ !cancelled() }}
+        run: python3 tests/test_loud_stereo.py
+        env:
+          TAKC_BIN: ${{ matrix.takc }}
+
+      - name: Decorrelation fixtures (decoder vs Takc.exe output)
+        if: ${{ !cancelled() }}
+        run: python3 tests/test_decorrelation_fixtures.py
+        env:
+          TAKC_BIN: ${{ matrix.takc }}
+
+  # -----------------------------------------------------------------------
+  # Encoder + Decoder matrix vs official Takc.exe — Linux only (wine)
+  # -----------------------------------------------------------------------
+  matrix-test:
+    name: Audio Matrix Tests (Linux x64)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install dependencies
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ python3 ffmpeg wine wine32
+
+      - name: Download TAK 2.3.3
+        run: |
+          curl -fL http://thbeck.de/Download/TAK_2.3.3.zip -o TAK.zip
+          unzip TAK.zip -d tak_dist
+          TAKC_EXE=$(find tak_dist -iname "Takc.exe" | head -1)
+          if [ -z "$TAKC_EXE" ]; then
+            echo "ERROR: Takc.exe not found in archive"
+            find tak_dist
+            exit 1
+          fi
+          echo "Found Takc.exe at: $TAKC_EXE"
+          echo "TAKC_EXE=$TAKC_EXE" >> "$GITHUB_ENV"
+
+      - name: Initialise Wine prefix
+        run: WINEDEBUG=-all WINEPREFIX="$HOME/.wine" wineboot --init
+        timeout-minutes: 2
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Generate test WAV files
+        run: python3 tests/generate_test_wavs.py
+
+      - name: Encoder Matrix Test (our takc → Takc.exe)
+        run: python3 tests/test_encoder_matrix.py
+        env:
+          TAKC_BIN: ./build/bin/takc
+          TAKC_EXE: ${{ env.TAKC_EXE }}
+          WINEDEBUG: "-all"
+
+      - name: Decoder Matrix Test (Takc.exe → our takc)
+        run: python3 tests/test_decoder_matrix.py
+        env:
+          TAKC_BIN: ./build/bin/takc
+          TAKC_EXE: ${{ env.TAKC_EXE }}
+          WINEDEBUG: "-all"
+
+  # -----------------------------------------------------------------------
+  # Loud stereo vs official Takc.exe, both directions — Linux only (wine)
+  # -----------------------------------------------------------------------
+  loud-stereo-takc:
+    name: Loud stereo vs Takc.exe (Linux x64)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install dependencies
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ python3 wine wine32
+
+      - name: Download TAK 2.3.3
+        run: |
+          curl -fL http://thbeck.de/Download/TAK_2.3.3.zip -o TAK.zip
+          unzip TAK.zip -d tak_dist
+          TAKC_EXE=$(find tak_dist -iname "Takc.exe" | head -1)
+          if [ -z "$TAKC_EXE" ]; then
+            echo "ERROR: Takc.exe not found in archive"
+            find tak_dist
+            exit 1
+          fi
+          echo "TAKC_EXE=$TAKC_EXE" >> "$GITHUB_ENV"
+
+      - name: Initialise Wine prefix
+        run: WINEDEBUG=-all WINEPREFIX="$HOME/.wine" wineboot --init
+        timeout-minutes: 2
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Loud stereo test (our takc ↔ Takc.exe)
+        run: python3 tests/test_loud_stereo.py
+        env:
+          TAKC_BIN: ./build/bin/takc
+          TAKC_EXE: ${{ env.TAKC_EXE }}
+          WINEDEBUG: "-all"
+
+      - name: Takc.exe file information
+        if: ${{ !cancelled() }}
+        run: |
+          for f in test_matrix/loud/16b_loud_left_p2.tak test_matrix/loud/16b_loud_left_exe.tak; do
+            echo "== $f"
+            wine "$TAKC_EXE" -fi "$f" || true
+          done
+        env:
+          WINEDEBUG: "-all"
+
+      - name: Upload loud stereo files
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: loud-stereo
+          path: test_matrix/loud/

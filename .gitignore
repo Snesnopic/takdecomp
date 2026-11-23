@@ -1,0 +1,5 @@
+build*/
+cmake-build-*/
+test_matrix/
+__pycache__/
+.idea/

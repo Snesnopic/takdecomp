@@ -1,0 +1,207 @@
+# stereo decorrelation modes 4-7 on loud, cross-correlated and amplified signals, decoded by us and optionally by takc.exe
+# usage: TAKC_BIN=./build/bin/takc [TAKC_EXE=<path>/Takc.exe] python3 tests/test_loud_stereo.py
+
+import os
+import random
+import subprocess
+import sys
+import wave
+
+TAKC_BIN = os.environ.get("TAKC_BIN", "./build/bin/takc")
+TAKC_EXE = os.environ.get("TAKC_EXE")
+WINE_ENV = {**os.environ, "WINEDEBUG": "-all"}
+OUT_DIR = "test_matrix/loud"
+SAMPLE_RATE = 44100
+N_SAMPLES = SAMPLE_RATE * 2
+BLOCK = SAMPLE_RATE // 4
+PRESETS = ["p0", "p2", "p4"]
+INT16_MAX = 32767
+
+
+def clip(v: float, bits: int) -> int:
+    lim = (1 << (bits - 1)) - 1
+    return max(-lim - 1, min(lim, round(v)))
+
+
+def loud_pair(bits: int, seed: int) -> tuple[list[int], list[int]]:
+    # clipped low-passed noise and a smoothed noisy copy of it: the encoder picks a cross-FIR mode
+    rng = random.Random(seed)
+    scale = 1 << (bits - 16)
+    y = 0.0
+    loud = []
+    for _ in range(N_SAMPLES):
+        y = 0.97 * y + rng.gauss(0, 1)
+        loud.append(clip(10000 * scale * y, bits))
+    copy = []
+    for i in range(N_SAMPLES):
+        avg = sum(loud[max(0, i - k)] for k in range(3)) / 3
+        copy.append(clip(avg + rng.gauss(0, 300) * scale, bits))
+    return loud, copy
+
+
+def scaled_pair(bits: int, seed: int) -> tuple[list[int], list[int]]:
+    # low-passed noise and a scaled noisy copy: modes 4/5, at 24 bit with shifts above 4
+    rng = random.Random(seed)
+    scale = 1 << (bits - 16)
+    y = 0.0
+    src = []
+    for _ in range(N_SAMPLES):
+        y = 0.95 * y + rng.gauss(0, 1)
+        src.append(clip(1500 * scale * y, bits))
+    copy = [clip(0.6 * v + rng.gauss(0, 20) * scale, bits) for v in src]
+    return src, copy
+
+
+def clamp_pair(bits: int, seed: int) -> tuple[list[int], list[int]]:
+    # quiet white noise and a copy amplified past 8x: the best cross-FIR coefficient is the limit -8192
+    rng = random.Random(seed)
+    scale = 1 << (bits - 16)
+    quiet, amplified = [], []
+    for i in range(N_SAMPLES):
+        block = i // BLOCK
+        x = rng.gauss(0, 2 + block % 4 * 2) * scale
+        quiet.append(clip(x, bits))
+        amplified.append(clip(-(8.3 + block // 4 * 0.4) * x, bits))
+    return quiet, amplified
+
+
+def write_wav(path: str, ch1: list[int], ch2: list[int], bits: int) -> None:
+    width = bits // 8
+    data = bytearray()
+    for a, b in zip(ch1, ch2):
+        data += a.to_bytes(width, "little", signed=True)
+        data += b.to_bytes(width, "little", signed=True)
+    with wave.open(path, "wb") as w:
+        w.setnchannels(2)
+        w.setsampwidth(width)
+        w.setframerate(SAMPLE_RATE)
+        w.writeframes(bytes(data))
+
+
+def compare(src: str, dec: str) -> tuple[bool, list[str]]:
+    if not os.path.exists(dec):
+        return False, ["output file missing"]
+    try:
+        with wave.open(src, "rb") as a, wave.open(dec, "rb") as b:
+            pa, pb = a.getparams()[:4], b.getparams()[:4]
+            if pa != pb:
+                return False, [f"format differs: source {pa}, decoded {pb}"]
+            raw_a, raw_b = a.readframes(pa[3]), b.readframes(pb[3])
+    except Exception as e:
+        return False, [f"unreadable: {e}"]
+    if raw_a == raw_b:
+        return True, []
+
+    channels, width = pa[0], pa[1]
+    count = len(raw_a) // width
+
+    def sample(raw: bytes, i: int) -> int:
+        return int.from_bytes(raw[i * width:(i + 1) * width], "little", signed=width > 1)
+
+    diffs = [i for i in range(count) if raw_a[i * width:(i + 1) * width] != raw_b[i * width:(i + 1) * width]]
+    first = diffs[0]
+    per_ch = [sum(1 for i in diffs if i % channels == c) for c in range(channels)]
+    blocks = sorted({i // channels // BLOCK for i in diffs})
+    near = [(sample(raw_a, i), sample(raw_b, i)) for i in range(first, min(first + 4 * channels, count), channels)]
+    return False, [
+        f"{len(diffs)} of {count} samples differ, per channel {per_ch}",
+        f"first at frame {first // channels} channel {first % channels} "
+        f"(250 ms block {first // channels // BLOCK}, offset {first // channels % BLOCK})",
+        f"250 ms blocks hit: {blocks}",
+        f"source/decoded on that channel from there: {near}",
+    ]
+
+
+def run_cmd(cmd: list[str], env: dict | None = None) -> tuple[bool, str]:
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=120, env=env)
+        return res.returncode == 0, (res.stdout + res.stderr).strip()
+    except subprocess.TimeoutExpired:
+        return False, "TIMEOUT"
+
+
+def decode_check(cmd: list[str], src: str, dec: str, env: dict | None = None) -> tuple[str, list[str]]:
+    if os.path.exists(dec):
+        os.remove(dec)
+    ok, out = run_cmd(cmd, env)
+    tail = [f"output: {line}" for line in out.splitlines()[-3:]]
+    if not ok:
+        return ("TIMEOUT" if out == "TIMEOUT" else "FAIL"), tail
+    same, notes = compare(src, dec)
+    return ("PASS", []) if same else ("BAD", notes + tail)
+
+
+def decoders(tak: str, src: str) -> list[tuple[str, str, list[str]]]:
+    base = tak[:-4]
+    out = [("ours", *decode_check([TAKC_BIN, "-d", "-overwrite", "-q", tak, f"{base}_by_ours.wav"],
+                                   src, f"{base}_by_ours.wav"))]
+    if TAKC_EXE:
+        out.append(("takc.exe", *decode_check(["wine", TAKC_EXE, "-d", "-overwrite", tak, f"{base}_by_exe.wav"],
+                                              src, f"{base}_by_exe.wav", WINE_ENV)))
+    return out
+
+
+def run() -> int:
+    os.makedirs(OUT_DIR, exist_ok=True)
+    names = ["ours"] + (["takc.exe"] if TAKC_EXE else [])
+    header = f"{'SIGNAL':<18} {'ENCODER':<12} {'Enc':<7} " + " ".join(f"{d:<9}" for d in names)
+    print(header)
+    print("-" * len(header))
+
+    cases = []
+    for bits in (16, 24):
+        loud, copy = loud_pair(bits, seed=1234)
+        # without jumps beyond int16 the encoder never has to keep modes 4-7 inside int16
+        jump = max(abs(loud[i] - loud[i - 1]) for i in range(1, N_SAMPLES))
+        if jump <= INT16_MAX:
+            print(f"signal too quiet for this test: largest jump {jump} at {bits} bit")
+            return 1
+        scaled, scaled_copy = scaled_pair(bits, seed=7)
+        quiet, amplified = clamp_pair(bits, seed=5)
+        for kind, a, b in (("loud", loud, copy), ("scaled", scaled, scaled_copy), ("clamp", quiet, amplified)):
+            cases.append((f"{bits}b_{kind}_left", a, b, bits))
+            cases.append((f"{bits}b_{kind}_right", b, a, bits))
+
+    failures = 0
+    total = 0
+    for name, ch1, ch2, bits in cases:
+        wav_path = f"{OUT_DIR}/{name}.wav"
+        write_wav(wav_path, ch1, ch2, bits)
+
+        encoders = [(f"ours -{p}", [TAKC_BIN, f"-{p}", "-e", "-overwrite", "-q"], f"{name}_{p}.tak", None)
+                    for p in PRESETS]
+        if TAKC_EXE:
+            encoders.append(("takc.exe", ["wine", TAKC_EXE, "-e", "-overwrite"], f"{name}_exe.tak", WINE_ENV))
+
+        for label, cmd, tak_name, env in encoders:
+            total += 1
+            tak_path = f"{OUT_DIR}/{tak_name}"
+            if os.path.exists(tak_path):
+                os.remove(tak_path)
+            enc_ok, enc_out = run_cmd(cmd + [wav_path, tak_path], env)
+            if not enc_ok:
+                print(f"{name:<18} {label:<12} {'FAIL':<7}")
+                for line in enc_out.splitlines()[-3:]:
+                    print(f"    [enc] {line[:160]}")
+                failures += 1
+                continue
+
+            results = decoders(tak_path, wav_path)
+            if any(r != "PASS" for _, r, _ in results):
+                failures += 1
+            print(f"{name:<18} {label:<12} {'OK':<7} " + " ".join(f"{r:<9}" for _, r, _ in results))
+            for dec_name, _, notes in results:
+                for note in notes:
+                    print(f"    [{dec_name}] {note[:200]}")
+
+    print()
+    print(f"Results: {total - failures}/{total} passed.")
+    if failures:
+        print(f"FAILED: {failures} test(s) failed.")
+    else:
+        print("All tests passed.")
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    sys.exit(run())
